@@ -1,0 +1,10 @@
+name: Paradex Rate Limits
+generated: '2026-10-13'
+method: searched
+source: https://docs.paradex.trade/api/general-information/rate-limits/api.md
+limits:
+- {name: Public default, limit_text: 1500 req/m, max: 1500, window: minute, scope: IP address}
+- {name: POST /onboarding, endpoint: POST /onboarding, limit_text: 600 req/m, max: 600, window: minute, scope: IP address}
+- {name: POST /auth, endpoint: POST /auth, limit_text: 600 req/m, max: 600, window: minute, scope: IP address}
+- {name: Order writes, endpoint: 'POST, DELETE, PUT /orders', limit_text: 800 req/s OR 17250 req/m, scope: Account}
+- {name: Private reads, endpoint: GET /*, limit_text: 120 req/s OR 600 req/m, scope: Account}

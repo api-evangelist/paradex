@@ -1,23 +1,150 @@
 aid: paradex
 name: Paradex
-description: 'Paradex is a company surfaced via the API Evangelist harvest backlog (source: market-gap:crypto-exchanges)
-  and added to the network as a stub for full-pipeline profiling.'
+image: https://cdn.prod.website-files.com/632b1650d518e93de132751a/67dc06a9c7c21f316cefbf02_og%20--%20home-prdx%20-%20new.webp
+description: Paradex is a perpetual futures decentralized exchange (perp DEX) built
+  on its own Starknet appchain, offering zero-fee trading of crypto, equities, FX
+  and commodity perpetuals and options. It exposes a public REST API, a WebSocket
+  API described in AsyncAPI, official Python and TypeScript SDKs, and hosted MCP servers
+  for AI agents.
 url: https://raw.githubusercontent.com/api-evangelist/paradex/refs/heads/main/apis.yml
 x-type: company
 x-source: harvest:market-gap:crypto-exchanges
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
+x-tier-reason: enrichment pass 2026-10-13 (local-v5; was harvest)
 specificationVersion: '0.20'
 created: '2026-10-13'
 modified: '2026-10-13'
 tags:
 - Company
-apis: []
+- Cryptocurrency
+- Exchanges
+- Derivatives
+- Trading
+- Perpetual Futures
+- DeFi
+- WebSockets
+- MCP
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: AgenticAccess
+  url: agentic-access/paradex-agentic-access.yml
+- type: RateLimits
+  url: rate-limits/paradex-rate-limits.yml
+- type: Spectral
+  url: rules/paradex-rules.yml
+- type: JSONLD
+  url: json-ld/paradex-context.jsonld
+- type: Vocabulary
+  url: vocabulary/paradex-vocabulary.yml
+- type: DataModel
+  url: data-model/paradex-data-model.yml
+- type: ErrorCatalog
+  url: errors/paradex-problem-types.yml
+- type: Conformance
+  url: conformance/paradex-conformance.yml
+- type: LLMsTxt
+  url: llms/paradex-llms.txt
+- type: ToolCrosswalk
+  url: mcp/paradex-tool-crosswalk.yml
+- type: MCPServer
+  url: mcp/paradex-mcp.yml
+- type: WellKnown
+  url: well-known/paradex-well-known.yml
+- type: Hosts
+  url: hosts/paradex-hosts.yml
+- type: Vendors
+  url: vendors/paradex-vendors.yml
+- type: SDKs
+  url: packages/paradex-packages.yml
+- type: Packages
+  url: packages/paradex-packages.yml
+- type: Authentication
+  url: authentication/paradex-authentication.yml
+- type: DomainSecurity
+  url: security/paradex-domain-security.yml
 - type: Website
   url: https://www.paradex.trade
+- type: Documentation
+  url: https://docs.paradex.trade/
+- type: GettingStarted
+  url: https://docs.paradex.trade/docs/getting-started/what-is-paradex
+- type: APIReference
+  url: https://docs.paradex.trade/api/general-information/api-quick-start
+- type: Blog
+  url: https://www.paradex.trade/blog
+- type: ChangeLog
+  url: https://docs.paradex.trade/releases/changelog
+- type: GitHubOrganization
+  url: https://github.com/tradeparadex
+- type: Login
+  url: https://app.paradex.trade/
+- type: PrivacyPolicy
+  url: https://www.paradex.trade/privacy-policy
+- type: TermsOfService
+  url: https://www.paradex.trade/terms-of-service
+- type: Pricing
+  url: https://docs.paradex.trade/trading/trading-fees
+- type: StatusPage
+  url: https://status.paradex.trade
+apis:
+- name: Paradex REST API
+  description: Public and private REST endpoints for markets, order books, trades,
+    orders, accounts, positions, vaults, block trades, RFQs and transfers on Paradex.
+  humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
+  baseURL: https://api.prod.paradex.trade/v1
+  tags:
+  - Trading
+  - Derivatives
+  properties:
+  - type: OpenAPI
+    url: openapi/paradex-openapi.yml
+  - type: OpenAPI
+    name: OpenAPI (provider-hosted)
+    url: https://raw.githubusercontent.com/tradeparadex/paradex-docs/main/fern/apis/prod_rest/openapi/openapi.json
+  - type: Documentation
+    url: https://docs.paradex.trade/api/general-information/api-quick-start
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-vault-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-system-config-response-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-transfer-result-schema.json
+  aid: paradex:paradex-rest-api
+- name: Paradex WebSocket API
+  description: JSON-RPC over WebSocket channels for real-time market data, order book,
+    trades, fills, orders, positions and account updates.
+  humanURL: https://docs.paradex.trade/ws/general-information/introduction
+  baseURL: wss://ws.api.prod.paradex.trade/v1
+  tags:
+  - WebSockets
+  properties:
+  - type: AsyncAPI
+    url: asyncapi/paradex-websocket-asyncapi.yml
+  - type: AsyncAPI
+    name: AsyncAPI (provider-hosted)
+    url: https://docs.paradex.trade/asyncapi.json
+  aid: paradex:paradex-websocket-api
+- name: Paradex MCP Server
+  description: Paradex-hosted public remote MCP server exposing market and vault data
+    tools to AI clients; also distributed as the mcp-paradex Python package.
+  humanURL: https://docs.paradex.trade/agentic-ai-hub/paradex-hosted-mcp/quickstart
+  baseURL: https://mcp.paradex.trade/mcp
+  tags:
+  - MCP
+  properties: []
+  aid: paradex:paradex-mcp-server
+x-enrichment:
+  date: '2026-10-13'
+  status: enriched
+  artifacts_added: 33
+  pass: local-v5

@@ -1,0 +1,64 @@
+generated: '2026-10-13'
+method: derived
+generator: derive-problem-types.py
+source:
+- openapi/paradex-openapi.yml
+format: custom
+envelope:
+  media_type: application/json
+  schema: responses.ApiError
+coverage:
+  operations: 133
+  statuses_declared: 7
+problems:
+- status: 400
+  title: Bad Request
+  description: Bad Request
+  operations: 108
+  media_types:
+  - application/json
+  - image/png
+  schema: responses.ApiError
+- status: 401
+  title: Unauthorized
+  description: Unauthorized
+  operations: 56
+  media_types:
+  - application/json
+  - image/png
+  schema: responses.ApiError
+- status: 403
+  title: Forbidden
+  description: Forbidden
+  operations: 30
+  media_types:
+  - application/json
+  schema: responses.ApiError
+- status: 404
+  title: Not Found
+  description: Not Found
+  operations: 25
+  media_types:
+  - application/json
+  schema: responses.ApiError
+- status: 409
+  title: Conflict
+  description: Conflict
+  operations: 2
+  media_types:
+  - application/json
+  schema: responses.ApiError
+- status: 500
+  title: Internal Server Error
+  description: Internal Server Error
+  operations: 1
+  media_types:
+  - application/json
+  schema: responses.ApiError
+- status: 503
+  title: Service Unavailable
+  description: Service Unavailable
+  operations: 4
+  media_types:
+  - application/json
+  schema: responses.ApiError

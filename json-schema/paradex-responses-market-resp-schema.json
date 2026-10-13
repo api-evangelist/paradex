@@ -1,0 +1,379 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/paradex/main/json-schema/paradex-responses-market-resp-schema.json",
+  "title": "responses.MarketResp",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/paradex-openapi.yml#/components/schemas/responses.MarketResp",
+  "type": "object",
+  "properties": {
+    "asset_kind": {
+      "description": "Type of asset",
+      "enum": [
+        "PERP",
+        "PERP_OPTION",
+        "SPOT"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/responses.AssetKind"
+        }
+      ]
+    },
+    "base_currency": {
+      "description": "Base currency of the market",
+      "type": "string"
+    },
+    "clamp_rate": {
+      "description": "Clamp rate",
+      "type": "string"
+    },
+    "delta1_cross_margin_params": {
+      "description": "Delta1 Cross margin parameters",
+      "allOf": [
+        {
+          "$ref": "#/$defs/responses.Delta1CrossMarginParams"
+        }
+      ]
+    },
+    "expiry_at": {
+      "description": "Market expiry time",
+      "type": "integer"
+    },
+    "fee_config": {
+      "description": "Fee config indicates override fee for the market. If not set, it will use the global exchange fee config",
+      "allOf": [
+        {
+          "$ref": "#/$defs/responses.MarketFeeConfig"
+        }
+      ]
+    },
+    "funding_multiplier": {
+      "description": "Funding multiplier",
+      "type": "number"
+    },
+    "funding_period_hours": {
+      "description": "Funding period in hours",
+      "type": "number"
+    },
+    "interest_rate": {
+      "description": "Interest rate",
+      "type": "string"
+    },
+    "iv_bands_width": {
+      "description": "IV Bands Width",
+      "type": "string"
+    },
+    "market_kind": {
+      "description": "Market's margin mode",
+      "enum": [
+        "cross",
+        "isolated",
+        "isolated_margin"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/responses.MarketKind"
+        }
+      ]
+    },
+    "max_funding_rate": {
+      "description": "Max funding rate",
+      "type": "string"
+    },
+    "max_funding_rate_change": {
+      "description": "Max funding rate change",
+      "type": "string"
+    },
+    "max_open_orders": {
+      "description": "Max open orders",
+      "type": "integer"
+    },
+    "max_order_size": {
+      "description": "Maximum order size in base currency",
+      "type": "string"
+    },
+    "max_slippage": {
+      "description": "Default max slippage allowed for the market",
+      "type": "string"
+    },
+    "max_tob_spread": {
+      "description": "The maximum TOB spread allowed to apply funding rate changes",
+      "type": "string"
+    },
+    "min_notional": {
+      "description": "Minimum order notional in USD. For futures: size*mark_price, for options: size*spot_price",
+      "type": "string"
+    },
+    "open_at": {
+      "description": "Market open time in milliseconds",
+      "type": "integer"
+    },
+    "option_cross_margin_params": {
+      "description": "Option Cross margin parameters",
+      "allOf": [
+        {
+          "$ref": "#/$defs/responses.OptionCrossMarginParams"
+        }
+      ]
+    },
+    "option_spread_margin_params": {
+      "description": "Same-expiry option spread offset scales",
+      "allOf": [
+        {
+          "$ref": "#/$defs/responses.OptionSpreadMarginParams"
+        }
+      ]
+    },
+    "option_type": {
+      "description": "Type of option",
+      "type": "string",
+      "enum": [
+        "PUT",
+        "CALL"
+      ]
+    },
+    "oracle_ewma_factor": {
+      "description": "Oracle EWMA factor",
+      "type": "string"
+    },
+    "order_size_increment": {
+      "description": "Minimum size increment for base currency",
+      "type": "string"
+    },
+    "position_limit": {
+      "description": "Position limit in base currency",
+      "type": "string"
+    },
+    "price_bands_width": {
+      "description": "Price Bands Width, 0.05 means 5% price deviation allowed from mark price",
+      "type": "string"
+    },
+    "price_feed_id": {
+      "description": "Price feed id. Pyth price account used to price underlying asset",
+      "type": "string"
+    },
+    "price_tick_size": {
+      "description": "Minimum price increment of the market in USD",
+      "type": "string"
+    },
+    "quote_currency": {
+      "description": "Quote currency of the market",
+      "type": "string"
+    },
+    "settlement_currency": {
+      "description": "Settlement currency of the market",
+      "type": "string"
+    },
+    "strike_price": {
+      "description": "Strike price for option market",
+      "type": "string"
+    },
+    "symbol": {
+      "description": "Market symbol",
+      "type": "string"
+    },
+    "tags": {
+      "description": "Market tags",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "trading_mode": {
+      "description": "Order-entry mode. STANDARD accepts on-book orders; RFQ_ONLY rejects them and accepts only block-trade legs from RFQ settlement.",
+      "enum": [
+        "STANDARD",
+        "RFQ_ONLY"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/responses.TradingMode"
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "responses.AssetKind": {
+      "type": "string",
+      "enum": [
+        "PERP",
+        "PERP_OPTION",
+        "SPOT",
+        "OPTION",
+        "FUTURE"
+      ],
+      "x-enum-varnames": [
+        "AssetKindPerp",
+        "AssetKindPerpOption",
+        "AssetKindSpot",
+        "AssetKindOption",
+        "AssetKindFuture"
+      ]
+    },
+    "responses.Delta1CrossMarginParams": {
+      "type": "object",
+      "properties": {
+        "imf_base": {
+          "description": "Initial Margin Base",
+          "type": "string"
+        },
+        "imf_factor": {
+          "description": "Initial Margin Factor, always 0.",
+          "type": "string"
+        },
+        "imf_shift": {
+          "description": "Initial Margin Shift, unused, always 0.",
+          "type": "string"
+        },
+        "mmf_factor": {
+          "description": "Maintenance Margin Factor",
+          "type": "string"
+        }
+      }
+    },
+    "responses.FeeWithCap": {
+      "type": "object",
+      "properties": {
+        "fee": {
+          "description": "fee rate",
+          "type": "string"
+        },
+        "fee_cap": {
+          "description": "fee cap (used for option)",
+          "type": "string"
+        },
+        "fee_floor": {
+          "description": "fee floor (used for option)",
+          "type": "string"
+        }
+      }
+    },
+    "responses.MakerTakerFee": {
+      "type": "object",
+      "properties": {
+        "maker_fee": {
+          "description": "fee for maker",
+          "allOf": [
+            {
+              "$ref": "#/$defs/responses.FeeWithCap"
+            }
+          ]
+        },
+        "taker_fee": {
+          "description": "fee for taker",
+          "allOf": [
+            {
+              "$ref": "#/$defs/responses.FeeWithCap"
+            }
+          ]
+        }
+      }
+    },
+    "responses.MarketFeeConfig": {
+      "type": "object",
+      "properties": {
+        "api_fee": {
+          "description": "fee for order coming from API",
+          "allOf": [
+            {
+              "$ref": "#/$defs/responses.MakerTakerFee"
+            }
+          ]
+        },
+        "interactive_fee": {
+          "description": "fee for order coming from UI",
+          "allOf": [
+            {
+              "$ref": "#/$defs/responses.MakerTakerFee"
+            }
+          ]
+        },
+        "rpi_fee": {
+          "description": "fee for order coming from API with RPI instruction",
+          "allOf": [
+            {
+              "$ref": "#/$defs/responses.MakerTakerFee"
+            }
+          ]
+        }
+      }
+    },
+    "responses.MarketKind": {
+      "type": "string",
+      "enum": [
+        "",
+        "cross",
+        "isolated",
+        "isolated_margin"
+      ],
+      "x-enum-varnames": [
+        "MarketKindUnknown",
+        "MarketKindCross",
+        "MarketKindIsolated",
+        "MarketKindIsolatedMargin"
+      ]
+    },
+    "responses.OptionCrossMarginParams": {
+      "type": "object",
+      "properties": {
+        "imf": {
+          "$ref": "#/$defs/responses.OptionMarginParams"
+        },
+        "mmf": {
+          "$ref": "#/$defs/responses.OptionMarginParams"
+        }
+      }
+    },
+    "responses.OptionMarginParams": {
+      "type": "object",
+      "properties": {
+        "long_itm": {
+          "description": "Margin fraction for long ITM options",
+          "type": "string"
+        },
+        "premium_multiplier": {
+          "description": "Multiplier for margin fraction for premium",
+          "type": "string"
+        },
+        "short_itm": {
+          "description": "Margin fraction for short ITM options",
+          "type": "string"
+        },
+        "short_otm": {
+          "description": "Margin fraction for short OTM options",
+          "type": "string"
+        },
+        "short_put_cap": {
+          "description": "Cap for margin fraction for short put options",
+          "type": "string"
+        }
+      }
+    },
+    "responses.OptionSpreadMarginParams": {
+      "type": "object",
+      "properties": {
+        "unpaired_scale_im": {
+          "description": "Initial-margin scale on the unpaired short call reserve",
+          "type": "string"
+        },
+        "unpaired_scale_mm": {
+          "description": "Maintenance-margin scale on the unpaired short call reserve",
+          "type": "string"
+        }
+      }
+    },
+    "responses.TradingMode": {
+      "type": "string",
+      "enum": [
+        "STANDARD",
+        "RFQ_ONLY"
+      ],
+      "x-enum-varnames": [
+        "TradingModeStandard",
+        "TradingModeRfqOnly"
+      ]
+    }
+  }
+}

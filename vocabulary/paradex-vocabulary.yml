@@ -1,0 +1,433 @@
+generated: '2026-10-13'
+method: derived
+generator: derive-vocabulary.py
+source: openapi/paradex-openapi.yml
+vocabulary:
+  name: Paradex Domain Vocabulary
+  description: 'Terms declared by Paradex''s own API contract: its resource groups, objects and enumerations, with the contract''s definitions.
+    Derived, not authored.'
+  version: '2026-10-13'
+  terms:
+  - term: messagesv1.NftPrice
+    definition: 'Object declared by the contract with fields: currency, decimals, value.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/messagesv1.NftPrice
+  - term: requests.AccountMarginRequest
+    definition: 'Object declared by the contract with fields: leverage, margin_type, on_behalf_of_account.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.AccountMarginRequest
+  - term: requests.AccountMmpConfigRequest
+    definition: 'Object declared by the contract with fields: delta_limit, frozen_time_ms, interval_ms, protect_block_trades, size_limit, vega_limit.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.AccountMmpConfigRequest
+  - term: requests.AccountMmpResetRequest
+    definition: 'Object declared by the contract with fields: base_asset.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.AccountMmpResetRequest
+  - term: requests.ActivateSubkey
+    definition: 'Object declared by the contract with fields: account_id, name, public_key, signature, timestamp.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.ActivateSubkey
+  - term: requests.ActivateSubkeyResponse
+    definition: 'Object declared by the contract with fields: encrypted_key.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.ActivateSubkeyResponse
+  - term: requests.AlgoOrderRequest
+    definition: 'Object declared by the contract with fields: algo_type, dime_discount, duration_seconds, frequency, market, on_behalf_of_account,
+      recv_window, side, signature, signature_timestamp, size, type.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.AlgoOrderRequest
+  - term: requests.BlockExecuteRequest
+    definition: 'Object declared by the contract with fields: execution_nonce, selected_offers, signatures.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.BlockExecuteRequest
+  - term: requests.BlockOfferInfo
+    definition: 'Object declared by the contract with fields: offerer_order, price, size.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.BlockOfferInfo
+  - term: requests.BlockOfferRequest
+    definition: 'Object declared by the contract with fields: nonce, offering_account, signature, trades.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.BlockOfferRequest
+  - term: requests.BlockTradeInfo
+    definition: 'Object declared by the contract with fields: maker_order, price, size, taker_order, trade_constraints.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.BlockTradeInfo
+  - term: requests.BlockTradeRequest
+    definition: 'Object declared by the contract with fields: block_expiration, nonce, required_signers, signatures, trades.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.BlockTradeRequest
+  - term: requests.CancelOrderBatchRequest
+    definition: 'Object declared by the contract with fields: client_order_ids, order_ids.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.CancelOrderBatchRequest
+  - term: requests.CreateSubkey
+    definition: 'Object declared by the contract with fields: allowed_cidrs, encrypted_key, eph_public_key, evm_signature, name, public_key, signature,
+      signature_expiry, signature_timestamp, siwe_message, state.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.CreateSubkey
+  - term: requests.CreateToken
+    definition: 'Object declared by the contract with fields: allowed_cidrs, expiry_duration, name, token_type.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.CreateToken
+  - term: requests.CreateVault
+    definition: 'Object declared by the contract with fields: curator_name, deposit_tx_signature, description, lockup_period, max_tvl, name, operator_eth_address,
+      operator_index, operator_signer_type, profit_share, public_key, show_balances. (2 more)'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.CreateVault
+  - term: requests.CreateXPTransferRequest
+    definition: 'Object declared by the contract with fields: amount, is_private, recipient, season.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.CreateXPTransferRequest
+  - term: requests.ModifyOrderRequest
+    definition: 'Object declared by the contract with fields: id, market, on_behalf_of_account, price, side, signature, signature_timestamp, size,
+      trigger_price, type.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.ModifyOrderRequest
+  - term: requests.Onboarding
+    definition: 'Object declared by the contract with fields: marketing_code, portfolio_margin, public_key, referral_code, utm.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.Onboarding
+  - term: requests.OrderRequest
+    definition: 'Object declared by the contract with fields: client_id, dime_discount, flags, instruction, market, on_behalf_of_account, price,
+      recv_window, side, signature, signature_timestamp, size. (4 more)'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.OrderRequest
+  - term: requests.PriceKind
+    definition: 'Enumeration declared by the contract with values: last, mark, underlying.'
+    tags:
+    - Enumeration
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.PriceKind
+  - term: requests.RecordComplianceActionRequest
+    definition: 'Object declared by the contract with fields: action_type, action_version.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.RecordComplianceActionRequest
+  - term: requests.RfqCreateRequest
+    definition: 'Object declared by the contract with fields: counterparties, is_anonymous, label, legs, max_slippage, quantity, side, strategy.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.RfqCreateRequest
+  - term: requests.RfqExecuteRequest
+    definition: 'Object declared by the contract with fields: label, price, quantity, side.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.RfqExecuteRequest
+  - term: requests.RfqLeg
+    definition: 'Object declared by the contract with fields: market, price, ratio, side.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.RfqLeg
+  - term: requests.UpdateAccountMaxSlippageRequest
+    definition: 'Object declared by the contract with fields: max_slippage.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.UpdateAccountMaxSlippageRequest
+  - term: requests.UpdateAccountProfileRequest
+    definition: 'Object declared by the contract with fields: ai_agent_url, announcements, fill_sound, fills, is_username_private, max_slippage,
+      orders, referral_code, referred_by, size_currency_display, tap_share_rate, trading_value_display. (3 more)'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.UpdateAccountProfileRequest
+  - term: requests.UpdateAllowedCIDRs
+    definition: 'Object declared by the contract with fields: allowed_cidrs.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.UpdateAllowedCIDRs
+  - term: requests.UpdateNotificationPreferencesRequest
+    definition: 'Object declared by the contract with fields: announcements, fill_sound, fills, orders, transfers.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.UpdateNotificationPreferencesRequest
+  - term: requests.UpdateSizeCurrencyDisplayRequest
+    definition: 'Object declared by the contract with fields: size_currency_display.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.UpdateSizeCurrencyDisplayRequest
+  - term: requests.UpdateSubkey
+    definition: 'Object declared by the contract with fields: name.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.UpdateSubkey
+  - term: requests.UpdateSubkeyBlockTradeSigning
+    definition: 'Object declared by the contract with fields: enabled.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.UpdateSubkeyBlockTradeSigning
+  - term: requests.UpdateTradingValueDisplayRequest
+    definition: 'Object declared by the contract with fields: trading_value_display.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.UpdateTradingValueDisplayRequest
+  - term: requests.Utm
+    definition: 'Object declared by the contract with fields: campaign, source, type.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/requests.Utm
+  - term: responses.APIResults
+    definition: 'Object declared by the contract with fields: results.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.APIResults
+  - term: responses.AccountAnalytics
+    definition: 'Object declared by the contract with fields: account_address, annualized_volatility, apr, apr_simple_itd, cum_return, cumulative_pnl_series,
+      cumulative_pnl_usd, end_value, hourly_cumulative_pnl_series, max_dd, max_drawdown_to_date, monthly_pnl_last_12m. (6 more)'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.AccountAnalytics
+  - term: responses.AccountDailyPnlPoint
+    definition: 'Object declared by the contract with fields: day, value.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.AccountDailyPnlPoint
+  - term: responses.AccountHistoricalDataResp
+    definition: 'Object declared by the contract with fields: data, timestamps.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.AccountHistoricalDataResp
+  - term: responses.AccountHourlyPnlPoint
+    definition: 'Object declared by the contract with fields: at, value.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.AccountHourlyPnlPoint
+  - term: responses.AccountInfoResponse
+    definition: 'Object declared by the contract with fields: account, created_at, derivation_path, fees, has_ecosystem_nft, isolated_market,
+      kind, parent_account, public_key, username, volume_tiers.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.AccountInfoResponse
+  - term: responses.AccountKind
+    definition: 'Enumeration declared by the contract with values: , main, subaccount, vault_operator, vault_sub_operator.'
+    tags:
+    - Enumeration
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.AccountKind
+  - term: responses.AccountMarginEntry
+    definition: 'Object declared by the contract with fields: isolated_margin_leverage, leverage, margin_type, market.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.AccountMarginEntry
+  - term: responses.AccountMmpConfigResp
+    definition: 'Object declared by the contract with fields: base_asset, delta_limit, frozen_time_ms, frozen_until, interval_ms, is_frozen, protect_block_trades,
+      size_limit, updated_at, vega_limit, window_delta, window_size. (1 more)'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.AccountMmpConfigResp
+  - term: responses.AccountMmpResetRefusedData
+    definition: 'Object declared by the contract with fields: refused, reset.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.AccountMmpResetRefusedData
+  - term: responses.AccountMmpResetResp
+    definition: 'Object declared by the contract with fields: results.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.AccountMmpResetResp
+  - term: responses.AccountMmpResetResult
+    definition: 'Object declared by the contract with fields: base_asset, reset_at.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.AccountMmpResetResult
+  - term: responses.AccountMonthlyPnlEntry
+    definition: 'Object declared by the contract with fields: month, month_return_canonical.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.AccountMonthlyPnlEntry
+  - term: responses.AccountProfileResp
+    definition: 'Object declared by the contract with fields: ai_agent_url, discord, is_username_private, last_seen_notification, market_max_slippage,
+      marketed_by, nfts, notifications, referral, referral_code, referred_by, size_currency_display. (6 more)'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.AccountProfileResp
+  - term: responses.AccountSettingsResp
+    definition: 'Object declared by the contract with fields: trading_value_display.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.AccountSettingsResp
+  - term: responses.AccountSummaryResponse
+    definition: 'Object declared by the contract with fields: account, account_value, free_collateral, initial_margin_requirement, last_seen_notification,
+      maintenance_margin_requirement, margin_cushion, seq_no, settlement_asset, status, total_collateral, updated_at.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.AccountSummaryResponse
+  - term: responses.AlgoOrderResp
+    definition: 'Object declared by the contract with fields: account, algo_params, algo_type, avg_fill_price, cancel_reason, created_at, end_at,
+      id, last_updated_at, market, remaining_size, side. (2 more)'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.AlgoOrderResp
+  - term: responses.AlgoType
+    definition: 'Enumeration declared by the contract with values: , TWAP.'
+    tags:
+    - Enumeration
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.AlgoType
+  - term: responses.Announcement
+    definition: 'Object declared by the contract with fields: content, expiry_at, kind, notification_expiry_at, title, visible_at.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.Announcement
+  - term: responses.AnnouncementKind
+    definition: 'Enumeration declared by the contract with values: UPDATE, LISTING, DELISTING.'
+    tags:
+    - Enumeration
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.AnnouncementKind
+  - term: responses.ApiError
+    definition: 'Object declared by the contract with fields: data, error, message.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.ApiError
+  - term: responses.ApiToken
+    definition: 'Object declared by the contract with fields: allowed_cidrs, created_at, expiry_at, kind, last_updated_at, lookup_id, name, revoked_at,
+      token_id.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.ApiToken
+  - term: responses.AskBidArray
+    definition: 'Object declared by the contract with fields: asks, best_ask_api, best_ask_interactive, best_bid_api, best_bid_interactive, bids,
+      last_updated_at, market, seq_no.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.AskBidArray
+  - term: responses.AssetKind
+    definition: 'Enumeration declared by the contract with values: PERP, PERP_OPTION, SPOT, OPTION, FUTURE.'
+    tags:
+    - Enumeration
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.AssetKind
+  - term: responses.AuthResp
+    definition: 'Object declared by the contract with fields: jwt_token.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.AuthResp
+  - term: responses.BBOResp
+    definition: 'Object declared by the contract with fields: ask, ask_size, bid, bid_size, last_updated_at, market, seq_no.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.BBOResp
+  - term: responses.BalanceResp
+    definition: 'Object declared by the contract with fields: average_entry_price, average_entry_price_usd, cost, cost_usd, last_updated_at, size,
+      token.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.BalanceResp
+  - term: responses.BatchResponse
+    definition: 'Object declared by the contract with fields: errors, orders.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.BatchResponse
+  - term: responses.BlockTradeConstraints
+    definition: 'Object declared by the contract with fields: max_price, max_size, min_price, min_size.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.BlockTradeConstraints
+  - term: responses.BlockTradeDetailFullResponse
+    definition: 'Object declared by the contract with fields: block_expiration, block_id, block_type, created_at, failure_reason, initiator, last_updated_at,
+      nonce, parent_block_id, required_signers, signatures, status. (1 more)'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.BlockTradeDetailFullResponse
+  - term: responses.BlockTradeDetailResponse
+    definition: 'Object declared by the contract with fields: executed_at, failure_reason, maker_account, maker_fill, maker_order, market, price,
+      size, taker_account, taker_fill, taker_order, trade_constraints. (1 more)'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.BlockTradeDetailResponse
+  - term: responses.BlockTradeOrder
+    definition: 'Object declared by the contract with fields: account, client_id, flags, market, price, side, signature, signature_timestamp,
+      size, type.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.BlockTradeOrder
+  - term: responses.BlockTradeSignature
+    definition: 'Object declared by the contract with fields: nonce, signature_data, signature_expiration, signature_timestamp, signature_type,
+      signer_account, signer_public_key.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.BlockTradeSignature
+  - term: responses.BlockTradeStatus
+    definition: 'Enumeration declared by the contract with values: CREATED, OFFER_COLLECTION, READY_TO_EXECUTE, EXECUTING, PENDING_SETTLEMENT,
+      COMPLETED, FAILED, CANCELLED.'
+    tags:
+    - Enumeration
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.BlockTradeStatus
+  - term: responses.BlockTradeType
+    definition: 'Enumeration declared by the contract with values: DIRECT, OFFER_BASED.'
+    tags:
+    - Enumeration
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.BlockTradeType
+  - term: responses.BridgedToken
+    definition: 'Object declared by the contract with fields: decimals, l1_bridge_address, l1_token_address, l2_bridge_address, l2_token_address,
+      name, symbol.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.BridgedToken
+  - term: responses.CancelOrderBatchResponse
+    definition: 'Object declared by the contract with fields: results.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.CancelOrderBatchResponse
+  - term: responses.CancelOrderResult
+    definition: 'Object declared by the contract with fields: account, client_id, id, market, status.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.CancelOrderResult
+  - term: responses.ComplianceActionResp
+    definition: 'Object declared by the contract with fields: action_type, action_version, created_at.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.ComplianceActionResp
+  - term: responses.CreateTokenResponse
+    definition: 'Object declared by the contract with fields: api_token, token.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.CreateTokenResponse
+  - term: responses.CreateTransferResponse
+    definition: 'Object declared by the contract with fields: transfer.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.CreateTransferResponse
+  - term: responses.Delta1CrossMarginParams
+    definition: 'Object declared by the contract with fields: imf_base, imf_factor, imf_shift, mmf_factor.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.Delta1CrossMarginParams
+  - term: responses.DiscordProfile
+    definition: 'Object declared by the contract with fields: id, image_url, username.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.DiscordProfile
+  - term: responses.ErrorCode
+    definition: 'Enumeration declared by the contract with values: VALIDATION_ERROR, BINDING_ERROR, INTERNAL_ERROR, NOT_FOUND, SERVICE_UNAVAILABLE,
+      INVALID_REQUEST_PARAMETER, ORDER_ID_NOT_FOUND, ORDER_IS_CLOSED, ORDER_IS_NOT_OPEN, INVALID_ORDER_SIZE, CLIENT_ORDER_ID_NOT_FOUND, DUPLICATED_CLIENT_ID.
+      (108 more)'
+    tags:
+    - Enumeration
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.ErrorCode
+  - term: responses.ErrorResponse
+    definition: 'Object declared by the contract with fields: error, message.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.ErrorResponse
+  - term: responses.FeeWithCap
+    definition: 'Object declared by the contract with fields: fee, fee_cap, fee_floor.'
+    tags:
+    - Object
+    source: openapi/paradex-openapi.yml#/components/schemas/responses.FeeWithCap

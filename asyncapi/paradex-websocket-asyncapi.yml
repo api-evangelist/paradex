@@ -1,0 +1,3051 @@
+asyncapi: 2.6.0
+info:
+    title: WebSocket channels
+    version: 1.7.1
+    description: |
+        Channels for real-time updates.
+
+        Public market data channels are delivered as SBE binary frames. Negotiate
+        the encoding with the sbeSchemaId and sbeSchemaVersion query parameters:
+
+            wss://ws.api.prod.paradex.trade/v1?sbeSchemaId=1&sbeSchemaVersion=1
+
+        An unsupported schema or version is rejected with HTTP 400 at connect.
+
+        Requests and control responses (subscribe, unsubscribe, auth, and their
+        acknowledgements and errors) are always JSON-RPC text frames. Only channel
+        payloads are binary, and they carry the same fields documented below.
+
+        Generate a decoder from the schema at
+        https://github.com/tradeparadex/paradex-py/blob/main/paradex_py/api/sbe/paradex_1_0.xml
+        See https://docs.paradex.trade/ws/general-information/binary-encoding-sbe
+servers:
+    production:
+        url: wss://ws.api.prod.paradex.trade/v1?sbeSchemaId=1&sbeSchemaVersion=1
+        protocol: wss
+        description: |
+            Production WebSocket server. The SBE parameters select binary encoding
+            for public channel payloads; omitting them is deprecated.
+channels:
+    /account:
+        subscribe:
+            summary: Private websocket channel for receiving updates of account status
+            message:
+                name: accountsummary
+                title: AccountSummaryResponse
+                payload:
+                    $ref: '#/components/schemas/ResponsesAccountSummaryResponse'
+                summary: Private websocket channel for receiving updates of account status
+                description: |-
+                    Subscribe to account messages
+                    Authenticate the WebSocket session with the `auth` method before subscribing.
+        x-fern-display-name: account
+    /auth:
+        publish:
+            summary: Authenticate the WebSocket session
+            description: Validates the JWT bearer token and associates the account with the connection. Must be called before subscribing to private channels or using order management methods.
+            tags:
+                - name: Session
+            message:
+                name: authrequest
+                title: AuthRequest
+                payload:
+                    properties:
+                        bearer:
+                            description: JWT string obtained from POST /auth
+                            example: eyJhbGci...
+                            type: string
+                    required:
+                        - bearer
+                    type: object
+        subscribe:
+            summary: auth response
+            tags:
+                - name: Session
+            message:
+                name: authresponse
+                title: AuthResponse
+                payload:
+                    properties:
+                        node_id:
+                            description: Opaque server node identifier
+                            type: string
+                    type: object
+        x-fern-display-name: auth
+    /balance_events:
+        subscribe:
+            summary: Private websocket channel to receive PnL calculation data
+            message:
+                name: balanceevent
+                title: BalanceEventResponse
+                payload:
+                    $ref: '#/components/schemas/ResponsesBalanceEventResponse'
+                summary: Private websocket channel to receive PnL calculation data
+                description: |-
+                    Subscribe to balance event messages
+                    Authenticate the WebSocket session with the `auth` method before subscribing.
+        x-fern-display-name: balance_events
+    /bbo.{market_symbol}:
+        parameters:
+            market_symbol:
+                $ref: '#/components/parameters/market_symbol'
+        subscribe:
+            summary: Public websocket channel for tick updates of orderbook best bid/ask prices and amounts
+            message:
+                name: bboresp
+                title: BBOResp
+                payload:
+                    $ref: '#/components/schemas/ResponsesBBOResp'
+                summary: Public websocket channel for tick updates of orderbook best bid/ask prices and amounts
+                description: 'Subscribe to market messages. Use `bbo.{market_symbol}` for a single market, `bbo.ALL` for every market, or pass `{"channel": "bbo", "base_asset": "{base_asset}"}` to receive updates for every active options market (OPTION and PERP_OPTION) for the given base asset.'
+        x-fern-display-name: bbo.{market_symbol}
+    /fills.{market_symbol}:
+        parameters:
+            market_symbol:
+                $ref: '#/components/parameters/market_symbol'
+        subscribe:
+            summary: Private websocket channel to receive details of fills for specific account
+            message:
+                name: fillresult
+                title: FillResult
+                payload:
+                    $ref: '#/components/schemas/ResponsesFillResult'
+                summary: Private websocket channel to receive details of fills for specific account
+                description: |-
+                    Subscribe to fill messages for a market
+                    Authenticate the WebSocket session with the `auth` method before subscribing.
+        x-fern-display-name: fills.{market_symbol}
+    /funding_data.{market_symbol}:
+        parameters:
+            market_symbol:
+                $ref: '#/components/parameters/market_symbol'
+        subscribe:
+            summary: Public websocket channel to receive funding data updates
+            message:
+                name: fundingdataresult
+                title: FundingDataResult
+                payload:
+                    $ref: '#/components/schemas/ResponsesFundingDataResult'
+                summary: Public websocket channel to receive funding data updates
+                description: Subscribe to funding data messages for a market
+        x-fern-display-name: funding_data.{market_symbol}
+    /funding_payments.{market_symbol}:
+        parameters:
+            market_symbol:
+                $ref: '#/components/parameters/market_symbol'
+        subscribe:
+            summary: Private websocket channel to receive funding payments of an account
+            message:
+                name: fundingpayment
+                title: FundingPayment
+                payload:
+                    $ref: '#/components/schemas/ResponsesFundingPayment'
+                summary: Private websocket channel to receive funding payments of an account
+                description: |-
+                    Subscribe to funding payment messages for a market
+                    Authenticate the WebSocket session with the `auth` method before subscribing.
+        x-fern-display-name: funding_payments.{market_symbol}
+    /markets[.{market_symbol}]:
+        parameters:
+            market_symbol:
+                $ref: '#/components/parameters/market_symbol'
+        subscribe:
+            summary: Public websocket channel for live updates to market specifications
+            message:
+                name: marketevent
+                title: MarketEvent
+                payload:
+                    $ref: '#/components/schemas/ResponsesMarketEvent'
+                summary: Public websocket channel for live updates to market specifications
+                description: 'Subscribe to market spec changes: new listings (CREATED), settlements (SETTLED), market removals (DELETED) and parameter updates (UPDATED — e.g. price tick size, position limits, margin params). Supports `markets` (all markets) and `markets.{market_symbol}` (specific market). Payload shape mirrors GET /markets/history.'
+        x-fern-display-name: markets[.{market_symbol}]
+    /markets_summary[.{market_symbol}]:
+        parameters:
+            market_symbol:
+                $ref: '#/components/parameters/market_symbol'
+        subscribe:
+            summary: Public websocket channel for updates of available markets
+            message:
+                name: marketsummaryresp
+                title: MarketSummaryResp
+                payload:
+                    $ref: '#/components/schemas/ResponsesMarketSummaryResp'
+                summary: Public websocket channel for updates of available markets
+                description: 'Subscribe to market summary messages for specific markets or all markets. Supports markets_summary (all markets) and markets_summary.{market_symbol} (specific market) dot-encoded patterns, plus a scoped mutable-filter mode: subscribe with a `markets` array (present, even empty) to filter to a specific set and change that set in place via modify_subscription without re-subscribing.'
+        x-fern-display-name: markets_summary[.{market_symbol}]
+    /mmp:
+        subscribe:
+            summary: Private websocket channel to receive market maker protection events
+            message:
+                name: mmpeventresp
+                title: MmpEventResp
+                payload:
+                    $ref: '#/components/schemas/ResponsesMmpEventResp'
+                summary: Private websocket channel to receive market maker protection events
+                description: |-
+                    Subscribe to `mmp` for market maker protection state changes on the authenticated account, one event per base asset.
+                    TRIGGERED: a limit tripped. Open MMP orders on the base asset are cancelled with MMP_TRIGGERED, and new ones with MMP_FROZEN until `frozen_until`, or until a manual reset when it is 0. UNFROZEN and RESET end a freeze. CONFIG_UPDATED carries the new config.
+                    Authenticate the WebSocket session with the `auth` method before subscribing.
+        x-fern-display-name: mmp
+    /modify_subscription:
+        publish:
+            summary: Modify a scoped subscription's market filter in place
+            description: Adds and/or removes markets on a live scoped markets_summary subscription without unsubscribing and resubscribing, so markets that remain in the filter stream uninterrupted. Requires a subscription opened in scoped mode (subscribe with a markets array).
+            tags:
+                - name: Session
+            message:
+                name: modify_subscriptionrequest
+                title: Modify_subscriptionRequest
+                payload:
+                    properties:
+                        add:
+                            description: Markets to add to the subscription's filter in place
+                            example: SOL-USD-PERP
+                            items:
+                                type: string
+                            type: array
+                        channel:
+                            description: Channel of the live scoped subscription to modify (e.g. markets_summary)
+                            example: markets_summary
+                            type: string
+                        remove:
+                            description: Markets to remove from the subscription's filter in place
+                            example: BTC-USD-PERP
+                            items:
+                                type: string
+                            type: array
+                    required:
+                        - channel
+                    type: object
+        subscribe:
+            summary: modify_subscription response
+            tags:
+                - name: Session
+            message:
+                name: modify_subscriptionresponse
+                title: Modify_subscriptionResponse
+                payload:
+                    properties:
+                        add:
+                            description: Markets that were added
+                            items:
+                                type: string
+                            type: array
+                        channel:
+                            description: Channel whose subscription filter was modified
+                            type: string
+                        remove:
+                            description: Markets that were removed
+                            items:
+                                type: string
+                            type: array
+                    type: object
+        x-fern-display-name: modify_subscription
+    /order.cancel:
+        publish:
+            summary: Cancel a single order
+            description: Cancels an order by exchange order ID or by client_id + market. Either id or (client_id + market) must be provided.
+            tags:
+                - name: Order Management
+            message:
+                name: order.cancelrequest
+                title: OrderCancelRequest
+                payload:
+                    properties:
+                        client_id:
+                            description: Client-assigned order ID; requires market when used
+                            example: my-order-001
+                            type: string
+                        id:
+                            description: Order ID to cancel; either id or client_id+market is required
+                            example: "1234567890"
+                            type: string
+                        market:
+                            description: Market symbol; required when cancelling by client_id
+                            example: BTC-USD-PERP
+                            type: string
+                    type: object
+        subscribe:
+            summary: order.cancel response
+            tags:
+                - name: Order Management
+            message:
+                name: order.cancelresponse
+                title: OrderCancelResponse
+                payload:
+                    properties:
+                        order_id:
+                            description: Cancelled order ID
+                            example: "1234567890"
+                            type: string
+                        status:
+                            description: Cancellation status
+                            enum:
+                                - QUEUED_FOR_CANCELLATION
+                            example: QUEUED_FOR_CANCELLATION
+                            type: string
+                    type: object
+        x-fern-display-name: order.cancel
+    /order.cancel_all:
+        publish:
+            summary: Cancel all open orders
+            description: Cancels all open orders for the authenticated account. If market is provided only orders in that market are cancelled.
+            tags:
+                - name: Order Management
+            message:
+                name: order.cancel_allrequest
+                title: OrderCancel_allRequest
+                payload:
+                    properties:
+                        market:
+                            description: If set, only cancel orders in this market; omit to cancel all open orders
+                            example: BTC-USD-PERP
+                            type: string
+                    type: object
+        subscribe:
+            summary: order.cancel_all response
+            tags:
+                - name: Order Management
+            message:
+                name: order.cancel_allresponse
+                title: OrderCancel_allResponse
+                payload:
+                    properties:
+                        status:
+                            description: Always "ok"
+                            example: ok
+                            type: string
+                    type: object
+        x-fern-display-name: order.cancel_all
+    /order.cancel_batch:
+        publish:
+            summary: Cancel multiple orders by ID
+            description: Cancels a list of orders by their exchange IDs. Returns a per-order status; the request does not fail if individual orders are not found or already closed.
+            tags:
+                - name: Order Management
+            message:
+                name: order.cancel_batchrequest
+                title: OrderCancel_batchRequest
+                payload:
+                    properties:
+                        order_ids:
+                            description: List of order IDs to cancel
+                            example: '["111","222"]'
+                            items:
+                                type: string
+                            type: array
+                    required:
+                        - order_ids
+                    type: object
+        subscribe:
+            summary: order.cancel_batch response
+            tags:
+                - name: Order Management
+            message:
+                name: order.cancel_batchresponse
+                title: OrderCancel_batchResponse
+                payload:
+                    properties:
+                        results:
+                            description: Per-order outcomes in the same order as order_ids
+                            items:
+                                properties:
+                                    id:
+                                        description: Order ID
+                                        example: "1234567890"
+                                        type: string
+                                    market:
+                                        description: Market symbol (absent when status is NOT_FOUND)
+                                        example: BTC-USD-PERP
+                                        type: string
+                                    status:
+                                        description: Outcome for this order
+                                        enum:
+                                            - QUEUED_FOR_CANCELLATION
+                                            - ALREADY_CLOSED
+                                            - NOT_FOUND
+                                        type: string
+                                type: object
+                            type: array
+                    type: object
+        x-fern-display-name: order.cancel_batch
+    /order.cancel_on_disconnect:
+        publish:
+            summary: Toggle Cancel on Disconnect (CoD)
+            description: When enabled, all orders placed (or already tracked) during this connection are automatically cancelled if the WebSocket disconnects unexpectedly. CoD state is scoped to the connection and does not persist across reconnects.
+            tags:
+                - name: Order Management
+            message:
+                name: order.cancel_on_disconnectrequest
+                title: OrderCancel_on_disconnectRequest
+                payload:
+                    properties:
+                        enabled:
+                            description: true to enable Cancel on Disconnect, false to disable
+                            type: boolean
+                    required:
+                        - enabled
+                    type: object
+        subscribe:
+            summary: order.cancel_on_disconnect response
+            tags:
+                - name: Order Management
+            message:
+                name: order.cancel_on_disconnectresponse
+                title: OrderCancel_on_disconnectResponse
+                payload:
+                    properties:
+                        enabled:
+                            description: The new Cancel on Disconnect state for this connection
+                            type: boolean
+                    type: object
+        x-fern-display-name: order.cancel_on_disconnect
+    /order.create:
+        publish:
+            summary: Submit a new order
+            description: Creates a single order. Requires authentication and a valid Starknet signature over the order payload. Rate limits are shared with the REST API (same Redis counters).
+            tags:
+                - name: Order Management
+            message:
+                name: order.createrequest
+                title: OrderCreateRequest
+                payload:
+                    properties:
+                        client_id:
+                            description: Client-assigned order ID (max 64 chars)
+                            example: my-order-001
+                            type: string
+                        flags:
+                            description: Order flags. MMP is for LIMIT orders on dated options and perpetual futures; only resting maker fills count
+                            items:
+                                enum:
+                                    - REDUCE_ONLY
+                                    - MMP
+                                type: string
+                            type: array
+                        instruction:
+                            description: Time-in-force instruction
+                            enum:
+                                - GTC
+                                - IOC
+                                - POST_ONLY
+                                - RPI
+                            type: string
+                        market:
+                            description: Market symbol
+                            example: BTC-USD-PERP
+                            type: string
+                        on_behalf_of_account:
+                            description: Isolated margin account address for isolated margin orders
+                            example: "0x1234567890abcdef"
+                            type: string
+                        price:
+                            description: Limit price; use "0" for MARKET orders
+                            example: "29500.00"
+                            type: string
+                        recv_window:
+                            description: Max milliseconds between signature_timestamp and server receipt (min 10)
+                            type: integer
+                        side:
+                            description: Order side
+                            enum:
+                                - BUY
+                                - SELL
+                            type: string
+                        signature:
+                            description: Starknet signature "[r,s]" over the order payload
+                            example: '[r_value,s_value]'
+                            type: string
+                        signature_timestamp:
+                            description: Unix timestamp in milliseconds used for signature verification
+                            example: "1696291200000"
+                            type: integer
+                        size:
+                            description: Order size (decimal string)
+                            example: "0.01"
+                            type: string
+                        stp:
+                            description: Self-trade prevention
+                            enum:
+                                - EXPIRE_MAKER
+                                - EXPIRE_TAKER
+                                - EXPIRE_BOTH
+                            type: string
+                        trigger_price:
+                            description: Trigger price for stop orders
+                            example: "29000.00"
+                            type: string
+                        type:
+                            description: Order type
+                            enum:
+                                - LIMIT
+                                - MARKET
+                                - STOP_LIMIT
+                                - STOP_MARKET
+                            type: string
+                    required:
+                        - market
+                        - side
+                        - type
+                        - size
+                        - price
+                        - instruction
+                        - signature
+                        - signature_timestamp
+                    type: object
+        subscribe:
+            summary: order.create response
+            tags:
+                - name: Order Management
+            message:
+                name: order.createresponse
+                title: OrderCreateResponse
+                payload:
+                    properties:
+                        created_at:
+                            description: Matching-engine timestamp in milliseconds
+                            example: "1696291200000"
+                            type: integer
+                        order:
+                            description: Created order
+                            properties:
+                                account:
+                                    description: Account address that owns the order
+                                    example: 0x4638e30...
+                                    type: string
+                                avg_fill_price:
+                                    description: Volume-weighted average fill price; "0" if unfilled
+                                    example: "0"
+                                    type: string
+                                cancel_reason:
+                                    description: Reason for cancellation (populated when status=CLOSED)
+                                    example: USER_CANCELED
+                                    type: string
+                                client_id:
+                                    description: Client-assigned order ID
+                                    example: my-order-001
+                                    type: string
+                                created_at:
+                                    description: Order creation time in milliseconds
+                                    example: "1696291200000"
+                                    type: integer
+                                flags:
+                                    description: Order flags applied
+                                    example: '["REDUCE_ONLY"]'
+                                    items:
+                                        type: string
+                                    type: array
+                                id:
+                                    description: Unique order identifier assigned by exchange
+                                    example: "1234567890"
+                                    type: string
+                                instruction:
+                                    description: Time-in-force instruction
+                                    enum:
+                                        - GTC
+                                        - IOC
+                                        - POST_ONLY
+                                        - RPI
+                                    type: string
+                                last_updated_at:
+                                    description: Order last update time in milliseconds
+                                    example: "1696291200000"
+                                    type: integer
+                                market:
+                                    description: Market symbol
+                                    example: BTC-USD-PERP
+                                    type: string
+                                price:
+                                    description: Limit price
+                                    example: "29500.00"
+                                    type: string
+                                published_at:
+                                    description: Exchange publish time in milliseconds
+                                    example: "1696291200000"
+                                    type: integer
+                                received_at:
+                                    description: Exchange receipt time in milliseconds
+                                    example: "1696291200000"
+                                    type: integer
+                                remaining_size:
+                                    description: Remaining unfilled size
+                                    example: "0.01"
+                                    type: string
+                                seq_no:
+                                    description: Monotonically increasing sequence number for this order's updates
+                                    example: "20784"
+                                    type: integer
+                                side:
+                                    description: Order side
+                                    enum:
+                                        - BUY
+                                        - SELL
+                                    type: string
+                                size:
+                                    description: Order size
+                                    example: "0.01"
+                                    type: string
+                                status:
+                                    description: Order status
+                                    enum:
+                                        - NEW
+                                        - OPEN
+                                        - CLOSED
+                                    type: string
+                                timestamp:
+                                    description: Signature timestamp supplied at creation
+                                    example: "1696291200000"
+                                    type: integer
+                                trigger_price:
+                                    description: Trigger price for stop orders
+                                    example: "29000.00"
+                                    type: string
+                                type:
+                                    description: Order type
+                                    enum:
+                                        - LIMIT
+                                        - MARKET
+                                        - STOP_LIMIT
+                                        - STOP_MARKET
+                                    type: string
+                            type: object
+                        received_at:
+                            description: Server receipt timestamp in nanoseconds, recorded before any speedbump
+                            example: "1696291200123456789"
+                            type: integer
+                    type: object
+        x-fern-display-name: order.create
+    /order.create_batch:
+        publish:
+            summary: Submit multiple orders in a single request
+            description: Creates up to the configured maximum number of orders atomically. All signatures are validated before any orders reach the matching engine. Rate limit is consumed once for the entire batch.
+            tags:
+                - name: Order Management
+            message:
+                name: order.create_batchrequest
+                title: OrderCreate_batchRequest
+                payload:
+                    properties:
+                        orders:
+                            description: Array of order create requests (max batch size enforced server-side)
+                            items:
+                                properties:
+                                    client_id:
+                                        description: Client-assigned order ID (max 64 chars)
+                                        example: my-order-001
+                                        type: string
+                                    flags:
+                                        description: Order flags. MMP is for LIMIT orders on dated options and perpetual futures; only resting maker fills count
+                                        items:
+                                            enum:
+                                                - REDUCE_ONLY
+                                                - MMP
+                                            type: string
+                                        type: array
+                                    instruction:
+                                        description: Time-in-force instruction
+                                        enum:
+                                            - GTC
+                                            - IOC
+                                            - POST_ONLY
+                                            - RPI
+                                        type: string
+                                    market:
+                                        description: Market symbol
+                                        example: BTC-USD-PERP
+                                        type: string
+                                    on_behalf_of_account:
+                                        description: Isolated margin account address for isolated margin orders
+                                        example: "0x1234567890abcdef"
+                                        type: string
+                                    price:
+                                        description: Limit price; use "0" for MARKET orders
+                                        example: "29500.00"
+                                        type: string
+                                    recv_window:
+                                        description: Max milliseconds between signature_timestamp and server receipt (min 10)
+                                        type: integer
+                                    side:
+                                        description: Order side
+                                        enum:
+                                            - BUY
+                                            - SELL
+                                        type: string
+                                    signature:
+                                        description: Starknet signature "[r,s]" over the order payload
+                                        example: '[r_value,s_value]'
+                                        type: string
+                                    signature_timestamp:
+                                        description: Unix timestamp in milliseconds used for signature verification
+                                        example: "1696291200000"
+                                        type: integer
+                                    size:
+                                        description: Order size (decimal string)
+                                        example: "0.01"
+                                        type: string
+                                    stp:
+                                        description: Self-trade prevention
+                                        enum:
+                                            - EXPIRE_MAKER
+                                            - EXPIRE_TAKER
+                                            - EXPIRE_BOTH
+                                        type: string
+                                    trigger_price:
+                                        description: Trigger price for stop orders
+                                        example: "29000.00"
+                                        type: string
+                                    type:
+                                        description: Order type
+                                        enum:
+                                            - LIMIT
+                                            - MARKET
+                                            - STOP_LIMIT
+                                            - STOP_MARKET
+                                        type: string
+                                required:
+                                    - market
+                                    - side
+                                    - type
+                                    - size
+                                    - price
+                                    - instruction
+                                    - signature
+                                    - signature_timestamp
+                                type: object
+                            type: array
+                    required:
+                        - orders
+                    type: object
+        subscribe:
+            summary: order.create_batch response
+            tags:
+                - name: Order Management
+            message:
+                name: order.create_batchresponse
+                title: OrderCreate_batchResponse
+                payload:
+                    properties:
+                        results:
+                            description: Per-order outcomes in the same order as the request array
+                            items:
+                                properties:
+                                    created_at:
+                                        description: Matching-engine timestamp in milliseconds (present on success)
+                                        type: integer
+                                    error:
+                                        description: Error message (present on failure)
+                                        type: string
+                                    order:
+                                        description: Created order (present on success)
+                                        properties:
+                                            account:
+                                                description: Account address that owns the order
+                                                example: 0x4638e30...
+                                                type: string
+                                            avg_fill_price:
+                                                description: Volume-weighted average fill price; "0" if unfilled
+                                                example: "0"
+                                                type: string
+                                            cancel_reason:
+                                                description: Reason for cancellation (populated when status=CLOSED)
+                                                example: USER_CANCELED
+                                                type: string
+                                            client_id:
+                                                description: Client-assigned order ID
+                                                example: my-order-001
+                                                type: string
+                                            created_at:
+                                                description: Order creation time in milliseconds
+                                                example: "1696291200000"
+                                                type: integer
+                                            flags:
+                                                description: Order flags applied
+                                                example: '["REDUCE_ONLY"]'
+                                                items:
+                                                    type: string
+                                                type: array
+                                            id:
+                                                description: Unique order identifier assigned by exchange
+                                                example: "1234567890"
+                                                type: string
+                                            instruction:
+                                                description: Time-in-force instruction
+                                                enum:
+                                                    - GTC
+                                                    - IOC
+                                                    - POST_ONLY
+                                                    - RPI
+                                                type: string
+                                            last_updated_at:
+                                                description: Order last update time in milliseconds
+                                                example: "1696291200000"
+                                                type: integer
+                                            market:
+                                                description: Market symbol
+                                                example: BTC-USD-PERP
+                                                type: string
+                                            price:
+                                                description: Limit price
+                                                example: "29500.00"
+                                                type: string
+                                            published_at:
+                                                description: Exchange publish time in milliseconds
+                                                example: "1696291200000"
+                                                type: integer
+                                            received_at:
+                                                description: Exchange receipt time in milliseconds
+                                                example: "1696291200000"
+                                                type: integer
+                                            remaining_size:
+                                                description: Remaining unfilled size
+                                                example: "0.01"
+                                                type: string
+                                            seq_no:
+                                                description: Monotonically increasing sequence number for this order's updates
+                                                example: "20784"
+                                                type: integer
+                                            side:
+                                                description: Order side
+                                                enum:
+                                                    - BUY
+                                                    - SELL
+                                                type: string
+                                            size:
+                                                description: Order size
+                                                example: "0.01"
+                                                type: string
+                                            status:
+                                                description: Order status
+                                                enum:
+                                                    - NEW
+                                                    - OPEN
+                                                    - CLOSED
+                                                type: string
+                                            timestamp:
+                                                description: Signature timestamp supplied at creation
+                                                example: "1696291200000"
+                                                type: integer
+                                            trigger_price:
+                                                description: Trigger price for stop orders
+                                                example: "29000.00"
+                                                type: string
+                                            type:
+                                                description: Order type
+                                                enum:
+                                                    - LIMIT
+                                                    - MARKET
+                                                    - STOP_LIMIT
+                                                    - STOP_MARKET
+                                                type: string
+                                        type: object
+                                    received_at:
+                                        description: Server receipt timestamp in nanoseconds (present on success)
+                                        type: integer
+                                type: object
+                            type: array
+                    type: object
+        x-fern-display-name: order.create_batch
+    /order.modify:
+        publish:
+            summary: Modify an existing open order
+            description: Updates the price and/or size of an open order. A new Starknet signature over the updated order payload is required.
+            tags:
+                - name: Order Management
+            message:
+                name: order.modifyrequest
+                title: OrderModifyRequest
+                payload:
+                    properties:
+                        id:
+                            description: Order ID to modify
+                            example: "1234567890"
+                            type: string
+                        market:
+                            description: Market symbol of the existing order
+                            example: BTC-USD-PERP
+                            type: string
+                        on_behalf_of_account:
+                            description: Isolated margin account address
+                            example: "0x1234567890abcdef"
+                            type: string
+                        price:
+                            description: New (or unchanged) limit price
+                            example: "29600.00"
+                            type: string
+                        side:
+                            description: Existing side of the order
+                            enum:
+                                - BUY
+                                - SELL
+                            type: string
+                        signature:
+                            description: Starknet signature "[r,s]" over the modified order payload
+                            example: '[r_value,s_value]'
+                            type: string
+                        signature_timestamp:
+                            description: Unix timestamp in milliseconds used for signature verification
+                            example: "1696291300000"
+                            type: integer
+                        size:
+                            description: New (or unchanged) size
+                            example: "0.02"
+                            type: string
+                        trigger_price:
+                            description: New (or unchanged) trigger price for TPSL orders
+                            example: "29000.00"
+                            type: string
+                        type:
+                            description: Existing type of the order
+                            enum:
+                                - LIMIT
+                                - MARKET
+                                - STOP_LIMIT
+                                - STOP_MARKET
+                            type: string
+                    required:
+                        - id
+                        - market
+                        - side
+                        - type
+                        - size
+                        - price
+                        - signature
+                        - signature_timestamp
+                    type: object
+        subscribe:
+            summary: order.modify response
+            tags:
+                - name: Order Management
+            message:
+                name: order.modifyresponse
+                title: OrderModifyResponse
+                payload:
+                    properties:
+                        order:
+                            description: Modified order
+                            properties:
+                                account:
+                                    description: Account address that owns the order
+                                    example: 0x4638e30...
+                                    type: string
+                                avg_fill_price:
+                                    description: Volume-weighted average fill price; "0" if unfilled
+                                    example: "0"
+                                    type: string
+                                cancel_reason:
+                                    description: Reason for cancellation (populated when status=CLOSED)
+                                    example: USER_CANCELED
+                                    type: string
+                                client_id:
+                                    description: Client-assigned order ID
+                                    example: my-order-001
+                                    type: string
+                                created_at:
+                                    description: Order creation time in milliseconds
+                                    example: "1696291200000"
+                                    type: integer
+                                flags:
+                                    description: Order flags applied
+                                    example: '["REDUCE_ONLY"]'
+                                    items:
+                                        type: string
+                                    type: array
+                                id:
+                                    description: Unique order identifier assigned by exchange
+                                    example: "1234567890"
+                                    type: string
+                                instruction:
+                                    description: Time-in-force instruction
+                                    enum:
+                                        - GTC
+                                        - IOC
+                                        - POST_ONLY
+                                        - RPI
+                                    type: string
+                                last_updated_at:
+                                    description: Order last update time in milliseconds
+                                    example: "1696291200000"
+                                    type: integer
+                                market:
+                                    description: Market symbol
+                                    example: BTC-USD-PERP
+                                    type: string
+                                price:
+                                    description: Limit price
+                                    example: "29500.00"
+                                    type: string
+                                published_at:
+                                    description: Exchange publish time in milliseconds
+                                    example: "1696291200000"
+                                    type: integer
+                                received_at:
+                                    description: Exchange receipt time in milliseconds
+                                    example: "1696291200000"
+                                    type: integer
+                                remaining_size:
+                                    description: Remaining unfilled size
+                                    example: "0.01"
+                                    type: string
+                                seq_no:
+                                    description: Monotonically increasing sequence number for this order's updates
+                                    example: "20784"
+                                    type: integer
+                                side:
+                                    description: Order side
+                                    enum:
+                                        - BUY
+                                        - SELL
+                                    type: string
+                                size:
+                                    description: Order size
+                                    example: "0.01"
+                                    type: string
+                                status:
+                                    description: Order status
+                                    enum:
+                                        - NEW
+                                        - OPEN
+                                        - CLOSED
+                                    type: string
+                                timestamp:
+                                    description: Signature timestamp supplied at creation
+                                    example: "1696291200000"
+                                    type: integer
+                                trigger_price:
+                                    description: Trigger price for stop orders
+                                    example: "29000.00"
+                                    type: string
+                                type:
+                                    description: Order type
+                                    enum:
+                                        - LIMIT
+                                        - MARKET
+                                        - STOP_LIMIT
+                                        - STOP_MARKET
+                                    type: string
+                            type: object
+                    type: object
+        x-fern-display-name: order.modify
+    /order_book.{market_symbol}.{feed_type}@15@{refresh_rate}[@{price_tick}]:
+        parameters:
+            feed_type:
+                $ref: '#/components/parameters/feed_type'
+            market_symbol:
+                $ref: '#/components/parameters/market_symbol'
+            price_tick:
+                $ref: '#/components/parameters/price_tick'
+            refresh_rate:
+                $ref: '#/components/parameters/refresh_rate'
+        subscribe:
+            summary: Public websocket channel for orderbook updates, as periodic snapshots of depth 15 or as full-depth incremental deltas
+            message:
+                name: pricebookupdate
+                title: PriceBookUpdate
+                payload:
+                    $ref: '#/components/schemas/ResponsesPriceBookUpdate'
+                summary: Public websocket channel for orderbook updates, as periodic snapshots of depth 15 or as full-depth incremental deltas
+                description: 'Public websocket channel for orderbook updates. The snapshot and interactive feeds send snapshots of depth 15 at most every 50ms or 100ms, optionally grouped by price tick. The deltas and interactive_deltas feeds take no parameters: each sends one full-depth snapshot on subscribe and then incremental updates, and neither applies price tick grouping. The interactive and interactive_deltas feeds include RPI orders; snapshot and deltas exclude them.'
+        x-fern-display-name: order_book.{market_symbol}.{feed_type}@15@{refresh_rate}[@{price_tick}]
+    /orders.{market_symbol}:
+        parameters:
+            market_symbol:
+                $ref: '#/components/parameters/market_symbol'
+        subscribe:
+            summary: Private websocket channel to receive order updates
+            message:
+                name: orderresp
+                title: OrderResp
+                payload:
+                    $ref: '#/components/schemas/ResponsesOrderResp'
+                summary: Private websocket channel to receive order updates
+                description: |-
+                    Subscribe to order messages for a market
+                    Authenticate the WebSocket session with the `auth` method before subscribing.
+        x-fern-display-name: orders.{market_symbol}
+    /positions:
+        subscribe:
+            summary: Private websocket channel to receive updates when position is changed
+            message:
+                name: positionresp
+                title: PositionResp
+                payload:
+                    $ref: '#/components/schemas/ResponsesPositionResp'
+                summary: Private websocket channel to receive updates when position is changed
+                description: |-
+                    Subscribe to position messages
+                    Authenticate the WebSocket session with the `auth` method before subscribing.
+        x-fern-display-name: positions
+    /rfq[.{rfq_id}]:
+        parameters:
+            rfq_id:
+                $ref: '#/components/parameters/rfq_id'
+        subscribe:
+            summary: Private websocket channel to receive events on your RFQs
+            message:
+                name: rfqeventresp
+                title: RfqEventResp
+                payload:
+                    $ref: '#/components/schemas/ResponsesRfqEventResp'
+                summary: Private websocket channel to receive events on your RFQs
+                description: |-
+                    Subscribe to `rfq` for all RFQs belonging to the authenticated account, or `rfq.{rfq_id}` for one venue-issued RFQ id.
+                    Events have type RFQ, QUOTE, TRADE, RESULT, or DERIBIT_COST. RESULT acknowledges asynchronous REST create, execute, and cancel commands; match it to the REST 202 response by `result.request_id`.
+                    DERIBIT_COST is a reference figure, not an event: it repeats on a timer while the RFQ is open, carries what the same structure would cost crossing Deribit's public book, and is not executable. Read `deribit_cost.last_updated_at` to tell a live figure from a frozen feed, bearing in mind it is absent whenever no venue tick backs the figure, and the per-direction `status` for why a direction has none: NO_SIZE and INSUFFICIENT_SIZE are answers about Deribit's book, NOT_LISTED says it does not list the instrument, and NO_DATA says no price for it has reached us yet, so do not render that one as an empty book.
+                    Authenticate the WebSocket session with the `auth` method before subscribing.
+        x-fern-display-name: rfq[.{rfq_id}]
+    /subscribe:
+        publish:
+            summary: Subscribe to a WebSocket channel
+            description: Starts receiving real-time messages for the given channel. Private channels (orders, fills, positions, account, etc.) require prior authentication. See the WebSocket Channels reference for all available channel names.
+            tags:
+                - name: Session
+            message:
+                name: subscriberequest
+                title: SubscribeRequest
+                payload:
+                    properties:
+                        channel:
+                            description: Channel name to subscribe to (e.g. trades.BTC-USD-PERP)
+                            example: trades.BTC-USD-PERP
+                            type: string
+                        markets:
+                            description: 'For markets_summary only: the initial set of markets to scope the subscription to (may be empty). Present selects scoped mutable-filter mode whose set is changed via modify_subscription; omit for the all-markets firehose.'
+                            example: BTC-USD-PERP,ETH-USD-PERP
+                            items:
+                                type: string
+                            type: array
+                    required:
+                        - channel
+                    type: object
+        subscribe:
+            summary: subscribe response
+            tags:
+                - name: Session
+            message:
+                name: subscriberesponse
+                title: SubscribeResponse
+                payload:
+                    properties:
+                        channel:
+                            description: Channel name that was subscribed
+                            type: string
+                    type: object
+        x-fern-display-name: subscribe
+    /tradebusts:
+        subscribe:
+            summary: Private websocket channel to receive fills that are busted by a blockchain
+            message:
+                name: tradebustresult
+                title: TradebustResult
+                payload:
+                    $ref: '#/components/schemas/ResponsesTradebustResult'
+                summary: Private websocket channel to receive fills that are busted by a blockchain
+                description: |-
+                    Private websocket channel to receive fills that are busted by a blockchain
+                    Authenticate the WebSocket session with the `auth` method before subscribing.
+        x-fern-display-name: tradebusts
+    /trades.{market_symbol}:
+        parameters:
+            market_symbol:
+                $ref: '#/components/parameters/market_symbol'
+        subscribe:
+            summary: Public websocket channel to receive updates on trades in particular market
+            message:
+                name: traderesult
+                title: TradeResult
+                payload:
+                    $ref: '#/components/schemas/ResponsesTradeResult'
+                summary: Public websocket channel to receive updates on trades in particular market
+                description: 'Subscribe to trade messages. Use `trades.{market_symbol}` for a single market, `trades.ALL` for every market, or pass `{"channel": "trades", "base_asset": "{base_asset}"}` to receive updates for every active options market (OPTION and PERP_OPTION) for the given base asset. A block trade is published as one message per leg; `block_id` is the id they share, which is what lets a client reassemble the package, and it is sent on block-trade messages only. (On a deployment still on the legacy fan-out rather than kafka-ingress, a block trade''s message carries its first leg alone; fetch `GET /trades?trade_type=BLOCK_TRADE` for the package.) Note that `block_id` is carried by the JSON encoding only; the SBE binary encoding of this channel does not carry it.'
+        x-fern-display-name: trades.{market_symbol}
+    /transaction:
+        subscribe:
+            summary: Private websocket channel for receiving transaction details of fills
+            message:
+                name: transaction
+                title: TransactionResponse
+                payload:
+                    $ref: '#/components/schemas/ResponsesTransactionResponse'
+                summary: Private websocket channel for receiving transaction details of fills
+                description: |-
+                    Subscribe to transaction messages
+                    Authenticate the WebSocket session with the `auth` method before subscribing.
+        x-fern-display-name: transaction
+    /transfers:
+        subscribe:
+            summary: Websocket channel for receiving transfer updates
+            message:
+                name: transferresult
+                title: TransferResult
+                payload:
+                    $ref: '#/components/schemas/ResponsesTransferResult'
+                summary: Websocket channel for receiving transfer updates
+                description: |-
+                    <p>Meaning of each transfer status:</p>
+                    <ul>
+                    <li><code>PENDING</code>: L2 txn calling Paraclear contract is in flight: For Withdrawals it's the initial status; refers to the L2 txn status being <code>RECEIVED</code>, <code>PENDING</code>, <code>ACCEPTED_ON_L2</code>. For Deposits refers to L2 txn status being <code>RECEIVED</code>, <code>PENDING</code>.</li>
+                    <li><code>AVAILABLE</code>: Action is required from user: For Withdrawals refers to L2 txn status being <code>ACCEPTED_ON_L1</code> and funds available for collection on Ethereum bridge. For Deposits refers to funds being available in the L2 account, ready to be deposited to Paraclear contract.</li>
+                    <li><code>COMPLETED</code>: Transfer has completed (final state): For Withdrawals funds have been collected and have moved to the requested Ethereum account; refers to L1 bridge withdraw txn status <code>SUCCESS</code>. For Deposits funds have become available in Paradex; refers to the L2 txn status being <code>ACCEPTED_ON_L2</code>.</li>
+                    <li><code>FAILED</code>: L2 txn calling Paraclear contract failed with <code>REJECTED</code> status. Deposits can be retried when they fail by repeating the L2 txn.</li>
+                    </ul>
+                    Authenticate the WebSocket session with the `auth` method before subscribing.
+        x-fern-display-name: transfers
+    /unsubscribe:
+        publish:
+            summary: Unsubscribe from a WebSocket channel
+            tags:
+                - name: Session
+            message:
+                name: unsubscriberequest
+                title: UnsubscribeRequest
+                payload:
+                    properties:
+                        channel:
+                            description: Channel name to unsubscribe from
+                            example: trades.BTC-USD-PERP
+                            type: string
+                    required:
+                        - channel
+                    type: object
+        subscribe:
+            summary: unsubscribe response
+            tags:
+                - name: Session
+            message:
+                name: unsubscriberesponse
+                title: UnsubscribeResponse
+                payload:
+                    properties:
+                        channel:
+                            description: Channel name that was unsubscribed
+                            type: string
+                    type: object
+        x-fern-display-name: unsubscribe
+components:
+    parameters:
+        feed_type:
+            description: Type of feed to subscribe to
+            schema:
+                enum:
+                    - snapshot
+                    - deltas
+                    - interactive
+                    - interactive_deltas
+                type: string
+        market_symbol:
+            description: Symbol of the market (e.g., BTC-PERP)
+            schema:
+                type: string
+        market_symbol_or_all:
+            description: Market symbol or 'ALL' for all markets
+            schema:
+                type: string
+        price_tick:
+            description: Optional price tick for grouping order book prices
+            schema:
+                enum:
+                    - "0_0000001"
+                    - "0_0000005"
+                    - "0_000001"
+                    - "0_00001"
+                    - "0_0001"
+                    - "0_001"
+                    - "0_01"
+                    - "0_1"
+                    - "1"
+                    - "10"
+                    - "100"
+                type: string
+        refresh_rate:
+            description: Rate of sending updates (used in BBO channels)
+            schema:
+                enum:
+                    - 50ms
+                    - 100ms
+                type: string
+        rfq_id:
+            description: Paradigm-issued RFQ id; scopes the subscription to a single RFQ
+            schema:
+                type: string
+    schemas:
+        ResponsesAccountSummaryResponse:
+            additionalProperties: false
+            properties:
+                account:
+                    description: User's starknet account
+                    example: 0x495d2eb5236a12b8b4ad7d3849ce6a203ce21c43f473c248dfd5ce70d9454fa
+                    type: string
+                account_value:
+                    description: Current account value [with unrealized P&Ls]
+                    example: "136285.06918911"
+                    type: string
+                free_collateral:
+                    description: Free collateral available (Account value in excess of Initial Margin required)
+                    example: "73276.47229774"
+                    type: string
+                initial_margin_requirement:
+                    description: Amount required to open trade for the existing positions
+                    example: "63008.59689218"
+                    type: string
+                last_seen_notification:
+                    description: Latest notification event timestamp (ms) the user has seen — used for cross-device dedup
+                    example: "1713400000000"
+                    type: integer
+                maintenance_margin_requirement:
+                    description: Amount required to maintain exisiting positions
+                    example: "31597.25239676"
+                    type: string
+                margin_cushion:
+                    description: Acc value in excess of maintenance margin required
+                    example: "104687.8167956"
+                    type: string
+                seq_no:
+                    description: Unique increasing number (non-sequential) that is assigned to this account update. Can be used to deduplicate multiple feeds
+                    example: "1681471234972000000"
+                    type: integer
+                settlement_asset:
+                    description: Settlement asset for the account
+                    example: USDC
+                    type: string
+                status:
+                    description: Status of the acc - like ACTIVE, LIQUIDATION
+                    example: ACTIVE
+                    type: string
+                total_collateral:
+                    description: User's total collateral
+                    example: "123003.62047353"
+                    type: string
+                updated_at:
+                    description: Account last updated time
+                    example: "1681471234972"
+                    type: integer
+            required:
+                - account
+                - initial_margin_requirement
+                - maintenance_margin_requirement
+                - account_value
+                - total_collateral
+                - free_collateral
+                - margin_cushion
+                - settlement_asset
+                - updated_at
+                - status
+                - seq_no
+                - last_seen_notification
+            type: object
+        ResponsesBBOResp:
+            additionalProperties: false
+            properties:
+                ask:
+                    description: Best ask price
+                    example: "30130.15"
+                    type: string
+                ask_size:
+                    description: Best ask size
+                    example: "0.05"
+                    type: string
+                bid:
+                    description: Best bid price
+                    example: "30112.22"
+                    type: string
+                bid_size:
+                    description: Best bid size
+                    example: "0.04"
+                    type: string
+                last_updated_at:
+                    description: Last update to the orderbook in milliseconds
+                    example: "1681493939981"
+                    type: integer
+                market:
+                    description: Symbol of the market
+                    example: BTC-USD-PERP
+                    type: string
+                seq_no:
+                    description: Sequence number of the orderbook
+                    example: "20784"
+                    type: integer
+            required:
+                - market
+                - seq_no
+                - ask
+                - ask_size
+                - bid
+                - bid_size
+                - last_updated_at
+            type: object
+        ResponsesBalanceEventResponse:
+            additionalProperties: false
+            properties:
+                created_at:
+                    description: Unix Millisecond timestamp at which the event occurred
+                    example: "1681497002041"
+                    type: integer
+                fees:
+                    description: Fees in USDC (for fill events)
+                    example: "0.000000000000000000"
+                    type: string
+                fill_id:
+                    description: Unique string ID of the fill (for fill events)
+                    example: "8615262148007718462"
+                    type: string
+                funding_index:
+                    description: Funding index used for the fill (for fill events)
+                    example: "0.000000000000000000"
+                    type: string
+                market:
+                    description: Name of the market the update is referring to (for fill events)
+                    example: ETH-USD-PERP
+                    type: string
+                realized_funding:
+                    description: Realized Funding in USDC (for fill events)
+                    example: "0.000000000000000000"
+                    type: string
+                realized_pnl:
+                    description: Realized PnL (excluding funding) in USDC (for fill events)
+                    example: "0.000000000000000000"
+                    type: string
+                settlement_asset_address:
+                    description: L2 Address of the settlement asset
+                    example: "0x1234567890"
+                    type: string
+                settlement_asset_balance_after:
+                    description: Balance of the settled asset after the update
+                    example: "0.000000000000000000"
+                    type: string
+                settlement_asset_balance_before:
+                    description: Balance of the settled asset before the update
+                    example: "0.000000000000000000"
+                    type: string
+                settlement_asset_name:
+                    description: Name of the settlement asset
+                    example: USDC
+                    type: string
+                settlement_asset_price:
+                    description: Price of the settled asset at the update
+                    example: "0.000000000000000000"
+                    type: string
+                status:
+                    description: Status of the balance event on chain
+                    example: ON_BLOCKCHAIN
+                    type: string
+                type:
+                    description: Type of the event
+                    example: TRANSACTION_FILL
+                    type: string
+            required:
+                - type
+                - fill_id
+                - market
+                - status
+                - settlement_asset_name
+                - settlement_asset_address
+                - settlement_asset_balance_before
+                - settlement_asset_balance_after
+                - settlement_asset_price
+                - funding_index
+                - realized_pnl
+                - fees
+                - realized_funding
+                - created_at
+            type: object
+        ResponsesFillResult:
+            additionalProperties: false
+            properties:
+                account:
+                    description: Account that made the fill
+                    example: 0x978532f46745d7fFBa1CDfa1D8C8202D09D89C9E
+                    type: string
+                client_id:
+                    description: Unique client assigned ID for the order
+                    example: x1234
+                    type: string
+                created_at:
+                    description: Fill time
+                    example: "1681375176910"
+                    type: integer
+                fee:
+                    description: Fee paid by the user
+                    example: "7.56"
+                    type: string
+                fee_currency:
+                    description: Asset that fee is charged in
+                    example: USDC
+                    type: string
+                fill_type:
+                    description: Fill type, can be FILL, LIQUIDATION or UNWIND_TRANSFER
+                    enum:
+                        - LIQUIDATION
+                        - UNWIND_TRANSFER
+                        - FILL
+                        - SETTLE_MARKET
+                        - RPI
+                        - BLOCK_TRADE
+                    example: FILL
+                    type: string
+                flags:
+                    description: Fill flags indicating special properties
+                    example: '["interactive", "rpi"]'
+                    items:
+                        type: string
+                    type: array
+                id:
+                    description: Unique string ID of fill per FillType
+                    example: "8615262148007718462"
+                    type: string
+                liquidity:
+                    description: Maker or Taker
+                    enum:
+                        - TAKER
+                        - MAKER
+                    type: string
+                market:
+                    description: Market name
+                    example: BTC-USD-PERP
+                    type: string
+                order_id:
+                    description: Order ID
+                    example: "1681462103821101699438490000"
+                    type: string
+                orderbook_seq_no:
+                    description: Orderbook sequence number after trade execution (post-execution state). Use seqno-1 for pre-execution. 0 for position transfers (liquidations, settlements)
+                    example: "12345"
+                    type: integer
+                price:
+                    description: Price at which order was filled
+                    example: "30000.12"
+                    type: string
+                realized_funding:
+                    description: Realized funding of the fill
+                    example: "7.56"
+                    type: string
+                realized_pnl:
+                    description: Realized PnL of the fill
+                    example: "7.56"
+                    type: string
+                remaining_size:
+                    description: Remaining size of the order
+                    example: "0.5"
+                    type: string
+                side:
+                    description: Taker side
+                    enum:
+                        - BUY
+                        - SELL
+                    type: string
+                size:
+                    description: Size of the fill
+                    example: "0.5"
+                    type: string
+                underlying_price:
+                    description: Underlying asset price of the fill (spot price)
+                    example: "7.56"
+                    type: string
+            required:
+                - id
+                - side
+                - liquidity
+                - market
+                - order_id
+                - price
+                - size
+                - fee
+                - fee_currency
+                - created_at
+                - remaining_size
+                - client_id
+                - fill_type
+                - realized_pnl
+                - realized_funding
+                - account
+                - underlying_price
+                - flags
+            type: object
+        ResponsesFundingDataResult:
+            additionalProperties: false
+            properties:
+                created_at:
+                    description: Timestamp in milliseconds when the funding data was created
+                    type: integer
+                funding_index:
+                    description: Current funding index value as a decimal string
+                    type: string
+                funding_period_hours:
+                    description: Actual funding period in hours for this market
+                    type: number
+                funding_premium:
+                    description: Current funding premium as a decimal string
+                    type: string
+                funding_rate:
+                    description: Raw funding rate for the actual funding period as a decimal string
+                    type: string
+                funding_rate_8h:
+                    description: Normalized 8-hour funding rate as a decimal string
+                    type: string
+                impact_premium_rate:
+                    type: string
+                market:
+                    description: Market represents the market identifier
+                    type: string
+            required:
+                - market
+                - funding_index
+                - funding_premium
+                - funding_rate
+                - funding_rate_8h
+                - funding_period_hours
+                - created_at
+            type: object
+        ResponsesFundingPayment:
+            additionalProperties: false
+            properties:
+                account:
+                    description: Account that made the payment
+                    type: string
+                created_at:
+                    description: Funding payment time
+                    example: "1681375481000"
+                    type: integer
+                fill_id:
+                    description: Fill id that triggered the payment (if any)
+                    example: "8615262148007718462"
+                    type: string
+                id:
+                    description: Unique string ID to identify the payment
+                    example: "1681375578221101699352320000"
+                    type: string
+                index:
+                    description: Value of the funding index at the time of payment
+                    example: "-2819.53434361"
+                    type: string
+                market:
+                    description: Market against which payment is made
+                    example: BTC-USD-PERP
+                    type: string
+                payment:
+                    description: Payment amount in settlement asset
+                    example: "34.4490622"
+                    type: string
+            required:
+                - id
+                - account
+                - market
+                - payment
+                - index
+                - fill_id
+                - created_at
+            type: object
+        ResponsesMarketEvent:
+            additionalProperties: false
+            properties:
+                changed_fields:
+                    additionalProperties: false
+                    properties:
+                        asset_kind:
+                            example: PERP
+                            type: string
+                        base_currency:
+                            example: BTC
+                            type: string
+                        clamp_rate:
+                            example: "0.05"
+                            type: number
+                        delta1_cross_margin_params:
+                            type: object
+                        expiry_at:
+                            example: "0"
+                            type: integer
+                        fee_config:
+                            type: object
+                        funding_multiplier:
+                            example: "1"
+                            type: number
+                        funding_period_hours:
+                            example: "8"
+                            type: number
+                        interest_rate:
+                            example: "0.01"
+                            type: number
+                        market_kind:
+                            example: cross
+                            type: string
+                        max_funding_rate:
+                            example: "0.05"
+                            type: number
+                        max_funding_rate_change:
+                            example: "0.0005"
+                            type: number
+                        max_open_orders:
+                            example: "100"
+                            type: integer
+                        max_order_size:
+                            example: "100"
+                            type: string
+                        max_slippage:
+                            example: "0.05"
+                            type: number
+                        max_tob_spread:
+                            example: "0.2"
+                            type: number
+                        min_notional:
+                            example: "3"
+                            type: string
+                        open_at:
+                            example: "1762809600000"
+                            type: integer
+                        option_cross_margin_params:
+                            type: object
+                        option_type:
+                            example: CALL
+                            type: string
+                        oracle_ewma_factor:
+                            example: "0.2"
+                            type: number
+                        order_size_increment:
+                            example: "0.001"
+                            type: string
+                        position_limit:
+                            example: "500"
+                            type: string
+                        price_bands_width:
+                            example: "0.05"
+                            type: number
+                        price_tick_size:
+                            example: "0.01"
+                            type: string
+                        quote_currency:
+                            example: USD
+                            type: string
+                        settlement_currency:
+                            example: USDC
+                            type: string
+                        settlement_price:
+                            example: "50000"
+                            type: number
+                        strike_price:
+                            example: "66500"
+                            type: string
+                        underlying_twap_price:
+                            example: "50000"
+                            type: number
+                    type: object
+                event_type:
+                    description: Type of change
+                    enum:
+                        - CREATED
+                        - DELETED
+                        - SETTLED
+                        - UPDATED
+                    example: UPDATED
+                    type: string
+                symbol:
+                    description: Market symbol
+                    example: BTC-USD-PERP
+                    type: string
+                updated_at:
+                    description: Time of change (unix time millisecond)
+                    example: "1762809600000"
+                    type: integer
+            required:
+                - symbol
+                - event_type
+                - updated_at
+                - changed_fields
+            type: object
+        ResponsesMarketSummaryResp:
+            additionalProperties: false
+            properties:
+                ask:
+                    description: Best ask price
+                    example: "30130.15"
+                    type: string
+                ask_iv:
+                    description: Ask implied volatility, for options
+                    example: "0.2"
+                    type: string
+                ask_size:
+                    description: Size at best ask price
+                    example: "0.05"
+                    type: string
+                bid:
+                    description: Best bid price
+                    example: "30112.22"
+                    type: string
+                bid_iv:
+                    description: Bid implied volatility, for options
+                    example: "0.2"
+                    type: string
+                bid_size:
+                    description: Size at best bid price
+                    example: "0.04"
+                    type: string
+                created_at:
+                    description: Market summary creation time
+                    type: integer
+                delta:
+                    description: 'Deprecated: Use greeks.delta instead'
+                    example: "1"
+                    type: string
+                external_fair_price:
+                    description: 'External fair price, calculated from spot price and an external basis: spot_price * (1 + external_basis). where external basis is the median basis rate on different external exchanges'
+                    example: "29876.3"
+                    type: string
+                forward_rate:
+                    description: EWMA-smoothed annualized forward rate for dated options
+                    example: "0.05"
+                    type: string
+                funding_rate:
+                    description: This raw funding rate corresponds to the actual funding period of the instrument itself. It is not a normalized 8h funding rate.
+                    example: "0.3"
+                    type: string
+                future_funding_rate:
+                    description: For options it's a smoothed version of future's funding rate
+                    example: "0.3"
+                    type: string
+                greeks:
+                    additionalProperties: false
+                    description: Greeks (delta, gamma, vega). Partial for perpetual futures.
+                    properties:
+                        delta:
+                            description: Market Delta
+                            example: "1"
+                            type: string
+                        gamma:
+                            description: Market Gamma
+                            example: "0.2"
+                            type: string
+                        rho:
+                            description: Market Rho
+                            example: "0.2"
+                            type: string
+                        theta:
+                            description: Market Theta
+                            example: "-0.2"
+                            type: string
+                        vanna:
+                            description: Market Vanna
+                            example: "0.2"
+                            type: string
+                        vega:
+                            description: Market Vega
+                            example: "0.2"
+                            type: string
+                        volga:
+                            description: Market Volga
+                            example: "0.2"
+                            type: string
+                    required:
+                        - delta
+                        - gamma
+                        - vega
+                    type: object
+                last_iv:
+                    description: Last traded price implied volatility, for options
+                    example: "0.2"
+                    type: string
+                last_traded_price:
+                    description: Last traded price
+                    example: "30109.53"
+                    type: string
+                mark_iv:
+                    description: Mark implied volatility, for options
+                    example: "0.2"
+                    type: string
+                mark_price:
+                    description: '[Mark price](https://docs.paradex.trade/risk-system/mark-price-calculation)'
+                    example: "29799.70877478"
+                    type: string
+                open_interest:
+                    description: Open interest in base currency
+                    example: "6100048.3"
+                    type: string
+                price_change_rate_24h:
+                    description: Price change rate in the last 24 hours
+                    example: "0.05"
+                    type: string
+                risk_free_rate:
+                    description: Risk-free discounting rate used for option pricing
+                    example: "0.05"
+                    type: string
+                rolling_details:
+                    additionalProperties: false
+                    properties:
+                        current_active_contract_symbol:
+                            description: Current active contract symbol
+                            example: Commodities.WTIJ6/USD
+                            type: string
+                        current_active_contract_weight:
+                            description: Front contract weight ("0" to "1")
+                            example: "0.75"
+                            type: string
+                        next_active_contract_symbol:
+                            description: Next active contract symbol
+                            example: Commodities.WTIK6/USD
+                            type: string
+                        period_end:
+                            description: UTC millis, end of current rolling period
+                            example: "1718150400000"
+                            type: integer
+                        period_start:
+                            description: UTC millis, start of current rolling period
+                            example: "1717545600000"
+                            type: integer
+                    type: object
+                settlement_twap_estimate:
+                    description: Running average of the underlying over the settlement window, on the live summary only while inside that window
+                    example: "76423.56"
+                    type: string
+                symbol:
+                    description: Market symbol
+                    example: BTC-USD-PERP
+                    type: string
+                total_volume:
+                    description: Lifetime total traded volume in USD
+                    example: "141341.0424"
+                    type: string
+                underlying_price:
+                    description: Underlying asset price (spot price)
+                    example: "29876.3"
+                    type: string
+                volume_24h:
+                    description: 24 hour volume in USD
+                    example: "47041.0424"
+                    type: string
+            required:
+                - symbol
+                - mark_price
+                - last_traded_price
+                - bid
+                - bid_size
+                - ask
+                - ask_size
+                - volume_24h
+                - total_volume
+                - created_at
+                - underlying_price
+                - open_interest
+                - funding_rate
+                - price_change_rate_24h
+            type: object
+        ResponsesMmpEventResp:
+            additionalProperties: false
+            properties:
+                account:
+                    description: Account the event belongs to
+                    type: string
+                base_asset:
+                    description: Base asset the event applies to
+                    example: BTC
+                    type: string
+                config:
+                    additionalProperties: false
+                    description: The new config, CONFIG_UPDATED only
+                    properties:
+                        base_asset:
+                            description: Base asset the config applies to, across its dated options and perpetual futures
+                            example: BTC
+                            type: string
+                        delta_limit:
+                            description: Delta limit in base asset units; 0 = check disabled
+                            example: "20"
+                            type: string
+                        frozen_time_ms:
+                            description: How long a trip freezes MMP orders, in milliseconds. 0 freezes until a manual reset
+                            example: "5000"
+                            type: integer
+                        interval_ms:
+                            description: Sliding window length in milliseconds. 0 when MMP was removed
+                            example: "1000"
+                            type: integer
+                        protect_block_trades:
+                            description: Whether block trade legs, RFQ executions included, are protected
+                            example: "true"
+                            type: boolean
+                        removed:
+                            description: True when MMP was removed for this base asset; the limits above are then zero
+                            example: "false"
+                            type: boolean
+                        size_limit:
+                            description: Size limit in base asset units; 0 = check disabled
+                            example: "60"
+                            type: string
+                        updated_at:
+                            description: Unix milliseconds the config was last written
+                            example: "1717171717000"
+                            type: integer
+                        vega_limit:
+                            description: Vega limit in USD; 0 = check disabled
+                            example: "5000"
+                            type: string
+                    required:
+                        - base_asset
+                        - interval_ms
+                        - frozen_time_ms
+                        - size_limit
+                        - delta_limit
+                        - vega_limit
+                        - protect_block_trades
+                        - updated_at
+                        - removed
+                    type: object
+                created_at:
+                    description: Unix milliseconds the event occurred
+                    example: "1717171717640"
+                    type: integer
+                frozen_until:
+                    description: Unix milliseconds the freeze ends on TRIGGERED, where 0 means until a manual reset. Always 0 on other kinds, which says nothing about freeze state
+                    example: "1717171722640"
+                    type: integer
+                kind:
+                    description: 'TRIGGERED: a limit tripped. UNFROZEN: the freeze expired. RESET: MMP was reset. CONFIG_UPDATED: the config changed'
+                    enum:
+                        - TRIGGERED
+                        - UNFROZEN
+                        - RESET
+                        - CONFIG_UPDATED
+                    type: string
+                trigger_market:
+                    description: Market of the fill that tripped, TRIGGERED only
+                    example: BTC-USD-26DEC26-105000-C
+                    type: string
+                trip_reason:
+                    description: Limit that tripped, TRIGGERED only
+                    enum:
+                        - SIZE
+                        - DELTA
+                        - VEGA
+                        - INVALID_FILL
+                    type: string
+                window_delta:
+                    description: Signed sum of fill delta in the window when the limit tripped, TRIGGERED only
+                    example: "-21.22"
+                    type: string
+                window_size:
+                    description: Sum of fill size in the window when the limit tripped, TRIGGERED only
+                    example: "53"
+                    type: string
+                window_vega:
+                    description: Signed sum of fill vega in USD in the window when the limit tripped, TRIGGERED only
+                    example: "-1450.5"
+                    type: string
+            required:
+                - account
+                - base_asset
+                - kind
+                - frozen_until
+                - created_at
+            type: object
+        ResponsesOrderResp:
+            additionalProperties: false
+            properties:
+                account:
+                    description: Paradex Account
+                    example: 0x4638e3041366aa71720be63e32e53e1223316c7f0d56f7aa617542ed1e7512x
+                    type: string
+                avg_fill_price:
+                    description: Average fill price of the order
+                    example: "26000"
+                    type: string
+                cancel_reason:
+                    description: Reason for order cancellation if it was closed by cancel
+                    example: NOT_ENOUGH_MARGIN
+                    type: string
+                client_id:
+                    description: Client order id provided by the client at order creation
+                    example: x1234
+                    type: string
+                created_at:
+                    description: Order creation time
+                    example: "1681493746016"
+                    type: integer
+                flags:
+                    description: Order flags
+                    items:
+                        type: string
+                    type: array
+                id:
+                    description: Unique order identifier generated by Paradex
+                    example: "123456"
+                    type: string
+                instruction:
+                    description: Execution instruction for order matching
+                    enum:
+                        - GTC
+                        - POST_ONLY
+                        - IOC
+                        - RPI
+                    example: GTC
+                    type: string
+                last_updated_at:
+                    description: Order last update time.  No changes once status=CLOSED
+                    example: "1681493746016"
+                    type: integer
+                market:
+                    description: Market
+                    example: BTC-USD-PERP
+                    type: string
+                price:
+                    description: Order price. 0 for MARKET orders
+                    example: "26000"
+                    type: string
+                published_at:
+                    description: Timestamp in milliseconds when order was sent to the client
+                    example: "1681493746016"
+                    type: integer
+                received_at:
+                    description: Timestamp in milliseconds when order was received by API service
+                    example: "1681493746016"
+                    type: integer
+                remaining_size:
+                    description: Remaining size of the order
+                    example: "0"
+                    type: string
+                request_info:
+                    additionalProperties: false
+                    description: Additional request information for orders
+                    properties:
+                        id:
+                            description: Request id
+                            type: string
+                        message:
+                            description: Error message for failed requests
+                            type: string
+                        request_type:
+                            description: Type of request (MODIFY_ORDER)
+                            type: string
+                        status:
+                            description: Status of modify order request
+                            type: string
+                    required:
+                        - id
+                        - status
+                        - message
+                        - request_type
+                    type: object
+                seq_no:
+                    description: Unique increasing number (non-sequential) that is assigned to this order update and changes on every order update. Can be used to deduplicate multiple feeds. WebSocket and REST responses use independently generated seq_no per event.
+                    example: "1681471234972000000"
+                    type: integer
+                side:
+                    description: Order side
+                    enum:
+                        - BUY
+                        - SELL
+                    type: string
+                size:
+                    description: Order size
+                    example: "0.05"
+                    type: string
+                status:
+                    description: Order status
+                    enum:
+                        - NEW
+                        - UNTRIGGERED
+                        - OPEN
+                        - CLOSED
+                    type: string
+                stp:
+                    description: Self Trade Prevention mode
+                    enum:
+                        - EXPIRE_MAKER
+                        - EXPIRE_TAKER
+                        - EXPIRE_BOTH
+                    example: EXPIRE_MAKER
+                    type: string
+                timestamp:
+                    description: Order signature timestamp
+                    example: "1681493746016"
+                    type: integer
+                trigger_price:
+                    description: Trigger price for stop order
+                    example: "26000"
+                    type: string
+                type:
+                    description: Order type
+                    enum:
+                        - MARKET
+                        - LIMIT
+                        - STOP_LIMIT
+                        - STOP_MARKET
+                        - TAKE_PROFIT_LIMIT
+                        - TAKE_PROFIT_MARKET
+                        - STOP_LOSS_MARKET
+                        - STOP_LOSS_LIMIT
+                    type: string
+            required:
+                - id
+                - account
+                - market
+                - side
+                - type
+                - size
+                - remaining_size
+                - price
+                - status
+                - created_at
+                - last_updated_at
+                - timestamp
+                - cancel_reason
+                - client_id
+                - seq_no
+                - instruction
+                - avg_fill_price
+                - stp
+                - received_at
+                - published_at
+                - flags
+                - trigger_price
+            type: object
+        ResponsesPositionResp:
+            additionalProperties: false
+            properties:
+                account:
+                    description: Account ID of the position
+                    type: string
+                average_entry_price:
+                    description: Average entry price
+                    example: "29001.34"
+                    type: string
+                average_entry_price_usd:
+                    description: Average entry price in USD
+                    example: "29001.34"
+                    type: string
+                average_exit_price:
+                    description: Average exit price
+                    example: "29001.34"
+                    type: string
+                cached_funding_index:
+                    description: Position cached funding index
+                    example: "1234.3"
+                    type: string
+                closed_at:
+                    description: Position closed time
+                    example: "1681493939981"
+                    type: integer
+                cost:
+                    description: Position cost
+                    example: "-10005.4623"
+                    type: string
+                cost_usd:
+                    description: Position cost in USD
+                    example: "-10005.4623"
+                    type: string
+                created_at:
+                    description: Position creation time
+                    example: "1681493939981"
+                    type: integer
+                id:
+                    description: Unique string ID for the position
+                    example: "1234234"
+                    type: string
+                last_fill_id:
+                    description: Last fill ID to which the position is referring
+                    example: "1234234"
+                    type: string
+                last_updated_at:
+                    description: Position last update time
+                    example: "1681493939981"
+                    type: integer
+                leverage:
+                    description: Leverage of the position
+                    type: string
+                liquidation_price:
+                    description: Liquidation price of the position
+                    type: string
+                market:
+                    description: Market for position
+                    example: BTC-USD-PERP
+                    type: string
+                realized_positional_funding_pnl:
+                    description: Realized Funding PnL for the position. Reset to 0 when position is closed or flipped.
+                    example: "12.234"
+                    type: string
+                realized_positional_pnl:
+                    description: Realized PnL including both positional PnL and funding payments. Reset to 0 when position is closed or flipped.
+                    example: "-123.23"
+                    type: string
+                seq_no:
+                    description: Unique increasing number (non-sequential) that is assigned to this position update. Can be used to deduplicate multiple feeds
+                    example: "1681471234972000000"
+                    type: integer
+                side:
+                    description: 'Position Side : Long or Short'
+                    enum:
+                        - SHORT
+                        - LONG
+                    type: string
+                size:
+                    description: Size of the position with sign (positive if long or negative if short)
+                    example: "-0.345"
+                    type: string
+                status:
+                    description: 'Status of Position : Open or Closed'
+                    enum:
+                        - OPEN
+                        - CLOSED
+                    type: string
+                unrealized_funding_pnl:
+                    description: Unrealized running funding P&L for the position
+                    example: "12.234"
+                    type: string
+                unrealized_pnl:
+                    description: Unrealized P&L of the position in the quote asset. Includes the unrealized running funding P&L.
+                    example: "-123.23"
+                    type: string
+            required:
+                - id
+                - account
+                - market
+                - status
+                - side
+                - size
+                - average_entry_price
+                - average_entry_price_usd
+                - average_exit_price
+                - unrealized_pnl
+                - unrealized_funding_pnl
+                - cost
+                - cost_usd
+                - cached_funding_index
+                - last_fill_id
+                - seq_no
+                - liquidation_price
+                - leverage
+                - realized_positional_pnl
+                - realized_positional_funding_pnl
+            type: object
+        ResponsesPriceBookUpdate:
+            additionalProperties: false
+            properties:
+                best_ask_api:
+                    additionalProperties: false
+                    description: Size on the best ask from API (excluding RPI)
+                    properties:
+                        price:
+                            type: string
+                        side:
+                            enum:
+                                - BUY
+                                - SELL
+                            type: string
+                        size:
+                            type: string
+                    required:
+                        - side
+                        - price
+                        - size
+                    type: object
+                best_ask_interactive:
+                    additionalProperties: false
+                    description: Size on the best ask from UI
+                    properties:
+                        price:
+                            type: string
+                        side:
+                            enum:
+                                - BUY
+                                - SELL
+                            type: string
+                        size:
+                            type: string
+                    required:
+                        - side
+                        - price
+                        - size
+                    type: object
+                best_bid_api:
+                    additionalProperties: false
+                    description: Size on the best bid from API (excluding RPI)
+                    properties:
+                        price:
+                            type: string
+                        side:
+                            enum:
+                                - BUY
+                                - SELL
+                            type: string
+                        size:
+                            type: string
+                    required:
+                        - side
+                        - price
+                        - size
+                    type: object
+                best_bid_interactive:
+                    additionalProperties: false
+                    description: Size on the best bid from UI
+                    properties:
+                        price:
+                            type: string
+                        side:
+                            enum:
+                                - BUY
+                                - SELL
+                            type: string
+                        size:
+                            type: string
+                    required:
+                        - side
+                        - price
+                        - size
+                    type: object
+                deletes:
+                    items:
+                        additionalProperties: false
+                        properties:
+                            price:
+                                type: string
+                            side:
+                                enum:
+                                    - BUY
+                                    - SELL
+                                type: string
+                            size:
+                                type: string
+                        required:
+                            - side
+                            - price
+                            - size
+                        type: object
+                    type: array
+                inserts:
+                    items:
+                        additionalProperties: false
+                        properties:
+                            price:
+                                type: string
+                            side:
+                                enum:
+                                    - BUY
+                                    - SELL
+                                type: string
+                            size:
+                                type: string
+                        required:
+                            - side
+                            - price
+                            - size
+                        type: object
+                    type: array
+                last_updated_at:
+                    description: in milliseconds
+                    type: integer
+                market:
+                    type: string
+                relative_spread:
+                    description: 'Relative spread: (ask-bid)/midpoint. Only included for the periodic interactive feed.'
+                    type: string
+                seq_no:
+                    type: integer
+                update_type:
+                    enum:
+                        - s
+                        - d
+                    type: string
+                updates:
+                    items:
+                        additionalProperties: false
+                        properties:
+                            price:
+                                type: string
+                            side:
+                                enum:
+                                    - BUY
+                                    - SELL
+                                type: string
+                            size:
+                                type: string
+                        required:
+                            - side
+                            - price
+                            - size
+                        type: object
+                    type: array
+            required:
+                - seq_no
+                - market
+                - last_updated_at
+                - update_type
+                - inserts
+                - updates
+                - deletes
+            type: object
+        ResponsesRfqEventResp:
+            additionalProperties: false
+            properties:
+                account:
+                    description: Paradex account that owns the RFQ
+                    type: string
+                created_at:
+                    description: Event time in Unix milliseconds
+                    type: integer
+                deribit_cost:
+                    additionalProperties: false
+                    description: 'What the same structure would cost crossing Deribit''s public book, when type is DERIBIT_COST. A reference only: nothing here is executable, and it repeats on a timer while the RFQ is open'
+                    properties:
+                        buy_available:
+                            description: 'Structure units resting at Deribit''s top of book: the smallest, across premium legs, of that leg''s available amount over its ratio. Travels with INSUFFICIENT_SIZE so a client can name the gap rather than only assert one'
+                            type: string
+                        buy_cost:
+                            description: 'Signed USD total for the whole quantity, oriented like a structure price: positive is a debit, negative a net credit. Absent unless this direction''s status is PRICED. A zero is a real price, for a structure whose legs offset, and is not the same as an absent figure'
+                            type: string
+                        buy_status:
+                            description: 'Why this direction has no cost. NO_SIZE, INSUFFICIENT_SIZE and PRICED are one scale: nothing resting, some but not enough, enough. NOT_LISTED means Deribit does not list the instrument. NO_DATA means it does and no price has reached us, which is not an empty book and must not be drawn as one'
+                            enum:
+                                - PRICED
+                                - NOT_LISTED
+                                - NO_SIZE
+                                - INSUFFICIENT_SIZE
+                                - NO_DATA
+                            type: string
+                        last_updated_at:
+                            description: Unix ms of the OLDEST leg tick behind the figure, since a structure is as stale as its worst leg. Absent whenever no tick backs it, which is every NOT_LISTED and NO_DATA. Use it to tell a live figure from a frozen feed, not to tell whether the reference is still arriving
+                            type: integer
+                        sell_available:
+                            description: As buy_available, for selling the structure instead of buying it
+                            type: string
+                        sell_cost:
+                            description: As buy_cost, for selling the structure instead of buying it
+                            type: string
+                        sell_status:
+                            description: As buy_status, for selling the structure instead of buying it
+                            enum:
+                                - PRICED
+                                - NOT_LISTED
+                                - NO_SIZE
+                                - INSUFFICIENT_SIZE
+                                - NO_DATA
+                            type: string
+                    type: object
+                quote:
+                    additionalProperties: false
+                    description: Maker or taker quote payload when type is QUOTE
+                    properties:
+                        close_reason:
+                            description: Venue close reason on CLOSED (e.g. NO_MATCH, EXPIRED); empty otherwise
+                            type: string
+                        counterparty:
+                            type: string
+                        label:
+                            description: User label on the order; echoes your own label on TAKER orders
+                            type: string
+                        order_id:
+                            type: string
+                        price:
+                            type: string
+                        quantity:
+                            type: string
+                        role:
+                            description: TAKER for your own order, MAKER for a counterparty quote
+                            enum:
+                                - TAKER
+                                - MAKER
+                            type: string
+                        side:
+                            enum:
+                                - BUY
+                                - SELL
+                            type: string
+                        state:
+                            enum:
+                                - PENDING
+                                - OPENED
+                                - CLOSED
+                            type: string
+                    required:
+                        - order_id
+                        - state
+                    type: object
+                result:
+                    additionalProperties: false
+                    description: Asynchronous REST command outcome when type is RESULT
+                    properties:
+                        allowed_side:
+                            description: Directions the risk check granted this RFQ, on the create result only; executing the other way is refused
+                            enum:
+                                - BUY
+                                - SELL
+                                - TWO_WAY
+                            type: string
+                        http_status:
+                            description: Venue HTTP status, 0 when no response was received
+                            type: integer
+                        label:
+                            description: User label echoed from the request
+                            type: string
+                        message:
+                            description: Human-readable error, empty on SUCCESS
+                            type: string
+                        operation:
+                            description: REST command answered by this result
+                            enum:
+                                - RFQ_CREATE
+                                - RFQ_DELETE
+                                - RFQ_EXECUTE
+                            type: string
+                        order_id:
+                            description: Venue-issued order id, present only for successful RFQ executions
+                            type: string
+                        request_id:
+                            description: Paradex-issued id returned by the REST 202 and echoed here for correlation
+                            type: string
+                        status:
+                            description: Whether the RFQ venue accepted the command
+                            enum:
+                                - SUCCESS
+                                - FAILED
+                            type: string
+                    required:
+                        - status
+                        - operation
+                    type: object
+                rfq:
+                    additionalProperties: false
+                    description: RFQ lifecycle payload when type is RFQ
+                    properties:
+                        close_reason:
+                            enum:
+                                - FILLED
+                                - EXPIRED
+                                - CANCELLED
+                            type: string
+                        expires_at:
+                            type: integer
+                        quantity:
+                            type: string
+                        state:
+                            enum:
+                                - OPENED
+                                - CLOSED
+                            type: string
+                    required:
+                        - state
+                    type: object
+                rfq_id:
+                    description: Venue-issued RFQ id; empty on a failed create result
+                    type: string
+                seq:
+                    description: Monotonic delivery sequence for this account partition
+                    type: integer
+                trade:
+                    additionalProperties: false
+                    description: Block-trade payload when type is TRADE
+                    properties:
+                        counterparty:
+                            type: string
+                        price:
+                            type: string
+                        quantity:
+                            type: string
+                        reason:
+                            description: Taker-facing rejection reason on REJECTED (e.g. risk check, invalid credentials); empty otherwise
+                            type: string
+                        side:
+                            enum:
+                                - BUY
+                                - SELL
+                            type: string
+                        state:
+                            enum:
+                                - STARTED
+                                - EXECUTED
+                                - REJECTED
+                                - PROGRESS
+                            type: string
+                        trade_id:
+                            type: string
+                    required:
+                        - trade_id
+                        - state
+                    type: object
+                type:
+                    description: Event variant; exactly one matching payload field is populated
+                    enum:
+                        - RFQ
+                        - QUOTE
+                        - TRADE
+                        - RESULT
+                        - DERIBIT_COST
+                    type: string
+            required:
+                - type
+                - account
+                - rfq_id
+                - seq
+                - created_at
+            type: object
+        ResponsesTradeResult:
+            additionalProperties: false
+            properties:
+                block_id:
+                    description: Groups the legs settled together in one block execution, one id per accepted offer for offer-based blocks. Empty for non-block trades. Delivered on the JSON encoding only, not the SBE binary encoding.
+                    example: "1681497002041000000"
+                    type: string
+                created_at:
+                    description: Unix Millisecond timestamp at which trade was done
+                    example: "1681497002041"
+                    type: integer
+                id:
+                    description: Unique Trade ID per TradeType
+                    example: "12345643"
+                    type: string
+                market:
+                    description: Market for which trade was done
+                    example: BTC-USD-PERP
+                    type: string
+                price:
+                    description: Trade price
+                    example: "30001.2"
+                    type: string
+                side:
+                    description: Taker side
+                    enum:
+                        - BUY
+                        - SELL
+                    type: string
+                size:
+                    description: Trade size
+                    example: "0.01"
+                    type: string
+                trade_type:
+                    description: 'Trade type: FILL, LIQUIDATION, RPI, UNWIND_TRANSFER, SETTLE_MARKET or BLOCK_TRADE'
+                    enum:
+                        - LIQUIDATION
+                        - UNWIND_TRANSFER
+                        - FILL
+                        - SETTLE_MARKET
+                        - RPI
+                        - BLOCK_TRADE
+                    example: FILL
+                    type: string
+            required:
+                - id
+                - market
+                - side
+                - size
+                - price
+                - created_at
+                - trade_type
+            type: object
+        ResponsesTradebustResult:
+            additionalProperties: false
+            properties:
+                account:
+                    description: Paradex Account
+                    example: 0x495d2eb5236a12b8b4ad7d3849ce6a203ce21c43f473c248dfd5ce70d9454fa
+                    type: string
+                busted_fill_id:
+                    description: Unique ID of the busted fill
+                    example: "12342345"
+                    type: string
+                created_at:
+                    description: Unix timestamp in milliseconds when bust was created
+                    example: "1681497002041"
+                    type: integer
+            required:
+                - account
+                - busted_fill_id
+                - created_at
+            type: object
+        ResponsesTransactionResponse:
+            additionalProperties: false
+            properties:
+                completed_at:
+                    description: Timestamp from when the transaction was completed
+                    type: integer
+                created_at:
+                    description: Timestamp from when the transaction was sent to blockchain gateway
+                    type: integer
+                hash:
+                    description: Tx Hash of the settled trade                                                // Hash of the transaction
+                    example: 0x445c05d6bfb899e39338440d199971c4d7f4cde7878ed3888df3f716efb8df2
+                    type: string
+                id:
+                    description: Unique string ID of the event that triggered the transaction. For example, fill ID or liquidation ID
+                    example: "12342423"
+                    type: string
+                state:
+                    description: Status of the transaction on Starknet
+                    enum:
+                        - ACCEPTED_ON_L1
+                        - ACCEPTED_ON_L2
+                        - NOT_RECEIVED
+                        - RECEIVED
+                        - REJECTED
+                        - REVERTED
+                    type: string
+                type:
+                    description: Event that triggered the transaction
+                    enum:
+                        - TRANSACTION_FILL
+                        - TRANSACTION_LIQUIDATE
+                        - TRANSACTION_SETTLE_MARKET
+                    type: string
+            required:
+                - id
+                - type
+                - hash
+                - state
+                - created_at
+                - completed_at
+            type: object
+        ResponsesTransferResult:
+            additionalProperties: false
+            properties:
+                account:
+                    description: Starknet Account address
+                    example: 0x495d2eb5236a12b8b4ad7d3849ce6a203ce21c43f473c248dfd5ce70d9454fa
+                    type: string
+                amount:
+                    description: Transferred amount
+                    example: "100"
+                    type: string
+                auto_withdrawal_fee:
+                    description: Fee for auto withdrawal in USDC
+                    example: "4.5"
+                    type: string
+                bridge:
+                    description: Bridge used for the transfer
+                    enum:
+                        - ""
+                        - STARKGATE
+                        - LAYERSWAP
+                        - RHINOFI
+                        - HYPERLANE
+                    example: STARKGATE
+                    type: string
+                counterparty:
+                    description: Counterparty address
+                    example: 0x495d2eb5236a12b8b4ad7d3849ce6a203ce21c43f473c248dfd5ce70d9454fa
+                    type: string
+                created_at:
+                    description: Unix Millis timestamp transfer was created on L2
+                    example: "1681497002041"
+                    type: integer
+                direction:
+                    description: Transfer direction (IN, OUT)
+                    enum:
+                        - IN
+                        - OUT
+                    example: OUT
+                    type: string
+                external_account:
+                    description: External chain account address
+                    example: 0x495d2eb5236a12b8b4ad7d3849ce6a203ce21c43f473c248dfd5ce70d9454fa
+                    type: string
+                external_chain:
+                    description: External chain used for the transfer
+                    example: ETHEREUM
+                    type: string
+                external_txn_hash:
+                    description: Transaction hash on the external chain
+                    example: 0x495d2eb5236a12b8b4ad7d3849ce6a203ce21c43f473c248dfd5ce70d9454fa
+                    type: string
+                failure_reason:
+                    description: Reason for transfer failure
+                    example: Gas fee too low
+                    type: string
+                id:
+                    description: Transfer auto-generated ID
+                    example: "123456789"
+                    type: string
+                kind:
+                    description: Transfer Kind (DEPOSIT, WITHDRAWAL)
+                    enum:
+                        - DEPOSIT
+                        - WITHDRAWAL
+                        - UNWINDING
+                        - VAULT_DEPOSIT
+                        - VAULT_WITHDRAWAL
+                        - AUTO_WITHDRAWAL
+                        - AIRDROP
+                    example: DEPOSIT
+                    type: string
+                last_updated_at:
+                    description: Unix Millis timestamp transfer was last updated on L2
+                    example: "1681497002041"
+                    type: integer
+                socialized_loss_factor:
+                    description: Withdrawal's socialized loss factor
+                    example: "0"
+                    type: string
+                status:
+                    description: Transfer External State (PENDING, AVAILABLE, COMPLETED, FAILED)
+                    enum:
+                        - PENDING
+                        - AVAILABLE
+                        - COMPLETED
+                        - FAILED
+                    example: PENDING
+                    type: string
+                token:
+                    description: Transferred token name
+                    example: USDC
+                    type: string
+                txn_hash:
+                    description: Transaction hash on Paradex chain
+                    example: 0x495d2eb5236a12b8b4ad7d3849ce6a203ce21c43f473c248dfd5ce70d9454fa
+                    type: string
+                vault_address:
+                    description: Vault address
+                    example: 0x7a3b1c8f9e2d4e6f8a0c2b4d6e8f0a2c4b6e8d0a
+                    type: string
+                vault_unwind_completion_percentage:
+                    description: Vault unwind completion percentage
+                    example: "0.35"
+                    type: string
+            required:
+                - id
+                - account
+                - kind
+                - status
+                - amount
+                - token
+                - created_at
+                - last_updated_at
+                - txn_hash
+                - external_txn_hash
+                - socialized_loss_factor
+                - bridge
+                - external_chain
+                - external_account
+                - failure_reason
+                - direction
+                - vault_address
+                - vault_unwind_completion_percentage
+                - counterparty
+                - auto_withdrawal_fee
+            type: object
+    messages:
+        ResponsesAccountSummaryResponse:
+            name: accountsummary
+            title: AccountSummaryResponse
+            summary: Private websocket channel for receiving updates of account status
+            description: Subscribe to account messages
+            tags:
+                - name: account
+        ResponsesBBOResp:
+            name: bboresp
+            title: BBOResp
+            summary: Public websocket channel for tick updates of orderbook best bid/ask prices and amounts
+            description: 'Subscribe to market messages. Use `bbo.{market_symbol}` for a single market, `bbo.ALL` for every market, or pass `{"channel": "bbo", "base_asset": "{base_asset}"}` to receive updates for every active options market (OPTION and PERP_OPTION) for the given base asset.'
+            tags:
+                - name: market
+        ResponsesBalanceEventResponse:
+            name: balanceevent
+            title: BalanceEventResponse
+            summary: Private websocket channel to receive PnL calculation data
+            description: Subscribe to balance event messages
+            tags:
+                - name: account
+        ResponsesFillResult:
+            name: fillresult
+            title: FillResult
+            summary: Private websocket channel to receive details of fills for specific account
+            description: Subscribe to fill messages for a market
+            tags:
+                - name: trading
+        ResponsesFundingDataResult:
+            name: fundingdataresult
+            title: FundingDataResult
+            summary: Public websocket channel to receive funding data updates
+            description: Subscribe to funding data messages for a market
+            tags:
+                - name: market
+                - name: funding
+        ResponsesFundingPayment:
+            name: fundingpayment
+            title: FundingPayment
+            summary: Private websocket channel to receive funding payments of an account
+            description: Subscribe to funding payment messages for a market
+            tags:
+                - name: funding
+        ResponsesMarketEvent:
+            name: marketevent
+            title: MarketEvent
+            summary: Public websocket channel for live updates to market specifications
+            description: 'Subscribe to market spec changes: new listings (CREATED), settlements (SETTLED), market removals (DELETED) and parameter updates (UPDATED — e.g. price tick size, position limits, margin params). Supports `markets` (all markets) and `markets.{market_symbol}` (specific market). Payload shape mirrors GET /markets/history.'
+            tags:
+                - name: market
+        ResponsesMarketSummaryResp:
+            name: marketsummaryresp
+            title: MarketSummaryResp
+            summary: Public websocket channel for updates of available markets
+            description: 'Subscribe to market summary messages for specific markets or all markets. Supports markets_summary (all markets) and markets_summary.{market_symbol} (specific market) dot-encoded patterns, plus a scoped mutable-filter mode: subscribe with a `markets` array (present, even empty) to filter to a specific set and change that set in place via modify_subscription without re-subscribing.'
+            tags:
+                - name: market
+        ResponsesMmpEventResp:
+            name: mmpeventresp
+            title: MmpEventResp
+            summary: Private websocket channel to receive market maker protection events
+            description: |-
+                Subscribe to `mmp` for market maker protection state changes on the authenticated account, one event per base asset.
+                TRIGGERED: a limit tripped. Open MMP orders on the base asset are cancelled with MMP_TRIGGERED, and new ones with MMP_FROZEN until `frozen_until`, or until a manual reset when it is 0. UNFROZEN and RESET end a freeze. CONFIG_UPDATED carries the new config.
+            tags:
+                - name: account
+        ResponsesOrderResp:
+            name: orderresp
+            title: OrderResp
+            summary: Private websocket channel to receive order updates
+            description: Subscribe to order messages for a market
+            tags:
+                - name: trading
+        ResponsesPositionResp:
+            name: positionresp
+            title: PositionResp
+            summary: Private websocket channel to receive updates when position is changed
+            description: Subscribe to position messages
+            tags:
+                - name: trading
+        ResponsesPriceBookUpdate:
+            name: pricebookupdate
+            title: PriceBookUpdate
+            summary: Public websocket channel for orderbook updates, as periodic snapshots of depth 15 or as full-depth incremental deltas
+            description: 'Public websocket channel for orderbook updates. The snapshot and interactive feeds send snapshots of depth 15 at most every 50ms or 100ms, optionally grouped by price tick. The deltas and interactive_deltas feeds take no parameters: each sends one full-depth snapshot on subscribe and then incremental updates, and neither applies price tick grouping. The interactive and interactive_deltas feeds include RPI orders; snapshot and deltas exclude them.'
+            tags:
+                - name: market
+        ResponsesRfqEventResp:
+            name: rfqeventresp
+            title: RfqEventResp
+            summary: Private websocket channel to receive events on your RFQs
+            description: |-
+                Subscribe to `rfq` for all RFQs belonging to the authenticated account, or `rfq.{rfq_id}` for one venue-issued RFQ id.
+                Events have type RFQ, QUOTE, TRADE, RESULT, or DERIBIT_COST. RESULT acknowledges asynchronous REST create, execute, and cancel commands; match it to the REST 202 response by `result.request_id`.
+                DERIBIT_COST is a reference figure, not an event: it repeats on a timer while the RFQ is open, carries what the same structure would cost crossing Deribit's public book, and is not executable. Read `deribit_cost.last_updated_at` to tell a live figure from a frozen feed, bearing in mind it is absent whenever no venue tick backs the figure, and the per-direction `status` for why a direction has none: NO_SIZE and INSUFFICIENT_SIZE are answers about Deribit's book, NOT_LISTED says it does not list the instrument, and NO_DATA says no price for it has reached us yet, so do not render that one as an empty book.
+            tags:
+                - name: trading
+        ResponsesTradeResult:
+            name: traderesult
+            title: TradeResult
+            summary: Public websocket channel to receive updates on trades in particular market
+            description: 'Subscribe to trade messages. Use `trades.{market_symbol}` for a single market, `trades.ALL` for every market, or pass `{"channel": "trades", "base_asset": "{base_asset}"}` to receive updates for every active options market (OPTION and PERP_OPTION) for the given base asset. A block trade is published as one message per leg; `block_id` is the id they share, which is what lets a client reassemble the package, and it is sent on block-trade messages only. (On a deployment still on the legacy fan-out rather than kafka-ingress, a block trade''s message carries its first leg alone; fetch `GET /trades?trade_type=BLOCK_TRADE` for the package.) Note that `block_id` is carried by the JSON encoding only; the SBE binary encoding of this channel does not carry it.'
+            tags:
+                - name: market
+        ResponsesTradebustResult:
+            name: tradebustresult
+            title: TradebustResult
+            summary: Private websocket channel to receive fills that are busted by a blockchain
+            description: Private websocket channel to receive fills that are busted by a blockchain
+            tags:
+                - name: trading
+        ResponsesTransactionResponse:
+            name: transaction
+            title: TransactionResponse
+            summary: Private websocket channel for receiving transaction details of fills
+            description: Subscribe to transaction messages
+            tags:
+                - name: account
+        ResponsesTransferResult:
+            name: transferresult
+            title: TransferResult
+            summary: Websocket channel for receiving transfer updates
+            description: |-
+                <p>Meaning of each transfer status:</p>
+                <ul>
+                <li><code>PENDING</code>: L2 txn calling Paraclear contract is in flight: For Withdrawals it's the initial status; refers to the L2 txn status being <code>RECEIVED</code>, <code>PENDING</code>, <code>ACCEPTED_ON_L2</code>. For Deposits refers to L2 txn status being <code>RECEIVED</code>, <code>PENDING</code>.</li>
+                <li><code>AVAILABLE</code>: Action is required from user: For Withdrawals refers to L2 txn status being <code>ACCEPTED_ON_L1</code> and funds available for collection on Ethereum bridge. For Deposits refers to funds being available in the L2 account, ready to be deposited to Paraclear contract.</li>
+                <li><code>COMPLETED</code>: Transfer has completed (final state): For Withdrawals funds have been collected and have moved to the requested Ethereum account; refers to L1 bridge withdraw txn status <code>SUCCESS</code>. For Deposits funds have become available in Paradex; refers to the L2 txn status being <code>ACCEPTED_ON_L2</code>.</li>
+                <li><code>FAILED</code>: L2 txn calling Paraclear contract failed with <code>REJECTED</code> status. Deposits can be retried when they fail by repeating the L2 txn.</li>
+                </ul>
+            tags:
+                - name: account
+defaultContentType: application/json

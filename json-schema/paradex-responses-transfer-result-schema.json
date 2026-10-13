@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/paradex/main/json-schema/paradex-responses-transfer-result-schema.json",
+  "title": "responses.TransferResult",
+  "description": "TransferResult",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/paradex-openapi.yml#/components/schemas/responses.TransferResult",
+  "type": "object",
+  "properties": {
+    "account": {
+      "description": "Starknet Account address",
+      "type": "string"
+    },
+    "amount": {
+      "description": "Transferred amount",
+      "type": "string"
+    },
+    "auto_withdrawal_fee": {
+      "description": "Fee for auto withdrawal in USDC",
+      "type": "string"
+    },
+    "bridge": {
+      "description": "Bridge used for the transfer",
+      "allOf": [
+        {
+          "$ref": "#/$defs/responses.TransferBridge"
+        }
+      ]
+    },
+    "counterparty": {
+      "description": "Counterparty address",
+      "type": "string"
+    },
+    "created_at": {
+      "description": "Unix Millis timestamp transfer was created on L2",
+      "type": "integer"
+    },
+    "direction": {
+      "description": "Transfer direction (IN, OUT)",
+      "allOf": [
+        {
+          "$ref": "#/$defs/responses.TransferDirection"
+        }
+      ]
+    },
+    "external_account": {
+      "description": "External chain account address",
+      "type": "string"
+    },
+    "external_chain": {
+      "description": "External chain used for the transfer",
+      "type": "string"
+    },
+    "external_txn_hash": {
+      "description": "Transaction hash on the external chain",
+      "type": "string"
+    },
+    "failure_reason": {
+      "description": "Reason for transfer failure",
+      "type": "string"
+    },
+    "id": {
+      "description": "Transfer auto-generated ID",
+      "type": "string"
+    },
+    "kind": {
+      "description": "Transfer Kind (DEPOSIT, WITHDRAWAL)",
+      "allOf": [
+        {
+          "$ref": "#/$defs/responses.TransferKind"
+        }
+      ]
+    },
+    "last_updated_at": {
+      "description": "Unix Millis timestamp transfer was last updated on L2",
+      "type": "integer"
+    },
+    "socialized_loss_factor": {
+      "description": "Withdrawal's socialized loss factor",
+      "type": "string"
+    },
+    "status": {
+      "description": "Transfer External State (PENDING, AVAILABLE, COMPLETED, FAILED)",
+      "allOf": [
+        {
+          "$ref": "#/$defs/responses.TransferStatus"
+        }
+      ]
+    },
+    "token": {
+      "description": "Transferred token name",
+      "type": "string"
+    },
+    "txn_hash": {
+      "description": "Transaction hash on Paradex chain",
+      "type": "string"
+    },
+    "vault_address": {
+      "description": "Vault address",
+      "type": "string"
+    },
+    "vault_unwind_completion_percentage": {
+      "description": "Vault unwind completion percentage",
+      "type": "string"
+    }
+  },
+  "$defs": {
+    "responses.TransferBridge": {
+      "type": "string",
+      "enum": [
+        "",
+        "STARKGATE",
+        "LAYERSWAP",
+        "RHINOFI",
+        "HYPERLANE"
+      ],
+      "x-enum-varnames": [
+        "TransferBridgeUnspecified",
+        "TransferBridgeStarkgate",
+        "TransferBridgeLayerswap",
+        "TransferBridgeRhinofi",
+        "TransferBridgeHyperlane"
+      ]
+    },
+    "responses.TransferDirection": {
+      "type": "string",
+      "enum": [
+        "IN",
+        "OUT"
+      ],
+      "x-enum-varnames": [
+        "TransferDirectionIn",
+        "TransferDirectionOut"
+      ]
+    },
+    "responses.TransferKind": {
+      "type": "string",
+      "enum": [
+        "DEPOSIT",
+        "WITHDRAWAL",
+        "UNWINDING",
+        "VAULT_DEPOSIT",
+        "VAULT_WITHDRAWAL",
+        "AUTO_WITHDRAWAL",
+        "AIRDROP"
+      ],
+      "x-enum-varnames": [
+        "TransferKindDeposit",
+        "TransferKindWithdrawal",
+        "TransferKindUnwinding",
+        "TransferKindVaultDeposit",
+        "TransferKindVaultWithdrawal",
+        "TransferKindAutoWithdrawal",
+        "TransferKindAirdrop"
+      ]
+    },
+    "responses.TransferStatus": {
+      "type": "string",
+      "enum": [
+        "PENDING",
+        "AVAILABLE",
+        "COMPLETED",
+        "FAILED"
+      ],
+      "x-enum-comments": {
+        "TransferStatusAvailable": "Action is required from user: For Withdrawals refers to L2 txn status being `ACCEPTED_ON_L1` and funds available for collection on Ethereum bridge. For Deposits refers to funds being available in the L2 account, ready to be deposited to Paraclear contract.",
+        "TransferStatusCompleted": "Transfer has completed (final state): For Withdrawals funds have been collected and have moved to the requested Ethereum account; refers to L1 bridge withdraw txn status `SUCCESS`. For Deposits funds have become available in Paradex; refers to the L2 txn status being `ACCEPTED_ON_L2`.",
+        "TransferStatusFailed": "L2 txn calling Paraclear contract failed with `REJECTED` or `REVERTED` status. Deposits can be retried when they fail by repeating the L2 txn.",
+        "TransferStatusPending": "L2 txn calling Paraclear contract is in flight: For Withdrawals it's the initial status; refers to the L2 txn status being `RECEIVED`, `PENDING`, `ACCEPTED_ON_L2`. For Deposits refers to L2 txn status being `RECEIVED`, `PENDING`."
+      },
+      "x-enum-varnames": [
+        "TransferStatusPending",
+        "TransferStatusAvailable",
+        "TransferStatusCompleted",
+        "TransferStatusFailed"
+      ]
+    }
+  }
+}

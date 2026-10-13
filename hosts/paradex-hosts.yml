@@ -1,0 +1,158 @@
+generated: '2026-10-13'
+method: derived
+source: the pre-flight dossier, apis.yml pointers, spec servers, well-known, vendors -- nothing fetched here
+generator: derive-hosts.py
+summary:
+  hosts: 12
+  own: 10
+  other_domain: 1
+  platform: 1
+  roles:
+  - api
+  - docs
+  - identity
+  - other
+  - source
+  - status
+  - website
+hosts:
+- host: api.paradex.trade
+  found_by:
+  - contract-discovery
+  types: []
+  serves: []
+  registrable_domain: paradex.trade
+  role: api
+  relation: own
+- host: api.prod.paradex.trade
+  found_by:
+  - apis[]
+  types: []
+  serves:
+  - api
+  registrable_domain: paradex.trade
+  role: api
+  relation: own
+- host: app.paradex.trade
+  found_by:
+  - pointer
+  - probed
+  - site-links
+  - contract-discovery
+  - well-known
+  types:
+  - Login
+  serves: []
+  registrable_domain: paradex.trade
+  role: identity
+  relation: own
+- host: app.testnet.paradex.trade
+  found_by:
+  - probed
+  - site-links
+  - contract-discovery
+  - well-known
+  types: []
+  serves: []
+  registrable_domain: paradex.trade
+  role: other
+  relation: own
+- host: docs.paradex.trade
+  found_by:
+  - pointer
+  - apis[]
+  - probed
+  - site-links
+  - namespace-probe
+  - docs-index
+  - spec-found
+  - contract-discovery
+  - well-known
+  types:
+  - Documentation
+  - GettingStarted
+  - APIReference
+  - ChangeLog
+  - Pricing
+  serves:
+  - docs
+  - spec
+  title: Zero-fee Equities, FX, Commodities, and Crypto Trading | Paradex | Documentation
+  status: 200
+  registrable_domain: paradex.trade
+  role: docs
+  relation: own
+- host: github.com
+  found_by:
+  - pointer
+  types:
+  - GitHubOrganization
+  serves: []
+  registrable_domain: github.com
+  role: source
+  relation: platform
+- host: mcp.paradex.trade
+  found_by:
+  - apis[]
+  types: []
+  serves:
+  - api
+  registrable_domain: paradex.trade
+  role: other
+  relation: own
+- host: modelcontextprotocol.io
+  found_by:
+  - docs-index
+  types: []
+  serves:
+  - docs
+  registrable_domain: modelcontextprotocol.io
+  role: other
+  relation: other-domain
+- host: paradex.trade
+  found_by:
+  - probed
+  - site-links
+  - well-known
+  types: []
+  serves: []
+  registrable_domain: paradex.trade
+  role: other
+  relation: own
+- host: shop.paradex.trade
+  found_by:
+  - probed
+  - site-links
+  - well-known
+  types: []
+  serves: []
+  registrable_domain: paradex.trade
+  role: other
+  relation: own
+- host: status.paradex.trade
+  found_by:
+  - pointer
+  - probed
+  - site-links
+  - well-known
+  types:
+  - StatusPage
+  serves: []
+  registrable_domain: paradex.trade
+  role: status
+  relation: own
+- host: www.paradex.trade
+  found_by:
+  - pointer
+  - probed
+  - contract-discovery
+  - well-known
+  types:
+  - Website
+  - Blog
+  - PrivacyPolicy
+  - TermsOfService
+  serves: []
+  registrable_domain: paradex.trade
+  role: website
+  relation: own

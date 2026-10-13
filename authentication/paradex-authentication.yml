@@ -1,0 +1,15 @@
+generated: '2026-10-13'
+method: derived
+source: openapi/paradex-openapi.yml
+summary:
+  types:
+  - apiKey
+  api_key_in:
+  - header
+schemes:
+- name: BearerToken
+  type: apiKey
+  in: header
+  parameter: Authorization
+  sources:
+  - openapi/paradex-openapi.yml

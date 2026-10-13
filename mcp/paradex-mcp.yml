@@ -1,0 +1,21 @@
+name: Paradex MCP Server
+generated: '2026-10-13'
+method: probed
+source: https://docs.paradex.trade/agentic-ai-hub/paradex-hosted-mcp/quickstart.md
+status: live
+description: Paradex hosts a public remote MCP server at https://mcp.paradex.trade/mcp (no API key, market and vault data). The same server is published as the open-source Python package mcp-paradex for local stdio use with a Paradex private key for trading. A separate docs-search MCP server is served at https://docs.paradex.trade/mcp.
+deployment:
+  mode: both
+  endpoint: https://mcp.paradex.trade/mcp
+  install: uvx mcp-paradex
+  package: https://pypi.org/project/mcp-paradex/
+  auth: none
+  verified: probed
+tools_list: mcp/paradex-mcp-tools-list.json
+tools_probe: anonymous POST tools/list to https://mcp.paradex.trade/mcp returned 200 text/event-stream with 16 tools on 2026-10-13
+tools: [paradex_filters_model, paradex_markets, paradex_market_summaries, paradex_funding_data, paradex_orderbook, paradex_klines, paradex_trades, paradex_bbo, paradex_system_config, paradex_system_state, paradex_vaults, paradex_vault_balance, paradex_vault_summary, paradex_vault_transfers, paradex_vault_positions, paradex_vault_account_summary]
+other_servers:
+- name: Paradex docs MCP
+  endpoint: https://docs.paradex.trade/mcp
+  tools: [searchDocs]
+  verified: probed

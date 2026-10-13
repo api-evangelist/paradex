@@ -1,0 +1,8 @@
+name: Paradex Packages
+generated: '2026-10-13'
+method: searched
+source: https://pypi.org/pypi/paradex-py/json
+packages:
+- {name: paradex-py, registry: pypi, url: 'https://pypi.org/project/paradex-py/', language: python, official: true, version: 0.8.2, published: '2026-10-13', repository: 'https://github.com/tradeparadex/paradex-py'}
+- {name: '@paradex/sdk', registry: npm, url: 'https://www.npmjs.com/package/@paradex/sdk', language: javascript, official: true, version: 0.8.1, published: '2025-12-12', repository: 'https://github.com/tradeparadex/paradex.js'}
+- {name: mcp-paradex, registry: pypi, url: 'https://pypi.org/project/mcp-paradex/', language: python, official: true, version: 0.3.1, published: '2026-04-23', repository: 'https://github.com/tradeparadex/mcp-paradex-py'}

@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/paradex/main/json-schema/paradex-responses-system-config-response-schema.json",
+  "title": "responses.SystemConfigResponse",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/paradex-openapi.yml#/components/schemas/responses.SystemConfigResponse",
+  "type": "object",
+  "properties": {
+    "assets_limit_per_account": {
+      "description": "Maximum number of token or synthetic positions allowed per account",
+      "type": "integer"
+    },
+    "block_explorer_url": {
+      "description": "Block explorer URL for the current SN Instance",
+      "type": "string"
+    },
+    "bridged_tokens": {
+      "description": "bridged tokens config\nhttps://github.com/starknet-io/starknet-addresses/blob/master/bridged_tokens/goerli.json",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/responses.BridgedToken"
+      }
+    },
+    "dime_staking_contract_address": {
+      "description": "DIME Staking contract address",
+      "type": "string"
+    },
+    "environment": {
+      "description": "Environment of the Paradex Instance",
+      "type": "string"
+    },
+    "l1_chain_id": {
+      "description": "L1 chain ID value",
+      "type": "string"
+    },
+    "l1_core_contract_address": {
+      "description": "Address of Starknet L1 core contract",
+      "type": "string"
+    },
+    "l1_operator_address": {
+      "description": "Address of Starknet L1 operator",
+      "type": "string"
+    },
+    "l1_relayer_address": {
+      "description": "Address of L1 Relayer",
+      "type": "string"
+    },
+    "l2_relayer_address": {
+      "description": "Address of L2 Relayer",
+      "type": "string"
+    },
+    "liquidation_fee": {
+      "description": "Liquidation fee",
+      "type": "string"
+    },
+    "oracle_address": {
+      "description": "Oracle contract address",
+      "type": "string"
+    },
+    "paraclear_account_hash": {
+      "description": "Class hash of the account contract",
+      "type": "string"
+    },
+    "paraclear_account_proxy_hash": {
+      "description": "Proxy hash of the account contract",
+      "type": "string"
+    },
+    "paraclear_address": {
+      "description": "Paraclear contract address",
+      "type": "string"
+    },
+    "paraclear_decimals": {
+      "type": "integer"
+    },
+    "paraclear_evm_account_hash": {
+      "description": "Class hash of the EVM (secp256k1) account contract",
+      "type": "string"
+    },
+    "partial_liquidation_buffer": {
+      "description": "Partial liquidation buffer. Account value is supposed to be at least this much above the MMR after partial liquidation",
+      "type": "string"
+    },
+    "partial_liquidation_share_increment": {
+      "description": "Minimum granularity of partial liquidation share. The share is rounded up to the nearest multiple of this value",
+      "type": "string"
+    },
+    "rfq_default_max_slippage": {
+      "description": "The exchange-wide fallback bound an unpriced RFQ's margin is computed\nfrom, as a fraction of the underlying spot notional, for an asset that\ncarries no bound of its own. Per-asset bounds are on\n/system/margin-config, already resolved. It does not bound the\nexecution: a quote wider than it is executable, and is charged what it\nactually costs. The price bands are what bound the trade.",
+      "type": "string"
+    },
+    "starknet_chain_id": {
+      "description": "Chain ID for the Starknet Instance",
+      "type": "string"
+    },
+    "starknet_fullnode_rpc_base_url": {
+      "description": "Full node RPC Proxy base URL for Starknet",
+      "type": "string"
+    },
+    "starknet_fullnode_rpc_url": {
+      "description": "Full node RPC Proxy URL for Starknet",
+      "type": "string"
+    },
+    "starknet_gateway_url": {
+      "description": "This field is deprecated",
+      "type": "string"
+    },
+    "universal_deployer_address": {
+      "description": "Universal deployer address",
+      "type": "string"
+    }
+  },
+  "$defs": {
+    "responses.BridgedToken": {
+      "type": "object",
+      "properties": {
+        "decimals": {
+          "type": "integer"
+        },
+        "l1_bridge_address": {
+          "type": "string"
+        },
+        "l1_token_address": {
+          "type": "string"
+        },
+        "l2_bridge_address": {
+          "type": "string"
+        },
+        "l2_token_address": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "symbol": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

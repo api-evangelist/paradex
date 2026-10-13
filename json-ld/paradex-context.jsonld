@@ -1,0 +1,1562 @@
+{
+  "@context": {
+    "@vocab": "https://paradex.trade/schema#",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "paradex": "https://paradex.trade/schema#",
+    "messagesv1.NftPrice": "paradex:messagesv1.NftPrice",
+    "currency": {
+      "@id": "paradex:currency",
+      "@type": "xsd:string"
+    },
+    "decimals": {
+      "@id": "paradex:decimals",
+      "@type": "xsd:integer"
+    },
+    "value": {
+      "@id": "paradex:value",
+      "@type": "xsd:string"
+    },
+    "requests.AccountMarginRequest": "paradex:requests.AccountMarginRequest",
+    "leverage": {
+      "@id": "paradex:leverage",
+      "@type": "xsd:integer"
+    },
+    "margin_type": {
+      "@id": "paradex:margin_type",
+      "@type": "xsd:string"
+    },
+    "on_behalf_of_account": {
+      "@id": "paradex:on_behalf_of_account",
+      "@type": "xsd:string"
+    },
+    "requests.AccountMmpConfigRequest": "paradex:requests.AccountMmpConfigRequest",
+    "delta_limit": {
+      "@id": "paradex:delta_limit",
+      "@type": "xsd:string"
+    },
+    "frozen_time_ms": {
+      "@id": "paradex:frozen_time_ms",
+      "@type": "xsd:integer"
+    },
+    "interval_ms": {
+      "@id": "paradex:interval_ms",
+      "@type": "xsd:integer"
+    },
+    "protect_block_trades": {
+      "@id": "paradex:protect_block_trades",
+      "@type": "xsd:boolean"
+    },
+    "size_limit": {
+      "@id": "paradex:size_limit",
+      "@type": "xsd:string"
+    },
+    "vega_limit": {
+      "@id": "paradex:vega_limit",
+      "@type": "xsd:string"
+    },
+    "requests.AccountMmpResetRequest": "paradex:requests.AccountMmpResetRequest",
+    "base_asset": {
+      "@id": "paradex:base_asset",
+      "@type": "xsd:string"
+    },
+    "requests.ActivateSubkey": "paradex:requests.ActivateSubkey",
+    "account_id": {
+      "@id": "paradex:account_id",
+      "@type": "xsd:string"
+    },
+    "name": {
+      "@id": "paradex:name",
+      "@type": "xsd:string"
+    },
+    "public_key": {
+      "@id": "paradex:public_key",
+      "@type": "xsd:string"
+    },
+    "signature": {
+      "@id": "paradex:signature",
+      "@container": "@list"
+    },
+    "timestamp": {
+      "@id": "paradex:timestamp",
+      "@type": "xsd:integer"
+    },
+    "requests.ActivateSubkeyResponse": "paradex:requests.ActivateSubkeyResponse",
+    "encrypted_key": {
+      "@id": "paradex:encrypted_key",
+      "@type": "xsd:string"
+    },
+    "requests.AlgoOrderRequest": "paradex:requests.AlgoOrderRequest",
+    "algo_type": {
+      "@id": "paradex:algo_type",
+      "@type": "xsd:string"
+    },
+    "dime_discount": {
+      "@id": "paradex:dime_discount",
+      "@type": "xsd:boolean"
+    },
+    "duration_seconds": {
+      "@id": "paradex:duration_seconds",
+      "@type": "xsd:integer"
+    },
+    "frequency": {
+      "@id": "paradex:frequency",
+      "@type": "xsd:integer"
+    },
+    "market": {
+      "@id": "paradex:market",
+      "@type": "xsd:string"
+    },
+    "recv_window": {
+      "@id": "paradex:recv_window",
+      "@type": "xsd:integer"
+    },
+    "side": {
+      "@id": "paradex:side"
+    },
+    "signature_timestamp": {
+      "@id": "paradex:signature_timestamp",
+      "@type": "xsd:integer"
+    },
+    "size": {
+      "@id": "paradex:size",
+      "@type": "xsd:string"
+    },
+    "type": {
+      "@id": "paradex:type"
+    },
+    "requests.BlockExecuteRequest": "paradex:requests.BlockExecuteRequest",
+    "execution_nonce": {
+      "@id": "paradex:execution_nonce",
+      "@type": "xsd:string"
+    },
+    "selected_offers": {
+      "@id": "paradex:selected_offers",
+      "@container": "@list"
+    },
+    "signatures": {
+      "@id": "paradex:signatures"
+    },
+    "requests.BlockOfferInfo": "paradex:requests.BlockOfferInfo",
+    "offerer_order": {
+      "@id": "paradex:offerer_order"
+    },
+    "price": {
+      "@id": "paradex:price",
+      "@type": "xsd:string"
+    },
+    "requests.BlockOfferRequest": "paradex:requests.BlockOfferRequest",
+    "nonce": {
+      "@id": "paradex:nonce",
+      "@type": "xsd:string"
+    },
+    "offering_account": {
+      "@id": "paradex:offering_account",
+      "@type": "xsd:string"
+    },
+    "trades": {
+      "@id": "paradex:trades"
+    },
+    "requests.BlockTradeInfo": "paradex:requests.BlockTradeInfo",
+    "maker_order": {
+      "@id": "paradex:maker_order"
+    },
+    "taker_order": {
+      "@id": "paradex:taker_order"
+    },
+    "trade_constraints": {
+      "@id": "paradex:trade_constraints"
+    },
+    "requests.BlockTradeRequest": "paradex:requests.BlockTradeRequest",
+    "block_expiration": {
+      "@id": "paradex:block_expiration",
+      "@type": "xsd:integer"
+    },
+    "required_signers": {
+      "@id": "paradex:required_signers",
+      "@container": "@list"
+    },
+    "requests.CancelOrderBatchRequest": "paradex:requests.CancelOrderBatchRequest",
+    "client_order_ids": {
+      "@id": "paradex:client_order_ids",
+      "@container": "@list"
+    },
+    "order_ids": {
+      "@id": "paradex:order_ids",
+      "@container": "@list"
+    },
+    "requests.CreateSubkey": "paradex:requests.CreateSubkey",
+    "allowed_cidrs": {
+      "@id": "paradex:allowed_cidrs",
+      "@container": "@list"
+    },
+    "eph_public_key": {
+      "@id": "paradex:eph_public_key",
+      "@type": "xsd:string"
+    },
+    "evm_signature": {
+      "@id": "paradex:evm_signature",
+      "@type": "xsd:string"
+    },
+    "signature_expiry": {
+      "@id": "paradex:signature_expiry",
+      "@type": "xsd:integer"
+    },
+    "siwe_message": {
+      "@id": "paradex:siwe_message",
+      "@type": "xsd:string"
+    },
+    "state": {
+      "@id": "paradex:state",
+      "@type": "xsd:string"
+    },
+    "requests.CreateToken": "paradex:requests.CreateToken",
+    "expiry_duration": {
+      "@id": "paradex:expiry_duration",
+      "@type": "xsd:integer"
+    },
+    "token_type": {
+      "@id": "paradex:token_type",
+      "@type": "xsd:string"
+    },
+    "requests.CreateVault": "paradex:requests.CreateVault",
+    "curator_name": {
+      "@id": "paradex:curator_name",
+      "@type": "xsd:string"
+    },
+    "deposit_tx_signature": {
+      "@id": "paradex:deposit_tx_signature",
+      "@type": "xsd:string"
+    },
+    "description": {
+      "@id": "paradex:description",
+      "@type": "xsd:string"
+    },
+    "lockup_period": {
+      "@id": "paradex:lockup_period",
+      "@type": "xsd:integer"
+    },
+    "max_tvl": {
+      "@id": "paradex:max_tvl",
+      "@type": "xsd:integer"
+    },
+    "operator_eth_address": {
+      "@id": "paradex:operator_eth_address",
+      "@type": "xsd:string"
+    },
+    "operator_index": {
+      "@id": "paradex:operator_index",
+      "@type": "xsd:integer"
+    },
+    "operator_signer_type": {
+      "@id": "paradex:operator_signer_type",
+      "@type": "xsd:string"
+    },
+    "profit_share": {
+      "@id": "paradex:profit_share",
+      "@type": "xsd:integer"
+    },
+    "show_balances": {
+      "@id": "paradex:show_balances",
+      "@type": "xsd:boolean"
+    },
+    "show_positions": {
+      "@id": "paradex:show_positions",
+      "@type": "xsd:boolean"
+    },
+    "strategy_description": {
+      "@id": "paradex:strategy_description",
+      "@type": "xsd:string"
+    },
+    "requests.CreateXPTransferRequest": "paradex:requests.CreateXPTransferRequest",
+    "amount": {
+      "@id": "paradex:amount",
+      "@type": "xsd:integer"
+    },
+    "is_private": {
+      "@id": "paradex:is_private",
+      "@type": "xsd:boolean"
+    },
+    "recipient": {
+      "@id": "paradex:recipient",
+      "@type": "xsd:string"
+    },
+    "season": {
+      "@id": "paradex:season",
+      "@type": "xsd:string"
+    },
+    "requests.ModifyOrderRequest": "paradex:requests.ModifyOrderRequest",
+    "id": {
+      "@id": "paradex:id",
+      "@type": "xsd:string"
+    },
+    "trigger_price": {
+      "@id": "paradex:trigger_price",
+      "@type": "xsd:string"
+    },
+    "requests.Onboarding": "paradex:requests.Onboarding",
+    "marketing_code": {
+      "@id": "paradex:marketing_code",
+      "@type": "xsd:string"
+    },
+    "portfolio_margin": {
+      "@id": "paradex:portfolio_margin",
+      "@type": "xsd:boolean"
+    },
+    "referral_code": {
+      "@id": "paradex:referral_code",
+      "@type": "xsd:string"
+    },
+    "utm": {
+      "@id": "paradex:utm"
+    },
+    "requests.OrderRequest": "paradex:requests.OrderRequest",
+    "client_id": {
+      "@id": "paradex:client_id",
+      "@type": "xsd:string"
+    },
+    "flags": {
+      "@id": "paradex:flags",
+      "@container": "@list"
+    },
+    "instruction": {
+      "@id": "paradex:instruction"
+    },
+    "stp": {
+      "@id": "paradex:stp",
+      "@type": "xsd:string"
+    },
+    "vwap_price": {
+      "@id": "paradex:vwap_price",
+      "@type": "xsd:string"
+    },
+    "requests.PriceKind": "paradex:requests.PriceKind",
+    "requests.RecordComplianceActionRequest": "paradex:requests.RecordComplianceActionRequest",
+    "action_type": {
+      "@id": "paradex:action_type",
+      "@type": "xsd:string"
+    },
+    "action_version": {
+      "@id": "paradex:action_version",
+      "@type": "xsd:string"
+    },
+    "requests.RfqCreateRequest": "paradex:requests.RfqCreateRequest",
+    "counterparties": {
+      "@id": "paradex:counterparties",
+      "@container": "@list"
+    },
+    "is_anonymous": {
+      "@id": "paradex:is_anonymous",
+      "@type": "xsd:boolean"
+    },
+    "label": {
+      "@id": "paradex:label",
+      "@type": "xsd:string"
+    },
+    "legs": {
+      "@id": "paradex:legs",
+      "@container": "@list"
+    },
+    "max_slippage": {
+      "@id": "paradex:max_slippage",
+      "@type": "xsd:string"
+    },
+    "quantity": {
+      "@id": "paradex:quantity",
+      "@type": "xsd:string"
+    },
+    "strategy": {
+      "@id": "paradex:strategy",
+      "@type": "xsd:string"
+    },
+    "requests.RfqExecuteRequest": "paradex:requests.RfqExecuteRequest",
+    "requests.RfqLeg": "paradex:requests.RfqLeg",
+    "ratio": {
+      "@id": "paradex:ratio",
+      "@type": "xsd:string"
+    },
+    "requests.UpdateAccountMaxSlippageRequest": "paradex:requests.UpdateAccountMaxSlippageRequest",
+    "requests.UpdateAccountProfileRequest": "paradex:requests.UpdateAccountProfileRequest",
+    "ai_agent_url": {
+      "@id": "paradex:ai_agent_url",
+      "@type": "xsd:string"
+    },
+    "announcements": {
+      "@id": "paradex:announcements",
+      "@type": "xsd:boolean"
+    },
+    "fill_sound": {
+      "@id": "paradex:fill_sound",
+      "@type": "xsd:boolean"
+    },
+    "fills": {
+      "@id": "paradex:fills",
+      "@type": "xsd:boolean"
+    },
+    "is_username_private": {
+      "@id": "paradex:is_username_private",
+      "@type": "xsd:boolean"
+    },
+    "orders": {
+      "@id": "paradex:orders",
+      "@type": "xsd:boolean"
+    },
+    "referred_by": {
+      "@id": "paradex:referred_by",
+      "@type": "xsd:string"
+    },
+    "size_currency_display": {
+      "@id": "paradex:size_currency_display",
+      "@type": "xsd:string"
+    },
+    "tap_share_rate": {
+      "@id": "paradex:tap_share_rate",
+      "@type": "xsd:string"
+    },
+    "trading_value_display": {
+      "@id": "paradex:trading_value_display",
+      "@type": "xsd:string"
+    },
+    "transfers": {
+      "@id": "paradex:transfers",
+      "@type": "xsd:boolean"
+    },
+    "username": {
+      "@id": "paradex:username",
+      "@type": "xsd:string"
+    },
+    "xp_share_rate": {
+      "@id": "paradex:xp_share_rate",
+      "@type": "xsd:string"
+    },
+    "requests.UpdateAllowedCIDRs": "paradex:requests.UpdateAllowedCIDRs",
+    "requests.UpdateNotificationPreferencesRequest": "paradex:requests.UpdateNotificationPreferencesRequest",
+    "requests.UpdateSizeCurrencyDisplayRequest": "paradex:requests.UpdateSizeCurrencyDisplayRequest",
+    "requests.UpdateSubkey": "paradex:requests.UpdateSubkey",
+    "requests.UpdateSubkeyBlockTradeSigning": "paradex:requests.UpdateSubkeyBlockTradeSigning",
+    "enabled": {
+      "@id": "paradex:enabled",
+      "@type": "xsd:boolean"
+    },
+    "requests.UpdateTradingValueDisplayRequest": "paradex:requests.UpdateTradingValueDisplayRequest",
+    "requests.Utm": "paradex:requests.Utm",
+    "campaign": {
+      "@id": "paradex:campaign",
+      "@type": "xsd:string"
+    },
+    "source": {
+      "@id": "paradex:source",
+      "@type": "xsd:string"
+    },
+    "responses.APIResults": "paradex:responses.APIResults",
+    "results": {
+      "@id": "paradex:results",
+      "@container": "@list"
+    },
+    "responses.AccountAnalytics": "paradex:responses.AccountAnalytics",
+    "account_address": {
+      "@id": "paradex:account_address",
+      "@type": "xsd:string"
+    },
+    "annualized_volatility": {
+      "@id": "paradex:annualized_volatility",
+      "@type": "@id"
+    },
+    "apr": {
+      "@id": "paradex:apr",
+      "@type": "@id"
+    },
+    "apr_simple_itd": {
+      "@id": "paradex:apr_simple_itd",
+      "@type": "xsd:string"
+    },
+    "cum_return": {
+      "@id": "paradex:cum_return",
+      "@type": "xsd:string"
+    },
+    "cumulative_pnl_series": {
+      "@id": "paradex:cumulative_pnl_series",
+      "@container": "@list"
+    },
+    "cumulative_pnl_usd": {
+      "@id": "paradex:cumulative_pnl_usd",
+      "@type": "xsd:string"
+    },
+    "end_value": {
+      "@id": "paradex:end_value",
+      "@type": "xsd:string"
+    },
+    "hourly_cumulative_pnl_series": {
+      "@id": "paradex:hourly_cumulative_pnl_series",
+      "@container": "@list"
+    },
+    "max_dd": {
+      "@id": "paradex:max_dd",
+      "@type": "@id"
+    },
+    "max_drawdown_to_date": {
+      "@id": "paradex:max_drawdown_to_date",
+      "@type": "xsd:string"
+    },
+    "monthly_pnl_last_12m": {
+      "@id": "paradex:monthly_pnl_last_12m",
+      "@container": "@list"
+    },
+    "pnl": {
+      "@id": "paradex:pnl",
+      "@type": "@id"
+    },
+    "return": {
+      "@id": "paradex:return",
+      "@type": "@id"
+    },
+    "sharpe": {
+      "@id": "paradex:sharpe",
+      "@type": "@id"
+    },
+    "sharpe_annualized_itd": {
+      "@id": "paradex:sharpe_annualized_itd",
+      "@type": "xsd:string"
+    },
+    "strategy_name": {
+      "@id": "paradex:strategy_name",
+      "@type": "xsd:string"
+    },
+    "vol_annualized_itd": {
+      "@id": "paradex:vol_annualized_itd",
+      "@type": "xsd:string"
+    },
+    "responses.AccountDailyPnlPoint": "paradex:responses.AccountDailyPnlPoint",
+    "day": {
+      "@id": "paradex:day",
+      "@type": "xsd:string"
+    },
+    "responses.AccountHistoricalDataResp": "paradex:responses.AccountHistoricalDataResp",
+    "data": {
+      "@id": "paradex:data",
+      "@container": "@list"
+    },
+    "timestamps": {
+      "@id": "paradex:timestamps",
+      "@container": "@list"
+    },
+    "responses.AccountHourlyPnlPoint": "paradex:responses.AccountHourlyPnlPoint",
+    "at": {
+      "@id": "paradex:at",
+      "@type": "xsd:string"
+    },
+    "responses.AccountInfoResponse": "paradex:responses.AccountInfoResponse",
+    "account": {
+      "@id": "paradex:account",
+      "@type": "xsd:string"
+    },
+    "created_at": {
+      "@id": "paradex:created_at",
+      "@type": "xsd:integer"
+    },
+    "derivation_path": {
+      "@id": "paradex:derivation_path",
+      "@type": "xsd:string"
+    },
+    "fees": {
+      "@id": "paradex:fees",
+      "@type": "@id"
+    },
+    "has_ecosystem_nft": {
+      "@id": "paradex:has_ecosystem_nft",
+      "@type": "xsd:boolean"
+    },
+    "isolated_market": {
+      "@id": "paradex:isolated_market",
+      "@type": "xsd:string"
+    },
+    "kind": {
+      "@id": "paradex:kind"
+    },
+    "parent_account": {
+      "@id": "paradex:parent_account",
+      "@type": "xsd:string"
+    },
+    "volume_tiers": {
+      "@id": "paradex:volume_tiers"
+    },
+    "responses.AccountKind": "paradex:responses.AccountKind",
+    "responses.AccountMarginEntry": "paradex:responses.AccountMarginEntry",
+    "isolated_margin_leverage": {
+      "@id": "paradex:isolated_margin_leverage",
+      "@type": "xsd:integer"
+    },
+    "responses.AccountMmpConfigResp": "paradex:responses.AccountMmpConfigResp",
+    "frozen_until": {
+      "@id": "paradex:frozen_until",
+      "@type": "xsd:integer"
+    },
+    "is_frozen": {
+      "@id": "paradex:is_frozen",
+      "@type": "xsd:boolean"
+    },
+    "updated_at": {
+      "@id": "paradex:updated_at",
+      "@type": "xsd:integer"
+    },
+    "window_delta": {
+      "@id": "paradex:window_delta",
+      "@type": "xsd:string"
+    },
+    "window_size": {
+      "@id": "paradex:window_size",
+      "@type": "xsd:string"
+    },
+    "window_vega": {
+      "@id": "paradex:window_vega",
+      "@type": "xsd:string"
+    },
+    "responses.AccountMmpResetRefusedData": "paradex:responses.AccountMmpResetRefusedData",
+    "refused": {
+      "@id": "paradex:refused",
+      "@container": "@list"
+    },
+    "reset": {
+      "@id": "paradex:reset",
+      "@container": "@list"
+    },
+    "responses.AccountMmpResetResp": "paradex:responses.AccountMmpResetResp",
+    "responses.AccountMmpResetResult": "paradex:responses.AccountMmpResetResult",
+    "reset_at": {
+      "@id": "paradex:reset_at",
+      "@type": "xsd:integer"
+    },
+    "responses.AccountMonthlyPnlEntry": "paradex:responses.AccountMonthlyPnlEntry",
+    "month": {
+      "@id": "paradex:month",
+      "@type": "xsd:string"
+    },
+    "month_return_canonical": {
+      "@id": "paradex:month_return_canonical",
+      "@type": "xsd:string"
+    },
+    "responses.AccountProfileResp": "paradex:responses.AccountProfileResp",
+    "discord": {
+      "@id": "paradex:discord",
+      "@type": "@id"
+    },
+    "last_seen_notification": {
+      "@id": "paradex:last_seen_notification",
+      "@type": "xsd:integer"
+    },
+    "market_max_slippage": {
+      "@id": "paradex:market_max_slippage"
+    },
+    "marketed_by": {
+      "@id": "paradex:marketed_by",
+      "@type": "xsd:string"
+    },
+    "nfts": {
+      "@id": "paradex:nfts",
+      "@container": "@list"
+    },
+    "notifications": {
+      "@id": "paradex:notifications",
+      "@type": "@id"
+    },
+    "referral": {
+      "@id": "paradex:referral",
+      "@type": "@id"
+    },
+    "tap_status": {
+      "@id": "paradex:tap_status",
+      "@type": "xsd:string"
+    },
+    "twitter": {
+      "@id": "paradex:twitter",
+      "@type": "@id"
+    },
+    "twitter_following": {
+      "@id": "paradex:twitter_following"
+    },
+    "responses.AccountSettingsResp": "paradex:responses.AccountSettingsResp",
+    "responses.AccountSummaryResponse": "paradex:responses.AccountSummaryResponse",
+    "account_value": {
+      "@id": "paradex:account_value",
+      "@type": "xsd:string"
+    },
+    "free_collateral": {
+      "@id": "paradex:free_collateral",
+      "@type": "xsd:string"
+    },
+    "initial_margin_requirement": {
+      "@id": "paradex:initial_margin_requirement",
+      "@type": "xsd:string"
+    },
+    "maintenance_margin_requirement": {
+      "@id": "paradex:maintenance_margin_requirement",
+      "@type": "xsd:string"
+    },
+    "margin_cushion": {
+      "@id": "paradex:margin_cushion",
+      "@type": "xsd:string"
+    },
+    "seq_no": {
+      "@id": "paradex:seq_no",
+      "@type": "xsd:integer"
+    },
+    "settlement_asset": {
+      "@id": "paradex:settlement_asset",
+      "@type": "xsd:string"
+    },
+    "status": {
+      "@id": "paradex:status",
+      "@type": "xsd:string"
+    },
+    "total_collateral": {
+      "@id": "paradex:total_collateral",
+      "@type": "xsd:string"
+    },
+    "responses.AlgoOrderResp": "paradex:responses.AlgoOrderResp",
+    "algo_params": {
+      "@id": "paradex:algo_params"
+    },
+    "avg_fill_price": {
+      "@id": "paradex:avg_fill_price",
+      "@type": "xsd:string"
+    },
+    "cancel_reason": {
+      "@id": "paradex:cancel_reason",
+      "@type": "xsd:string"
+    },
+    "end_at": {
+      "@id": "paradex:end_at",
+      "@type": "xsd:integer"
+    },
+    "last_updated_at": {
+      "@id": "paradex:last_updated_at",
+      "@type": "xsd:integer"
+    },
+    "remaining_size": {
+      "@id": "paradex:remaining_size",
+      "@type": "xsd:string"
+    },
+    "responses.AlgoType": "paradex:responses.AlgoType",
+    "responses.Announcement": "paradex:responses.Announcement",
+    "content": {
+      "@id": "paradex:content",
+      "@type": "xsd:string"
+    },
+    "expiry_at": {
+      "@id": "paradex:expiry_at",
+      "@type": "xsd:integer"
+    },
+    "notification_expiry_at": {
+      "@id": "paradex:notification_expiry_at",
+      "@type": "xsd:integer"
+    },
+    "title": {
+      "@id": "paradex:title",
+      "@type": "xsd:string"
+    },
+    "visible_at": {
+      "@id": "paradex:visible_at",
+      "@type": "xsd:integer"
+    },
+    "responses.AnnouncementKind": "paradex:responses.AnnouncementKind",
+    "responses.ApiError": "paradex:responses.ApiError",
+    "error": {
+      "@id": "paradex:error"
+    },
+    "message": {
+      "@id": "paradex:message",
+      "@type": "xsd:string"
+    },
+    "responses.ApiToken": "paradex:responses.ApiToken",
+    "lookup_id": {
+      "@id": "paradex:lookup_id",
+      "@type": "xsd:string"
+    },
+    "revoked_at": {
+      "@id": "paradex:revoked_at",
+      "@type": "xsd:integer"
+    },
+    "token_id": {
+      "@id": "paradex:token_id",
+      "@type": "xsd:string"
+    },
+    "responses.AskBidArray": "paradex:responses.AskBidArray",
+    "asks": {
+      "@id": "paradex:asks",
+      "@container": "@list"
+    },
+    "best_ask_api": {
+      "@id": "paradex:best_ask_api",
+      "@container": "@list"
+    },
+    "best_ask_interactive": {
+      "@id": "paradex:best_ask_interactive",
+      "@container": "@list"
+    },
+    "best_bid_api": {
+      "@id": "paradex:best_bid_api",
+      "@container": "@list"
+    },
+    "best_bid_interactive": {
+      "@id": "paradex:best_bid_interactive",
+      "@container": "@list"
+    },
+    "bids": {
+      "@id": "paradex:bids",
+      "@container": "@list"
+    },
+    "responses.AssetKind": "paradex:responses.AssetKind",
+    "responses.AuthResp": "paradex:responses.AuthResp",
+    "jwt_token": {
+      "@id": "paradex:jwt_token",
+      "@type": "xsd:string"
+    },
+    "responses.BBOResp": "paradex:responses.BBOResp",
+    "ask": {
+      "@id": "paradex:ask",
+      "@type": "xsd:string"
+    },
+    "ask_size": {
+      "@id": "paradex:ask_size",
+      "@type": "xsd:string"
+    },
+    "bid": {
+      "@id": "paradex:bid",
+      "@type": "xsd:string"
+    },
+    "bid_size": {
+      "@id": "paradex:bid_size",
+      "@type": "xsd:string"
+    },
+    "responses.BalanceResp": "paradex:responses.BalanceResp",
+    "average_entry_price": {
+      "@id": "paradex:average_entry_price",
+      "@type": "xsd:string"
+    },
+    "average_entry_price_usd": {
+      "@id": "paradex:average_entry_price_usd",
+      "@type": "xsd:string"
+    },
+    "cost": {
+      "@id": "paradex:cost",
+      "@type": "xsd:string"
+    },
+    "cost_usd": {
+      "@id": "paradex:cost_usd",
+      "@type": "xsd:string"
+    },
+    "token": {
+      "@id": "paradex:token",
+      "@type": "xsd:string"
+    },
+    "responses.BatchResponse": "paradex:responses.BatchResponse",
+    "errors": {
+      "@id": "paradex:errors",
+      "@container": "@list"
+    },
+    "responses.BlockTradeConstraints": "paradex:responses.BlockTradeConstraints",
+    "max_price": {
+      "@id": "paradex:max_price",
+      "@type": "xsd:string"
+    },
+    "max_size": {
+      "@id": "paradex:max_size",
+      "@type": "xsd:string"
+    },
+    "min_price": {
+      "@id": "paradex:min_price",
+      "@type": "xsd:string"
+    },
+    "min_size": {
+      "@id": "paradex:min_size",
+      "@type": "xsd:string"
+    },
+    "responses.BlockTradeDetailFullResponse": "paradex:responses.BlockTradeDetailFullResponse",
+    "block_id": {
+      "@id": "paradex:block_id",
+      "@type": "xsd:string"
+    },
+    "block_type": {
+      "@id": "paradex:block_type"
+    },
+    "failure_reason": {
+      "@id": "paradex:failure_reason",
+      "@type": "xsd:string"
+    },
+    "initiator": {
+      "@id": "paradex:initiator",
+      "@type": "xsd:string"
+    },
+    "parent_block_id": {
+      "@id": "paradex:parent_block_id",
+      "@type": "xsd:string"
+    },
+    "responses.BlockTradeDetailResponse": "paradex:responses.BlockTradeDetailResponse",
+    "executed_at": {
+      "@id": "paradex:executed_at",
+      "@type": "xsd:integer"
+    },
+    "maker_account": {
+      "@id": "paradex:maker_account",
+      "@type": "xsd:string"
+    },
+    "maker_fill": {
+      "@id": "paradex:maker_fill"
+    },
+    "taker_account": {
+      "@id": "paradex:taker_account",
+      "@type": "xsd:string"
+    },
+    "taker_fill": {
+      "@id": "paradex:taker_fill"
+    },
+    "trade_id": {
+      "@id": "paradex:trade_id",
+      "@type": "xsd:string"
+    },
+    "responses.BlockTradeOrder": "paradex:responses.BlockTradeOrder",
+    "responses.BlockTradeSignature": "paradex:responses.BlockTradeSignature",
+    "signature_data": {
+      "@id": "paradex:signature_data",
+      "@type": "xsd:string"
+    },
+    "signature_expiration": {
+      "@id": "paradex:signature_expiration",
+      "@type": "xsd:integer"
+    },
+    "signature_type": {
+      "@id": "paradex:signature_type",
+      "@type": "xsd:string"
+    },
+    "signer_account": {
+      "@id": "paradex:signer_account",
+      "@type": "xsd:string"
+    },
+    "signer_public_key": {
+      "@id": "paradex:signer_public_key",
+      "@type": "xsd:string"
+    },
+    "responses.BlockTradeStatus": "paradex:responses.BlockTradeStatus",
+    "responses.BlockTradeType": "paradex:responses.BlockTradeType",
+    "responses.BridgedToken": "paradex:responses.BridgedToken",
+    "l1_bridge_address": {
+      "@id": "paradex:l1_bridge_address",
+      "@type": "xsd:string"
+    },
+    "l1_token_address": {
+      "@id": "paradex:l1_token_address",
+      "@type": "xsd:string"
+    },
+    "l2_bridge_address": {
+      "@id": "paradex:l2_bridge_address",
+      "@type": "xsd:string"
+    },
+    "l2_token_address": {
+      "@id": "paradex:l2_token_address",
+      "@type": "xsd:string"
+    },
+    "symbol": {
+      "@id": "paradex:symbol",
+      "@type": "xsd:string"
+    },
+    "responses.CancelOrderBatchResponse": "paradex:responses.CancelOrderBatchResponse",
+    "responses.CancelOrderResult": "paradex:responses.CancelOrderResult",
+    "responses.ComplianceActionResp": "paradex:responses.ComplianceActionResp",
+    "responses.CreateTokenResponse": "paradex:responses.CreateTokenResponse",
+    "api_token": {
+      "@id": "paradex:api_token"
+    },
+    "responses.CreateTransferResponse": "paradex:responses.CreateTransferResponse",
+    "transfer": {
+      "@id": "paradex:transfer"
+    },
+    "responses.Delta1CrossMarginParams": "paradex:responses.Delta1CrossMarginParams",
+    "imf_base": {
+      "@id": "paradex:imf_base",
+      "@type": "xsd:string"
+    },
+    "imf_factor": {
+      "@id": "paradex:imf_factor",
+      "@type": "xsd:string"
+    },
+    "imf_shift": {
+      "@id": "paradex:imf_shift",
+      "@type": "xsd:string"
+    },
+    "mmf_factor": {
+      "@id": "paradex:mmf_factor",
+      "@type": "xsd:string"
+    },
+    "responses.DiscordProfile": "paradex:responses.DiscordProfile",
+    "image_url": {
+      "@id": "paradex:image_url",
+      "@type": "xsd:string"
+    },
+    "responses.ErrorCode": "paradex:responses.ErrorCode",
+    "responses.ErrorResponse": "paradex:responses.ErrorResponse",
+    "responses.FeeWithCap": "paradex:responses.FeeWithCap",
+    "fee": {
+      "@id": "paradex:fee",
+      "@type": "xsd:string"
+    },
+    "fee_cap": {
+      "@id": "paradex:fee_cap",
+      "@type": "xsd:string"
+    },
+    "fee_floor": {
+      "@id": "paradex:fee_floor",
+      "@type": "xsd:string"
+    },
+    "responses.Fees": "paradex:responses.Fees",
+    "commission_rate": {
+      "@id": "paradex:commission_rate",
+      "@type": "xsd:string"
+    },
+    "dated_option_maker_rate": {
+      "@id": "paradex:dated_option_maker_rate",
+      "@type": "xsd:string"
+    },
+    "dated_option_taker_rate": {
+      "@id": "paradex:dated_option_taker_rate",
+      "@type": "xsd:string"
+    },
+    "discount_rate": {
+      "@id": "paradex:discount_rate",
+      "@type": "xsd:string"
+    },
+    "maker_rate": {
+      "@id": "paradex:maker_rate",
+      "@type": "xsd:string"
+    },
+    "perp_option_maker_rate": {
+      "@id": "paradex:perp_option_maker_rate",
+      "@type": "xsd:string"
+    },
+    "perp_option_taker_rate": {
+      "@id": "paradex:perp_option_taker_rate",
+      "@type": "xsd:string"
+    },
+    "spot_maker_rate": {
+      "@id": "paradex:spot_maker_rate",
+      "@type": "xsd:string"
+    },
+    "spot_taker_rate": {
+      "@id": "paradex:spot_taker_rate",
+      "@type": "xsd:string"
+    },
+    "taker_rate": {
+      "@id": "paradex:taker_rate",
+      "@type": "xsd:string"
+    },
+    "responses.FillFlag": "paradex:responses.FillFlag",
+    "responses.FillResult": "paradex:responses.FillResult",
+    "fee_currency": {
+      "@id": "paradex:fee_currency",
+      "@type": "xsd:string"
+    },
+    "fill_type": {
+      "@id": "paradex:fill_type"
+    },
+    "liquidity": {
+      "@id": "paradex:liquidity"
+    },
+    "order_id": {
+      "@id": "paradex:order_id",
+      "@type": "xsd:string"
+    },
+    "orderbook_seq_no": {
+      "@id": "paradex:orderbook_seq_no",
+      "@type": "xsd:integer"
+    },
+    "realized_funding": {
+      "@id": "paradex:realized_funding",
+      "@type": "xsd:string"
+    },
+    "realized_pnl": {
+      "@id": "paradex:realized_pnl",
+      "@type": "xsd:string"
+    },
+    "underlying_price": {
+      "@id": "paradex:underlying_price",
+      "@type": "xsd:string"
+    },
+    "responses.FillType": "paradex:responses.FillType",
+    "responses.FundingDataResult": "paradex:responses.FundingDataResult",
+    "funding_index": {
+      "@id": "paradex:funding_index",
+      "@type": "xsd:string"
+    },
+    "funding_period_hours": {
+      "@id": "paradex:funding_period_hours",
+      "@type": "xsd:decimal"
+    },
+    "funding_premium": {
+      "@id": "paradex:funding_premium",
+      "@type": "xsd:string"
+    },
+    "funding_rate": {
+      "@id": "paradex:funding_rate",
+      "@type": "xsd:string"
+    },
+    "funding_rate_8h": {
+      "@id": "paradex:funding_rate_8h",
+      "@type": "xsd:string"
+    },
+    "impact_premium_rate": {
+      "@id": "paradex:impact_premium_rate",
+      "@type": "xsd:string"
+    },
+    "responses.FundingPayment": "paradex:responses.FundingPayment",
+    "fill_id": {
+      "@id": "paradex:fill_id",
+      "@type": "xsd:string"
+    },
+    "index": {
+      "@id": "paradex:index",
+      "@type": "xsd:string"
+    },
+    "payment": {
+      "@id": "paradex:payment",
+      "@type": "xsd:string"
+    },
+    "responses.GetAccountMarginConfigsResp": "paradex:responses.GetAccountMarginConfigsResp",
+    "configs": {
+      "@id": "paradex:configs",
+      "@container": "@list"
+    },
+    "margin_methodology": {
+      "@id": "paradex:margin_methodology",
+      "@type": "xsd:string"
+    },
+    "responses.GetAccountMmpConfigsResp": "paradex:responses.GetAccountMmpConfigsResp",
+    "responses.GetAccountsInfoResponse": "paradex:responses.GetAccountsInfoResponse",
+    "responses.GetOnboardingResp": "paradex:responses.GetOnboardingResp",
+    "account_signer_type": {
+      "@id": "paradex:account_signer_type",
+      "@type": "xsd:string"
+    },
+    "address": {
+      "@id": "paradex:address",
+      "@type": "xsd:string"
+    },
+    "derivation_info": {
+      "@id": "paradex:derivation_info"
+    },
+    "exists": {
+      "@id": "paradex:exists",
+      "@type": "xsd:boolean"
+    },
+    "responses.GetSubAccountsResponse": "paradex:responses.GetSubAccountsResponse",
+    "responses.GetXPBalanceResponseV2": "paradex:responses.GetXPBalanceResponseV2",
+    "earned_xp": {
+      "@id": "paradex:earned_xp",
+      "@type": "xsd:integer"
+    },
+    "transferrable_xp": {
+      "@id": "paradex:transferrable_xp",
+      "@type": "xsd:integer"
+    },
+    "xp_delta": {
+      "@id": "paradex:xp_delta",
+      "@type": "xsd:integer"
+    },
+    "responses.Greeks": "paradex:responses.Greeks",
+    "delta": {
+      "@id": "paradex:delta",
+      "@type": "xsd:string"
+    },
+    "gamma": {
+      "@id": "paradex:gamma",
+      "@type": "xsd:string"
+    },
+    "rho": {
+      "@id": "paradex:rho",
+      "@type": "xsd:string"
+    },
+    "theta": {
+      "@id": "paradex:theta",
+      "@type": "xsd:string"
+    },
+    "vanna": {
+      "@id": "paradex:vanna",
+      "@type": "xsd:string"
+    },
+    "vega": {
+      "@id": "paradex:vega",
+      "@type": "xsd:string"
+    },
+    "volga": {
+      "@id": "paradex:volga",
+      "@type": "xsd:string"
+    },
+    "responses.ImpactPriceResp": "paradex:responses.ImpactPriceResp",
+    "impact_price": {
+      "@id": "paradex:impact_price",
+      "@type": "xsd:string"
+    },
+    "responses.InsuranceAccountResp": "paradex:responses.InsuranceAccountResp",
+    "responses.JwkKey": "paradex:responses.JwkKey",
+    "alg": {
+      "@id": "paradex:alg",
+      "@type": "xsd:string"
+    },
+    "crv": {
+      "@id": "paradex:crv",
+      "@type": "xsd:string"
+    },
+    "kid": {
+      "@id": "paradex:kid",
+      "@type": "xsd:string"
+    },
+    "kty": {
+      "@id": "paradex:kty",
+      "@type": "xsd:string"
+    },
+    "use": {
+      "@id": "paradex:use",
+      "@type": "xsd:string"
+    },
+    "x": {
+      "@id": "paradex:x",
+      "@type": "xsd:string"
+    },
+    "y": {
+      "@id": "paradex:y",
+      "@type": "xsd:string"
+    },
+    "responses.JwksResponse": "paradex:responses.JwksResponse",
+    "keys": {
+      "@id": "paradex:keys",
+      "@container": "@list"
+    },
+    "responses.LiquidationResp": "paradex:responses.LiquidationResp",
+    "responses.MakerTakerFee": "paradex:responses.MakerTakerFee",
+    "maker_fee": {
+      "@id": "paradex:maker_fee"
+    },
+    "taker_fee": {
+      "@id": "paradex:taker_fee"
+    },
+    "responses.MarginParamsResp": "paradex:responses.MarginParamsResp",
+    "funding_provision_hour": {
+      "@id": "paradex:funding_provision_hour",
+      "@type": "xsd:decimal"
+    },
+    "hedged_margin_factor": {
+      "@id": "paradex:hedged_margin_factor",
+      "@type": "xsd:decimal"
+    },
+    "rfq_max_slippage": {
+      "@id": "paradex:rfq_max_slippage",
+      "@type": "xsd:string"
+    },
+    "scenarios": {
+      "@id": "paradex:scenarios",
+      "@container": "@list"
+    },
+    "unhedged_margin_factor": {
+      "@id": "paradex:unhedged_margin_factor",
+      "@type": "xsd:decimal"
+    },
+    "vol_shock_params": {
+      "@id": "paradex:vol_shock_params",
+      "@type": "@id"
+    },
+    "responses.MarketEvent": "paradex:responses.MarketEvent",
+    "changed_fields": {
+      "@id": "paradex:changed_fields",
+      "@type": "@id"
+    },
+    "event_type": {
+      "@id": "paradex:event_type"
+    },
+    "responses.MarketEventType": "paradex:responses.MarketEventType",
+    "responses.MarketFeeConfig": "paradex:responses.MarketFeeConfig",
+    "api_fee": {
+      "@id": "paradex:api_fee"
+    },
+    "interactive_fee": {
+      "@id": "paradex:interactive_fee"
+    },
+    "rpi_fee": {
+      "@id": "paradex:rpi_fee"
+    },
+    "responses.MarketHistoryFields": "paradex:responses.MarketHistoryFields",
+    "asset_kind": {
+      "@id": "paradex:asset_kind",
+      "@type": "xsd:string"
+    },
+    "base_currency": {
+      "@id": "paradex:base_currency",
+      "@type": "xsd:string"
+    },
+    "clamp_rate": {
+      "@id": "paradex:clamp_rate",
+      "@type": "xsd:decimal"
+    },
+    "delta1_cross_margin_params": {
+      "@id": "paradex:delta1_cross_margin_params"
+    },
+    "fee_config": {
+      "@id": "paradex:fee_config"
+    },
+    "funding_multiplier": {
+      "@id": "paradex:funding_multiplier",
+      "@type": "xsd:decimal"
+    },
+    "interest_rate": {
+      "@id": "paradex:interest_rate",
+      "@type": "xsd:decimal"
+    },
+    "market_kind": {
+      "@id": "paradex:market_kind",
+      "@type": "xsd:string"
+    },
+    "max_funding_rate": {
+      "@id": "paradex:max_funding_rate",
+      "@type": "xsd:decimal"
+    },
+    "max_funding_rate_change": {
+      "@id": "paradex:max_funding_rate_change",
+      "@type": "xsd:decimal"
+    },
+    "max_open_orders": {
+      "@id": "paradex:max_open_orders",
+      "@type": "xsd:integer"
+    },
+    "max_order_size": {
+      "@id": "paradex:max_order_size",
+      "@type": "xsd:string"
+    },
+    "max_tob_spread": {
+      "@id": "paradex:max_tob_spread",
+      "@type": "xsd:decimal"
+    },
+    "min_notional": {
+      "@id": "paradex:min_notional",
+      "@type": "xsd:string"
+    },
+    "open_at": {
+      "@id": "paradex:open_at",
+      "@type": "xsd:integer"
+    },
+    "option_cross_margin_params": {
+      "@id": "paradex:option_cross_margin_params"
+    },
+    "option_type": {
+      "@id": "paradex:option_type",
+      "@type": "xsd:string"
+    },
+    "oracle_ewma_factor": {
+      "@id": "paradex:oracle_ewma_factor",
+      "@type": "xsd:decimal"
+    },
+    "order_size_increment": {
+      "@id": "paradex:order_size_increment",
+      "@type": "xsd:string"
+    },
+    "position_limit": {
+      "@id": "paradex:position_limit",
+      "@type": "xsd:string"
+    },
+    "price_bands_width": {
+      "@id": "paradex:price_bands_width",
+      "@type": "xsd:decimal"
+    },
+    "price_tick_size": {
+      "@id": "paradex:price_tick_size",
+      "@type": "xsd:string"
+    },
+    "quote_currency": {
+      "@id": "paradex:quote_currency",
+      "@type": "xsd:string"
+    },
+    "settlement_currency": {
+      "@id": "paradex:settlement_currency",
+      "@type": "xsd:string"
+    },
+    "settlement_price": {
+      "@id": "paradex:settlement_price",
+      "@type": "xsd:decimal"
+    },
+    "strike_price": {
+      "@id": "paradex:strike_price",
+      "@type": "xsd:string"
+    },
+    "underlying_twap_price": {
+      "@id": "paradex:underlying_twap_price",
+      "@type": "xsd:decimal"
+    },
+    "responses.MarketHistoryResponse": "paradex:responses.MarketHistoryResponse",
+    "responses.MarketKind": "paradex:responses.MarketKind",
+    "responses.MarketResp": "paradex:responses.MarketResp",
+    "iv_bands_width": {
+      "@id": "paradex:iv_bands_width",
+      "@type": "xsd:string"
+    },
+    "option_spread_margin_params": {
+      "@id": "paradex:option_spread_margin_params"
+    },
+    "price_feed_id": {
+      "@id": "paradex:price_feed_id",
+      "@type": "xsd:string"
+    },
+    "tags": {
+      "@id": "paradex:tags",
+      "@container": "@list"
+    },
+    "trading_mode": {
+      "@id": "paradex:trading_mode"
+    },
+    "responses.MarketSettlementResp": "paradex:responses.MarketSettlementResp",
+    "responses.MarketSummaryResp": "paradex:responses.MarketSummaryResp",
+    "ask_iv": {
+      "@id": "paradex:ask_iv",
+      "@type": "xsd:string"
+    },
+    "bid_iv": {
+      "@id": "paradex:bid_iv",
+      "@type": "xsd:string"
+    },
+    "external_fair_price": {
+      "@id": "paradex:external_fair_price",
+      "@type": "xsd:string"
+    },
+    "forward_rate": {
+      "@id": "paradex:forward_rate",
+      "@type": "xsd:string"
+    },
+    "future_funding_rate": {
+      "@id": "paradex:future_funding_rate",
+      "@type": "xsd:string"
+    },
+    "greeks": {
+      "@id": "paradex:greeks"
+    },
+    "last_iv": {
+      "@id": "paradex:last_iv",
+      "@type": "xsd:string"
+    },
+    "last_traded_price": {
+      "@id": "paradex:last_traded_price",
+      "@type": "xsd:string"
+    },
+    "mark_iv": {
+      "@id": "paradex:mark_iv",
+      "@type": "xsd:string"
+    },
+    "mark_price": {
+      "@id": "paradex:mark_price",
+      "@type": "xsd:string"
+    },
+    "open_interest": {
+      "@id": "paradex:open_interest",
+      "@type": "xsd:string"
+    },
+    "price_change_rate_24h": {
+      "@id": "paradex:price_change_rate_24h",
+      "@type": "xsd:string"
+    },
+    "risk_free_rate": {
+      "@id": "paradex:risk_free_rate",
+      "@type": "xsd:string"
+    },
+    "rolling_details": {
+      "@id": "paradex:rolling_details"
+    },
+    "settlement_twap_estimate": {
+      "@id": "paradex:settlement_twap_estimate",
+      "@type": "xsd:string"
+    },
+    "total_volume": {
+      "@id": "paradex:total_volume",
+      "@type": "xsd:string"
+    },
+    "volume_24h": {
+      "@id": "paradex:volume_24h",
+      "@type": "xsd:string"
+    },
+    "responses.Nft": "paradex:responses.Nft",
+    "collection_address": {
+      "@id": "paradex:collection_address",
+      "@type": "xsd:string"
+    },
+    "collection_name": {
+      "@id": "paradex:collection_name",
+      "@type": "xsd:string"
+    },
+    "responses.NotificationPreferencesResp": "paradex:responses.NotificationPreferencesResp",
+    "responses.OnboardingDerivationInfo": "paradex:responses.OnboardingDerivationInfo",
+    "class_hash": {
+      "@id": "paradex:class_hash",
+      "@type": "xsd:string"
+    },
+    "proxy_class_hash": {
+      "@id": "paradex:proxy_class_hash",
+      "@type": "xsd:string"
+    },
+    "responses.OptionCrossMarginParams": "paradex:responses.OptionCrossMarginParams",
+    "imf": {
+      "@id": "paradex:imf",
+      "@type": "@id"
+    },
+    "mmf": {
+      "@id": "paradex:mmf",
+      "@type": "@id"
+    },
+    "responses.OptionMarginParams": "paradex:responses.OptionMarginParams",
+    "long_itm": {
+      "@id": "paradex:long_itm",
+      "@type": "xsd:string"
+    },
+    "premium_multiplier": {
+      "@id": "paradex:premium_multiplier",
+      "@type": "xsd:string"
+    },
+    "short_itm": {
+      "@id": "paradex:short_itm",
+      "@type": "xsd:string"
+    },
+    "short_otm": {
+      "@id": "paradex:short_otm",
+      "@type": "xsd:string"
+    },
+    "short_put_cap": {
+      "@id": "paradex:short_put_cap",
+      "@type": "xsd:string"
+    },
+    "responses.OptionSpreadMarginParams": "paradex:responses.OptionSpreadMarginParams",
+    "unpaired_scale_im": {
+      "@id": "paradex:unpaired_scale_im",
+      "@type": "xsd:string"
+    },
+    "unpaired_scale_mm": {
+      "@id": "paradex:unpaired_scale_mm",
+      "@type": "xsd:string"
+    },
+    "responses.OrderFlag": "paradex:responses.OrderFlag",
+    "responses.OrderInstruction": "paradex:responses.OrderInstruction",
+    "responses.OrderResp": "paradex:responses.OrderResp",
+    "published_at": {
+      "@id": "paradex:published_at",
+      "@type": "xsd:integer"
+    },
+    "received_at": {
+      "@id": "paradex:received_at",
+      "@type": "xsd:integer"
+    },
+    "request_info": {
+      "@id": "paradex:request_info"
+    },
+    "responses.OrderSide": "paradex:responses.OrderSide",
+    "responses.OrderStatus": "paradex:responses.OrderStatus"
+  },
+  "@type": "schema:Dataset",
+  "schema:name": "Paradex API JSON-LD context",
+  "schema:description": "A JSON-LD @context for the objects Paradex's own API contract declares: one class per component schema, one property per declared field, typed from the contract. Derived by script (derive-json-ld.py, 2026-10-13) from openapi/paradex-openapi.yml.",
+  "dcterms:created": "2026-10-13",
+  "dcterms:source": [
+    "openapi/paradex-openapi.yml"
+  ]
+}

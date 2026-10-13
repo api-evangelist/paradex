@@ -1,0 +1,184 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/paradex/main/json-schema/paradex-responses-market-summary-resp-schema.json",
+  "title": "responses.MarketSummaryResp",
+  "x-generated": "2026-10-13",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/paradex-openapi.yml#/components/schemas/responses.MarketSummaryResp",
+  "type": "object",
+  "properties": {
+    "ask": {
+      "description": "Best ask price",
+      "type": "string"
+    },
+    "ask_iv": {
+      "description": "Ask implied volatility, for options",
+      "type": "string"
+    },
+    "ask_size": {
+      "description": "Size at best ask price",
+      "type": "string"
+    },
+    "bid": {
+      "description": "Best bid price",
+      "type": "string"
+    },
+    "bid_iv": {
+      "description": "Bid implied volatility, for options",
+      "type": "string"
+    },
+    "bid_size": {
+      "description": "Size at best bid price",
+      "type": "string"
+    },
+    "created_at": {
+      "description": "Market summary creation time",
+      "type": "integer"
+    },
+    "delta": {
+      "description": "Deprecated: Use greeks.delta instead",
+      "type": "string"
+    },
+    "external_fair_price": {
+      "description": "External fair price, calculated from spot price and an external basis: spot_price * (1 + external_basis). where external basis is the median basis rate on different external exchanges",
+      "type": "string"
+    },
+    "forward_rate": {
+      "description": "EWMA-smoothed annualized forward rate for dated options",
+      "type": "string"
+    },
+    "funding_rate": {
+      "description": "This raw funding rate corresponds to the actual funding period of the instrument itself. It is not a normalized 8h funding rate.",
+      "type": "string"
+    },
+    "future_funding_rate": {
+      "description": "For options it's a smoothed version of future's funding rate",
+      "type": "string"
+    },
+    "greeks": {
+      "description": "Greeks (delta, gamma, vega). Partial for perpetual futures.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/responses.Greeks"
+        }
+      ]
+    },
+    "last_iv": {
+      "description": "Last traded price implied volatility, for options",
+      "type": "string"
+    },
+    "last_traded_price": {
+      "description": "Last traded price",
+      "type": "string"
+    },
+    "mark_iv": {
+      "description": "Mark implied volatility, for options",
+      "type": "string"
+    },
+    "mark_price": {
+      "description": "[Mark price](https://docs.paradex.trade/risk-system/mark-price-calculation)",
+      "type": "string"
+    },
+    "open_interest": {
+      "description": "Open interest in base currency",
+      "type": "string"
+    },
+    "price_change_rate_24h": {
+      "description": "Price change rate in the last 24 hours",
+      "type": "string"
+    },
+    "risk_free_rate": {
+      "description": "Risk-free discounting rate used for option pricing",
+      "type": "string"
+    },
+    "rolling_details": {
+      "description": "Rolling futures details — only populated for rolling futures markets",
+      "allOf": [
+        {
+          "$ref": "#/$defs/responses.RollingDetailsResp"
+        }
+      ]
+    },
+    "settlement_twap_estimate": {
+      "description": "Running average of the underlying over the settlement window, on the live summary only while inside that window",
+      "type": "string"
+    },
+    "symbol": {
+      "description": "Market symbol",
+      "type": "string"
+    },
+    "total_volume": {
+      "description": "Lifetime total traded volume in USD",
+      "type": "string"
+    },
+    "underlying_price": {
+      "description": "Underlying asset price (spot price)",
+      "type": "string"
+    },
+    "volume_24h": {
+      "description": "24 hour volume in USD",
+      "type": "string"
+    }
+  },
+  "$defs": {
+    "responses.Greeks": {
+      "type": "object",
+      "properties": {
+        "delta": {
+          "description": "Market Delta",
+          "type": "string"
+        },
+        "gamma": {
+          "description": "Market Gamma",
+          "type": "string"
+        },
+        "rho": {
+          "description": "Market Rho",
+          "type": "string"
+        },
+        "theta": {
+          "description": "Market Theta",
+          "type": "string"
+        },
+        "vanna": {
+          "description": "Market Vanna",
+          "type": "string"
+        },
+        "vega": {
+          "description": "Market Vega",
+          "type": "string"
+        },
+        "volga": {
+          "description": "Market Volga",
+          "type": "string"
+        }
+      }
+    },
+    "responses.RollingDetailsResp": {
+      "type": "object",
+      "properties": {
+        "current_active_contract_symbol": {
+          "description": "Current active contract symbol",
+          "type": "string"
+        },
+        "current_active_contract_weight": {
+          "description": "Front contract weight (\"0\" to \"1\")",
+          "type": "string"
+        },
+        "next_active_contract_symbol": {
+          "description": "Next active contract symbol",
+          "type": "string"
+        },
+        "period_end": {
+          "description": "UTC millis, end of current rolling period",
+          "type": "integer"
+        },
+        "period_start": {
+          "description": "UTC millis, start of current rolling period",
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,97 @@
+name: Paradex MCP to REST crosswalk
+generated: '2026-10-13'
+method: derived
+source: mcp/paradex-mcp-tools-list.json + openapi/paradex-openapi.yml
+surfaces:
+  openapi: openapi/paradex-openapi.yml
+  mcp: https://mcp.paradex.trade/mcp (public, probed)
+crosswalk:
+- tool: paradex_markets
+  category: market-data
+  rest:
+  - get-markets
+  binding: name-and-semantics
+  confidence: medium
+- tool: paradex_market_summaries
+  category: market-data
+  rest:
+  - get-markets-summary
+  binding: name-and-semantics
+  confidence: medium
+- tool: paradex_funding_data
+  category: market-data
+  rest:
+  - get-funding-data
+  binding: name-and-semantics
+  confidence: medium
+- tool: paradex_orderbook
+  category: market-data
+  rest:
+  - get-orderbook
+  binding: name-and-semantics
+  confidence: medium
+- tool: paradex_klines
+  category: market-data
+  rest:
+  - markets-klines
+  binding: name-and-semantics
+  confidence: medium
+- tool: paradex_trades
+  category: market-data
+  rest:
+  - trades
+  binding: name-and-semantics
+  confidence: medium
+- tool: paradex_bbo
+  category: market-data
+  rest:
+  - get-bbo
+  binding: name-and-semantics
+  confidence: medium
+- tool: paradex_vaults
+  category: vaults
+  rest:
+  - vaults-get
+  binding: name-and-semantics
+  confidence: medium
+- tool: paradex_vault_balance
+  category: vaults
+  rest:
+  - vaults-get-balance
+  binding: name-and-semantics
+  confidence: medium
+- tool: paradex_vault_summary
+  category: vaults
+  rest:
+  - vaults-get-summary
+  binding: name-and-semantics
+  confidence: medium
+- tool: paradex_vault_transfers
+  category: vaults
+  rest:
+  - vaults-get-transfers
+  binding: name-and-semantics
+  confidence: medium
+- tool: paradex_vault_positions
+  category: vaults
+  rest:
+  - vaults-get-positions
+  binding: name-and-semantics
+  confidence: medium
+- tool: paradex_vault_account_summary
+  category: vaults
+  rest:
+  - vaults-get-account-summary
+  binding: name-and-semantics
+  confidence: medium
+mcp_only:
+- tool: paradex_filters_model
+  reason: schema helper for building filters; no REST operation
+- tool: paradex_system_config
+  reason: backs GET /system/config, which has no operationId in the spec
+- tool: paradex_system_state
+  reason: backs GET /system/state, which has no operationId in the spec
+coverage:
+  tools: 16
+  mapped: 13
+  mcp_only: 3
