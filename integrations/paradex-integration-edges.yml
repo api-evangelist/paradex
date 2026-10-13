@@ -1,16 +1,46 @@
 generated: '2026-10-13'
-method: none
+method: searched
 source:
 - https://zapier.com/apps/paradex/integrations
 - https://n8n.io/integrations/paradex/
 - https://composio.dev/toolkits/paradex
 - https://monid.ai/tools/paradex
 checked:
+- https://api.coingecko.com/api/v3/exchanges
 - https://composio.dev/toolkits/paradex
 - https://monid.ai/tools/paradex
 - https://n8n.io/integrations/paradex/
+- https://raw.githubusercontent.com/ccxt/ccxt/master/exchanges.json
 - https://zapier.com/apps/paradex/integrations
 summary: null
 marketplace_apps: []
-edges: []
+edges:
+- partner_name: CCXT
+  partner: null
+  partner_match: null
+  type: coverage
+  channel: open-source-node
+  relationship: connector-coverage
+  direction: partner-built
+  evidence: https://github.com/ccxt/ccxt/blob/master/ts/src/paradex.ts
+  ccxt_id: paradex
+  ccxt_certified: false
+  ccxt_pro: true
+  matched_by: domain:paradex.trade
+  partner_gap: no ccxt repo in all/* (catalog gap)
+  detected_by: sweep-crypto.py
+  first_seen: '2026-10-13'
+- partner_name: CoinGecko
+  partner: coingecko
+  partner_match: aggregator
+  channel: partner-built
+  direction: partner-built
+  type: coverage
+  relationship: connector-coverage
+  evidence: https://api.coingecko.com/api/v3/exchanges/paradex-spot
+  matched_by: domain:paradex.trade
+  coingecko_id: paradex-spot
+  trust_score: 2
+  detected_by: sweep-crypto.py
+  first_seen: '2026-10-13'
 templates: []
