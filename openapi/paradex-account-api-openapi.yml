@@ -1,0 +1,2214 @@
+openapi: 3.2.0
+info:
+  title: Paradex Account API
+  version: 1.142.2
+  contact: {}
+  description: 'Operations tagged Account across 2 of this provider''s published API definitions: paradex-openapi-prod.json, paradex-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.prod.paradex.trade/v1
+tags:
+- name: Account
+paths:
+  /account:
+    get:
+      security:
+      - BearerToken: []
+      description: Respond with requester's account information
+      tags:
+      - Account
+      summary: Get account information
+      operationId: get-account
+      parameters:
+      - description: Subaccount address
+        name: subaccount_address
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.AccountSummaryResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /account/compliance:
+    get:
+      security:
+      - BearerToken: []
+      description: Returns all compliance actions for the authenticated account
+      tags:
+      - Account
+      summary: Get compliance actions
+      operationId: get-compliance-actions
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/responses.APIResults'
+                - type: object
+                  properties:
+                    results:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/responses.ComplianceActionResp'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    post:
+      security:
+      - BearerToken: []
+      description: Records a compliance action (e.g. TOS acceptance) for the authenticated account
+      tags:
+      - Account
+      summary: Record a compliance action
+      operationId: record-compliance-action
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/requests.RecordComplianceActionRequest'
+        description: Compliance action request
+        required: true
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '403':
+          description: Requires the account's main key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /account/history:
+    get:
+      security:
+      - BearerToken: []
+      description: Respond with requester's account information
+      tags:
+      - Account
+      summary: Get account history
+      operationId: get-account-history
+      parameters:
+      - description: Type of data
+        name: type
+        in: query
+        required: true
+        schema:
+          type: string
+          enum:
+          - pnl
+          - value
+          - volume
+          - fee_savings
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.AccountHistoricalDataResp'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /account/info:
+    get:
+      security:
+      - BearerToken: []
+      tags:
+      - Account
+      summary: Return account info of current account
+      operationId: get-accounts-info
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.GetAccountsInfoResponse'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /account/margin:
+    get:
+      security:
+      - BearerToken: []
+      description: Get margin configuration for an account and market
+      tags:
+      - Account
+      summary: Get account margin configuration
+      operationId: get-account-margin
+      parameters:
+      - description: 'Market Name - example: BTC-USD-PERP'
+        name: market
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.GetAccountMarginConfigsResp'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /account/margin/{market}:
+    post:
+      security:
+      - BearerToken: []
+      description: Set margin configuration for an account and market
+      tags:
+      - Account
+      summary: Set margin configuration
+      operationId: upsert-account-margin
+      parameters:
+      - description: 'Market Name - example: BTC-USD-PERP'
+        name: market
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/requests.AccountMarginRequest'
+        description: Margin Configuration
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.UpdateAccountMarginConfigResp'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /account/profile:
+    get:
+      security:
+      - BearerToken: []
+      description: Respond with requester's account information
+      tags:
+      - Account
+      summary: Get account profile information
+      operationId: get-account-profile
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.AccountProfileResp'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    put:
+      security:
+      - BearerToken: []
+      description: Updates account profile information
+      tags:
+      - Account
+      summary: Updates account profile
+      operationId: update-account-profile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/requests.UpdateAccountProfileRequest'
+        description: Update account profile request
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.AccountProfileResp'
+        '400':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '403':
+          description: Requires the account's main key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /account/profile/market_max_slippage/{market}:
+    post:
+      security:
+      - BearerToken: []
+      description: Respond with requester's account max_slippage
+      tags:
+      - Account
+      summary: Updates account max slippage for a specific market
+      operationId: update-account-market-max-slippage
+      parameters:
+      - description: '{base_currency}-{quote_currency}-{kind}'
+        name: market
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/requests.UpdateAccountMaxSlippageRequest'
+        description: Update market max slippage request
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.AccountProfileResp'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /account/profile/notifications:
+    post:
+      security:
+      - BearerToken: []
+      description: Updates user notification preferences for orders, fills, announcements, and transfers. All fields are optional - only provided fields will be updated.
+      tags:
+      - Account
+      summary: Updates account notification preferences
+      operationId: update-account-notification-preferences
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/requests.UpdateNotificationPreferencesRequest'
+        description: Update notification preferences request (all fields optional)
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.AccountProfileResp'
+        '400':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /account/profile/notifications/last_seen:
+    post:
+      security:
+      - BearerToken: []
+      description: Records current server time as the notification dedup watermark for cross-device dedup.
+      tags:
+      - Account
+      summary: Updates the last-seen notification timestamp
+      operationId: update-last-seen
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.AccountProfileResp'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /account/profile/referral_code:
+    post:
+      security:
+      - BearerToken: []
+      description: Respond with requester's account information
+      tags:
+      - Account
+      summary: Updates account profile fields
+      operationId: update-account-profile-referral-code
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.AccountProfileResp'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '403':
+          description: Requires the account's main key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /account/profile/refresh_inventory:
+    post:
+      security:
+      - BearerToken: []
+      description: Refreshes and returns the inventory for the authenticated account's Ethereum address
+      tags:
+      - Account
+      summary: Refresh inventory for authenticated account
+      operationId: refresh-account-inventory
+      responses:
+        '200':
+          description: Inventory
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.RefreshInventoryResp'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /account/profile/size_currency_display:
+    post:
+      security:
+      - BearerToken: []
+      description: To set user preferences for the size currency display on the UI, BASE will use base currency, and QUOTE will use quote currency.
+      tags:
+      - Account
+      summary: Updates account size currency display preference
+      operationId: update-account-size-currency-display
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/requests.UpdateSizeCurrencyDisplayRequest'
+        description: Update account size currency display request
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.AccountProfileResp'
+        '400':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /account/profile/username:
+    post:
+      security:
+      - BearerToken: []
+      description: Respond with requester's account information
+      tags:
+      - Account
+      summary: Updates account profile username fields
+      operationId: update-account-profile-username
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.AccountProfileResp'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '403':
+          description: Requires the account's main key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /account/referrer:
+    post:
+      security:
+      - BearerToken: []
+      description: Add missing account referrer within a certain time window after account creation.
+      tags:
+      - Account
+      summary: Updates account referred_by field
+      operationId: update-account-referrer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.AccountProfileResp'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '403':
+          description: Requires the account's main key
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /account/settings:
+    get:
+      security:
+      - BearerToken: []
+      tags:
+      - Account
+      summary: Get account settings
+      operationId: get-account-settings
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.AccountSettingsResp'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /account/settings/trading_value_display:
+    post:
+      security:
+      - BearerToken: []
+      description: To set user preferences for the trading value display on the UI, Spot Notional will use spot price, and Market Value will use the market price.
+      tags:
+      - Account
+      summary: Updates account trading value display
+      operationId: update-account-trading-value-display
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/requests.UpdateTradingValueDisplayRequest'
+        description: Update account trading value display request
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.AccountProfileResp'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /account/subaccounts:
+    get:
+      security:
+      - BearerToken: []
+      description: Respond with requester's list of sub-accounts
+      tags:
+      - Account
+      summary: List sub-accounts of current account
+      operationId: get-sub-accounts
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.GetSubAccountsResponse'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /account/summary:
+    get:
+      security:
+      - BearerToken: []
+      description: Respond with account summaries for the account plus all authorized accounts.
+      tags:
+      - Account
+      summary: Get account summaries (main account + authorized accounts)
+      operationId: get-accounts
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/responses.APIResults'
+                - type: object
+                  properties:
+                    results:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/responses.AccountSummaryResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /balance:
+    get:
+      security:
+      - BearerToken: []
+      description: Respond with requester's own balances
+      tags:
+      - Account
+      summary: List balances
+      operationId: get-balance
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/responses.APIResults'
+                - type: object
+                  properties:
+                    results:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/responses.BalanceResp'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /fills:
+    get:
+      security:
+      - BearerToken: []
+      description: 'This API returns a list of matched orders (i.e. fills) that have been sent to
+
+        chain for settlement.'
+      tags:
+      - Account
+      summary: List fills
+      parameters:
+      - description: Asset kind of the fill's market
+        name: asset_kind
+        in: query
+        schema:
+          type: string
+          enum:
+          - PERP
+          - PERP_OPTION
+          - OPTION
+          - SPOT
+      - description: Returns the ‘next’ paginated page.
+        name: cursor
+        in: query
+        schema:
+          type: string
+      - description: End Time (unix time millisecond)
+        name: end_at
+        in: query
+        schema:
+          type: integer
+      - description: Market symbol
+        name: market
+        in: query
+        schema:
+          type: string
+      - description: Limit the number of responses in the page
+        name: page_size
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 5000
+          default: 100
+      - description: Start Time (unix time millisecond)
+        name: start_at
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/responses.PaginatedAPIResults'
+                - type: object
+                  properties:
+                    results:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/responses.FillResult'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+      operationId: getFills
+      x-operation-id-source: derived
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /funding/payments:
+    get:
+      security:
+      - BearerToken: []
+      description: 'List funding payments made by/to the requester''s account
+
+
+        *Funding payments are periodic payments between traders to make the perpetual
+
+        futures contract price is close to the index price.*'
+      tags:
+      - Account
+      summary: Funding payments history
+      operationId: get-funding
+      parameters:
+      - description: Returns the ‘next’ paginated page.
+        name: cursor
+        in: query
+        schema:
+          type: string
+      - description: End Time (unix time millisecond)
+        name: end_at
+        in: query
+        schema:
+          type: integer
+      - example: BTC-USD-PERP
+        description: Market for which funding payments are queried
+        name: market
+        in: query
+        required: true
+        schema:
+          type: string
+      - description: Limit the number of responses in the page
+        name: page_size
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 5000
+          default: 100
+      - description: Start Time (unix time millisecond)
+        name: start_at
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/responses.PaginatedAPIResults'
+                - type: object
+                  properties:
+                    results:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/responses.FundingPayment'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /positions:
+    get:
+      security:
+      - BearerToken: []
+      description: Get all positions owned by current user
+      tags:
+      - Account
+      summary: List open positions
+      operationId: get-positions
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/responses.APIResults'
+                - type: object
+                  properties:
+                    results:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/responses.PositionResp'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /tradebusts:
+    get:
+      security:
+      - BearerToken: []
+      description: 'Returns paginated tradebusts for the account.
+
+
+        A tradebust occurs when a fill fails to clear and settle on the Paradex Chain.
+
+        The results of busted fills are not reflected on-chain and are reverted in the
+
+        cloud (off-chain position cache).'
+      tags:
+      - Account
+      summary: List tradebusts
+      operationId: tradebusts
+      parameters:
+      - description: Returns the ‘next’ paginated page.
+        name: cursor
+        in: query
+        schema:
+          type: string
+      - description: End Time (unix time millisecond)
+        name: end_at
+        in: query
+        schema:
+          type: integer
+      - description: Limit the number of responses in the page
+        name: page_size
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 5000
+          default: 100
+      - description: Start Time (unix time millisecond)
+        name: start_at
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/responses.PaginatedAPIResults'
+                - type: object
+                  properties:
+                    results:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/responses.TradebustResult'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /transactions:
+    get:
+      security:
+      - BearerToken: []
+      description: Retrieves a list of transactions initiated by the user
+      tags:
+      - Account
+      summary: List transactions
+      operationId: transactions
+      parameters:
+      - description: Returns the ‘next’ paginated page.
+        name: cursor
+        in: query
+        schema:
+          type: string
+      - description: End Time (unix time millisecond)
+        name: end_at
+        in: query
+        schema:
+          type: integer
+      - description: Limit the number of responses in the page
+        name: page_size
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 5000
+          default: 100
+      - description: Start Time (unix time millisecond)
+        name: start_at
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/responses.PaginatedAPIResults'
+                - type: object
+                  properties:
+                    results:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/responses.TransactionResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+components:
+  schemas:
+    responses.Fees:
+      type: object
+      properties:
+        commission_rate:
+          description: deprecated, always zero
+          type: string
+          example: '0.0001'
+        dated_option_maker_rate:
+          type: string
+          example: '0.0001'
+        dated_option_taker_rate:
+          type: string
+          example: '0.0001'
+        discount_rate:
+          description: deprecated, always zero
+          type: string
+          example: '0.9'
+        maker_rate:
+          type: string
+          example: '0.0001'
+        perp_option_maker_rate:
+          type: string
+          example: '0.0001'
+        perp_option_taker_rate:
+          type: string
+          example: '0.0001'
+        spot_maker_rate:
+          type: string
+          example: '0.0001'
+        spot_taker_rate:
+          type: string
+          example: '0.0001'
+        taker_rate:
+          type: string
+          example: '0.0001'
+    requests.UpdateAccountProfileRequest:
+      type: object
+      properties:
+        ai_agent_url:
+          type: string
+          example: wss://agent.example.com:18789
+        announcements:
+          type: boolean
+          example: false
+        fill_sound:
+          type: boolean
+          example: true
+        fills:
+          type: boolean
+          example: true
+        is_username_private:
+          type: boolean
+          example: true
+        max_slippage:
+          type: string
+        orders:
+          type: boolean
+          example: true
+        referral_code:
+          type: string
+          example: referral_code
+        referred_by:
+          type: string
+          example: referral_code
+        size_currency_display:
+          type: string
+        tap_share_rate:
+          type: string
+          example: '0.2'
+        trading_value_display:
+          type: string
+        transfers:
+          type: boolean
+          example: true
+        username:
+          type: string
+          example: username
+        xp_share_rate:
+          type: string
+          example: '0.2'
+    responses.FillFlag:
+      type: string
+      enum:
+      - interactive
+      - rpi
+      - fastfill
+      x-enum-comments:
+        FillFlagFast: Retail order was fast filled
+        FillFlagInteractive: Fill was generated from an interactive order (user-initiated)
+        FillFlagRPI: Fill qualifies for Retail Price Improvement
+      x-enum-varnames:
+      - FillFlagInteractive
+      - FillFlagRPI
+      - FillFlagFast
+    responses.AccountProfileResp:
+      type: object
+      properties:
+        ai_agent_url:
+          type: string
+          example: wss://agent.example.com:18789
+        discord:
+          $ref: '#/components/schemas/responses.DiscordProfile'
+        is_username_private:
+          type: boolean
+          example: true
+        last_seen_notification:
+          type: integer
+          example: 1713400000000
+        market_max_slippage:
+          type: object
+          additionalProperties:
+            type: string
+        marketed_by:
+          type: string
+          example: maxDegen
+        nfts:
+          type: array
+          items:
+            $ref: '#/components/schemas/responses.Nft'
+        notifications:
+          $ref: '#/components/schemas/responses.NotificationPreferencesResp'
+        referral:
+          $ref: '#/components/schemas/responses.ReferralConfigResp'
+        referral_code:
+          type: string
+          example: cryptofox8
+        referred_by:
+          type: string
+          example: maxDegen
+        size_currency_display:
+          type: string
+          example: BASE
+        tap_share_rate:
+          $ref: '#/components/schemas/responses.ShareRateResp'
+        tap_status:
+          description: 'TAP affiliate status: "NONE", "ACTIVE", or "INACTIVE"'
+          type: string
+        twitter:
+          $ref: '#/components/schemas/responses.TwitterProfile'
+        twitter_following:
+          type: object
+          additionalProperties:
+            type: boolean
+        username:
+          type: string
+          example: username
+        xp_share_rate:
+          $ref: '#/components/schemas/responses.ShareRateResp'
+    responses.Nft:
+      type: object
+      properties:
+        collection_address:
+          type: string
+        collection_name:
+          type: string
+        id:
+          type: string
+        image_url:
+          type: string
+        name:
+          type: string
+        price:
+          $ref: '#/components/schemas/messagesv1.NftPrice'
+    responses.ShareRateResp:
+      type: object
+      properties:
+        last_updated_at:
+          type: integer
+          example: 1715592690488
+        share_rate:
+          type: string
+          example: '0.2'
+    responses.BalanceResp:
+      type: object
+      properties:
+        average_entry_price:
+          description: Average entry price
+          type: string
+          example: '2901.34'
+        average_entry_price_usd:
+          description: Average entry price in USD
+          type: string
+          example: '2902.18'
+        cost:
+          description: Balance cost
+          type: string
+          example: '105.4623'
+        cost_usd:
+          description: Balance cost in USD
+          type: string
+          example: '105.8311'
+        last_updated_at:
+          description: Balance last updated time
+          type: integer
+          example: 1681462770114
+        size:
+          description: Balance amount of settlement token (includes deposits, withdrawals, realized PnL, realized funding, and fees)
+          type: string
+          example: '123003.620'
+        token:
+          description: Name of the token
+          type: string
+          example: USDC
+    responses.NotificationPreferencesResp:
+      type: object
+      properties:
+        announcements:
+          type: boolean
+          example: false
+        fill_sound:
+          type: boolean
+          example: true
+        fills:
+          type: boolean
+          example: true
+        orders:
+          type: boolean
+          example: true
+        transfers:
+          type: boolean
+          example: true
+    responses.PositionResp:
+      type: object
+      properties:
+        account:
+          description: Account ID of the position
+          type: string
+        average_entry_price:
+          description: Average entry price
+          type: string
+          example: '29001.34'
+        average_entry_price_usd:
+          description: Average entry price in USD
+          type: string
+          example: '29001.34'
+        average_exit_price:
+          description: Average exit price
+          type: string
+          example: '29001.34'
+        cached_funding_index:
+          description: Position cached funding index
+          type: string
+          example: '1234.3'
+        closed_at:
+          description: Position closed time
+          type: integer
+          example: 1681493939981
+        cost:
+          description: Position cost
+          type: string
+          example: '-10005.4623'
+        cost_usd:
+          description: Position cost in USD
+          type: string
+          example: '-10005.4623'
+        created_at:
+          description: Position creation time
+          type: integer
+          example: 1681493939981
+        id:
+          description: Unique string ID for the position
+          type: string
+          example: '1234234'
+        last_fill_id:
+          description: Last fill ID to which the position is referring
+          type: string
+          example: '1234234'
+        last_updated_at:
+          description: Position last update time
+          type: integer
+          example: 1681493939981
+        leverage:
+          description: Leverage of the position
+          type: string
+        liquidation_price:
+          description: Liquidation price of the position
+          type: string
+        market:
+          description: Market for position
+          type: string
+          example: BTC-USD-PERP
+        realized_positional_funding_pnl:
+          description: Realized Funding PnL for the position. Reset to 0 when position is closed or flipped.
+          type: string
+          example: '12.234'
+        realized_positional_pnl:
+          description: Realized PnL including both positional PnL and funding payments. Reset to 0 when position is closed or flipped.
+          type: string
+          example: '-123.23'
+        seq_no:
+          description: Unique increasing number (non-sequential) that is assigned to this position update. Can be used to deduplicate multiple feeds
+          type: integer
+          example: 1681471234972000000
+        side:
+          description: 'Position Side : Long or Short'
+          type: string
+          enum:
+          - SHORT
+          - LONG
+        size:
+          description: Size of the position with sign (positive if long or negative if short)
+          type: string
+          example: '-0.345'
+        status:
+          description: 'Status of Position : Open or Closed'
+          type: string
+          enum:
+          - OPEN
+          - CLOSED
+        unrealized_funding_pnl:
+          description: Unrealized running funding P&L for the position
+          type: string
+          example: '12.234'
+        unrealized_pnl:
+          description: Unrealized P&L of the position in the quote asset. Includes the unrealized running funding P&L.
+          type: string
+          example: '-123.23'
+    requests.AccountMarginRequest:
+      type: object
+      required:
+      - leverage
+      - margin_type
+      properties:
+        leverage:
+          description: Leverage value (1 up to market's maximum leverage)
+          type: integer
+          example: 10
+        margin_type:
+          description: Margin type (CROSS or ISOLATED)
+          type: string
+          example: CROSS
+        on_behalf_of_account:
+          description: Specify sub-account ID to set margin for, if not provided, it will be the main account itself
+          type: string
+          example: '0x1234567890abcdef'
+    responses.AccountSettingsResp:
+      type: object
+      properties:
+        trading_value_display:
+          type: string
+          example: SPOT_NOTIONAL
+    responses.TraderRole:
+      type: string
+      enum:
+      - TAKER
+      - MAKER
+      x-enum-varnames:
+      - TraderRoleTaker
+      - TraderRoleMaker
+    responses.FillType:
+      type: string
+      enum:
+      - LIQUIDATION
+      - UNWIND_TRANSFER
+      - FILL
+      - SETTLE_MARKET
+      - RPI
+      - BLOCK_TRADE
+      x-enum-varnames:
+      - FillTypeLiquidation
+      - FillTypeUnwindTransfer
+      - FillTypeFill
+      - FillTypeSettleMarket
+      - FillTypeRPI
+      - FillTypeBlockTrade
+    responses.PaginatedAPIResults:
+      type: object
+      properties:
+        next:
+          description: The pointer to fetch next set of records (null if there are no records left)
+          type: string
+          example: eyJmaWx0ZXIiMsIm1hcmtlciI6eyJtYXJrZXIiOiIxNjc1NjUwMDE3NDMxMTAxNjk5N=
+        prev:
+          description: The pointer to fetch previous set of records (null if there are no records left)
+          type: string
+          example: eyJmaWx0ZXIiOnsiTGltaXQiOjkwfSwidGltZSI6MTY4MTY3OTgzNzk3MTMwOTk1MywibWFya2VyIjp7Im1zMjExMD==
+        results:
+          description: Array of paginated results
+          type: array
+          items:
+            type: object
+    responses.ErrorCode:
+      type: string
+      enum:
+      - VALIDATION_ERROR
+      - BINDING_ERROR
+      - INTERNAL_ERROR
+      - NOT_FOUND
+      - SERVICE_UNAVAILABLE
+      - INVALID_REQUEST_PARAMETER
+      - ORDER_ID_NOT_FOUND
+      - ORDER_IS_CLOSED
+      - ORDER_IS_NOT_OPEN
+      - INVALID_ORDER_SIZE
+      - CLIENT_ORDER_ID_NOT_FOUND
+      - DUPLICATED_CLIENT_ID
+      - INVALID_SYMBOL
+      - INVALID_TOKEN
+      - INVALID_ETHEREUM_ADDRESS
+      - INVALID_ETHEREUM_SIGNATURE
+      - INVALID_STARKNET_ADDRESS
+      - INVALID_STARKNET_SIGNATURE
+      - STARKNET_SIGNATURE_VERIFICATION_FAILED
+      - ETHEREUM_SIGNER_MISMATCH
+      - ETHEREUM_HASH_MISMATCH
+      - NOT_ONBOARDED
+      - INVALID_TIMESTAMP
+      - INVALID_BLOCK_EXPIRATION
+      - ACCOUNT_NOT_FOUND
+      - MEDIA_NOT_FOUND
+      - INVALID_ORDER_SIGNATURE
+      - PUBLIC_KEY_INVALID
+      - UNAUTHORIZED_ETHEREUM_ADDRESS
+      - UNAUTHORIZED_ERROR
+      - ETHEREUM_ADDRESS_ALREADY_ONBOARDED
+      - EVM_ADDRESS_ALREADY_ONBOARDED
+      - MARKET_NOT_FOUND
+      - ALLOWLIST_ENTRY_NOT_FOUND
+      - USERNAME_IN_USE
+      - GEO_IP_BLOCK
+      - ETHEREUM_ADDRESS_BLOCKED
+      - PROGRAM_NOT_FOUND
+      - PROGRAM_NOT_SUPPORTED
+      - INVALID_DASHBOARD
+      - MARKET_NOT_OPEN
+      - MARKET_NOT_SETTLED
+      - INVALID_REFERRAL_CODE
+      - REQUEST_NOT_ALLOWED
+      - PARENT_ADDRESS_ALREADY_ONBOARDED
+      - INVALID_PARENT_ACCOUNT
+      - INVALID_VAULT_OPERATOR_CHAIN
+      - VAULT_OPERATOR_ALREADY_ONBOARDED
+      - VAULT_NAME_IN_USE
+      - VAULT_NOT_FOUND
+      - VAULT_STRATEGY_NOT_FOUND
+      - VAULT_LIMIT_REACHED
+      - VAULT_DATA_PRIVATE
+      - BATCH_SIZE_OUT_OF_RANGE
+      - ISOLATED_MARKET_ACCOUNT_MISMATCH
+      - NO_ACCESS_TO_MARKET
+      - POINTS_SUMMARY_NOT_FOUND
+      - ALGO_ID_NOT_FOUND
+      - INVALID_DERIVATION_PATH
+      - PROFILE_STATS_NOT_FOUND
+      - INVALID_CHAIN
+      - INVALID_LAYERSWAP_SWAP
+      - INVALID_DEPOSIT_ADDRESS
+      - SOCIAL_USERNAME_IN_USE
+      - INVALID_OAUTH_REQUEST
+      - RPI_ACCOUNT_NOT_WHITELISTED
+      - SYSTEM_STATUS_POST_ONLY
+      - SYSTEM_STATUS_CANCEL_ONLY
+      - INVALID_MARKETING_CODE
+      - OFFER_NOT_FOUND
+      - MARKET_MARGIN_RESTRICTED
+      - NOT_UNIQUE
+      - ACCOUNT_ALREADY_REFERRED
+      - ONBOARDING_PERIOD_EXPIRED
+      - ONBOARDING_RATE_LIMITED
+      - RFQ_CREATE_BUDGET_EXCEEDED
+      - SUBACCOUNTS_LIMIT_EXCEEDED
+      - INSUFFICIENT_MIN_CHAIN_BALANCE
+      - INSUFFICIENT_EVM_BALANCE
+      - PORTFOLIO_MARGIN_ONBOARDING_DISABLED
+      - PORTFOLIO_MARGIN_INVALID_ACCOUNT_KIND
+      - EVM_VAULT_OPERATORS_DISABLED
+      - VAULT_OPERATOR_OWNER_PROOF_REQUIRED
+      - INVALID_EVM_SIGNATURE
+      - EVM_SIGNATURE_VERIFICATION_FAILED
+      - INVALID_SUBKEY
+      - SUBKEY_NOT_ACTIVATABLE
+      - SUBKEY_REVOKED
+      - TOKEN_LIMIT_REACHED
+      - INVALID_TOKEN_SCOPE
+      - IP_NOT_ALLOWED
+      - INSUFFICIENT_TRANSFERRABLE_XP
+      - TRANSFER_LIMIT_REACHED
+      - XP_TRANSFERS_DISABLED
+      - BLOCK_TRADE_NOT_FOUND
+      - BLOCK_TRADE_NOT_ENABLED
+      - BLOCK_TRADE_EXPIRED
+      - BLOCK_TRADE_ALREADY_CANCELLED
+      - BLOCK_TRADE_INVALID_STATUS
+      - BLOCK_TRADE_UNAUTHORIZED
+      - BLOCK_TRADE_MISSING_TRADES
+      - BLOCK_TRADE_MISSING_SIGNERS
+      - BLOCK_TRADE_MISSING_SIGNATURE
+      - BLOCK_TRADE_ACCOUNT_MISMATCH
+      - BLOCK_TRADE_INVALID_SIGNATURE
+      - BLOCK_TRADE_SIGNER_KEY_UNAUTHORIZED
+      - BLOCK_TRADE_REPLAYED_SIGNATURE
+      - BLOCK_TRADE_SELF_TRADE
+      - OFFER_ALREADY_CANCELLED
+      - OFFER_INVALID_STATUS
+      - OFFER_UNAUTHORIZED
+      - OFFER_PARENT_MISMATCH
+      - OFFER_PARENT_NOT_ACCEPTING
+      - PORTFOLIO_MARGIN_CONFIG_NOT_FOUND
+      - MARGIN_CONFIG_NOT_FOUND
+      - MMP_CONFIG_INVALID
+      - MMP_NOT_ENABLED
+      - MMP_MIN_FREEZE_NOT_ELAPSED
+      - MMP_NOT_CONFIGURED
+      - RFQ_VENUE_UNAVAILABLE
+      x-enum-comments:
+        ErrorCodeString_SignerMismatch: '#nosec G101'
+      x-enum-varnames:
+      - ErrorCode_Validation
+      - ErrorCode_Binding
+      - ErrorCode_InternalError
+      - ErrorCode_NotFound
+      - ErrorCode_ServiceUnavailable
+      - ErrorCodeString_InvalidParameter
+      - ErrorCodeString_OrderIdNotFound
+      - ErrorCodeString_OrderIsClosed
+      - ErrorCodeString_OrderIsNotOpen
+      - ErrorCodeString_InvalidSizeForModifyOrder
+      - ErrorCodeString_ClientOrderIdNotFound
+      - ErrorCodeString_DuplicatedClientOrderId
+      - ErrorCodeString_InvalidSymbol
+      - ErrorCodeString_InvalidToken
+      - ErrorCodeString_BadEthAddress
+      - ErrorCodeString_BadEthSignature
+      - ErrorCodeString_BadStarkNetAddress
+      - ErrorCodeString_BadStarkNetSignature
+      - ErrorCodeString_StarknetSigVerificationFailed
+      - ErrorCodeString_SignerMismatch
+      - ErrorCodeString_HashMismatch
+      - ErrorCodeString_NotOnboarded
+      - ErrorCodeString_BadTimestamp
+      - ErrorCodeString_BadExpiration
+      - ErrorCodeString_AccountIdNotFound
+      - ErrorCodeString_MediaNotFound
+      - ErrorCodeString_InvalidOrderSignature
+      - ErrorCodeString_BadPublicKey
+      - ErrorCodeString_UnauthorizedEthAddress
+      - ErrorCodeString_UnauthorizedError
+      - ErrorCodeString_EthAddressAlreadyOnboarded
+      - ErrorCodeString_EvmAddressAlreadyOnboarded
+      - ErrorCodeString_MarketNotFound
+      - ErrorCodeString_AllowlistNotFound
+      - ErrorCodeString_UsernameInUse
+      - ErrorCodeString_GeoIPBlock
+      - ErrorCodeString_EthAddressBlocked
+      - ErrorCodeString_ProgramNotFound
+      - ErrorCodeString_ProgramNotSupported
+      - ErrorCodeString_InvalidDashboard
+      - ErrorCodeString_MarketNotOpen
+      - ErrorCodeString_MarketNotSettled
+      - ErrorCodeString_InvalidReferralCode
+      - ErrorCodeString_RequestNotAllowed
+      - ErrorCodeString_ParentAddressAlreadyOnboarded
+      - ErrorCodeString_InvalidParentAccount
+      - ErrorCodeString_InvalidVaultOperatorChain
+      - ErrorCodeString_VaultOperatorAlreadyOnboarded
+      - ErrorCodeString_VaultNameInUse
+      - ErrorCodeString_VaultNotFound
+      - ErrorCodeString_VaultStrategyNotFound
+      - ErrorCodeString_VaultLimitReached
+      - ErrorCodeString_VaultDataPrivate
+      - ErrorCodeString_BatchSizeOutOfRange
+      - ErrorCodeString_IsolatedMarketAccountMismatch
+      - ErrorCodeString_NoAccessToMarket
+      - ErrorCodeString_PointsSummaryNotFound
+      - ErrorCodeString_AlgoIdNotFound
+      - ErrorCodeString_InvalidDerivationPath
+      - ErrorCodeString_ProfileStatsNotFound
+      - ErrorCodeString_InvalidChain
+      - ErrorCodeString_InvalidLayerswapSwap
+      - ErrorCodeString_InvalidDepositAddress
+      - ErrorCodeString_SocialUsernameInUse
+      - ErrorCodeString_InvalidOAuthRequest
+      - ErrorCodeString_RPIAccountNotWhitelisted
+      - ErrorCodeString_SystemStatusPostOnly
+      - ErrorCodeString_SystemStatusCancelOnly
+      - ErrorCodeString_InvalidMarketingCode
+      - ErrorCodeString_OfferNotFound
+      - ErrorCodeString_MarketMarginRestricted
+      - ErrorCodeString_NotUnique
+      - ErrorCodeString_AccountAlreadyReferred
+      - ErrorCodeString_OnboardingPeriodExpired
+      - ErrorCodeString_OnboardingRateLimited
+      - ErrorCodeString_RfqCreateBudgetExceeded
+      - ErrorCodeString_SubaccountsLimitExceeded
+      - ErrorCodeString_InsufficientMinChainBalance
+      - ErrorCodeString_InsufficientEvmBalance
+      - ErrorCodeString_PortfolioMarginOnboardingDisabled
+      - ErrorCodeString_PortfolioMarginInvalidAccountKind
+      - ErrorCodeString_EvmVaultOperatorsDisabled
+      - ErrorCodeString_VaultOperatorOwnerProofRequired
+      - ErrorCodeString_BadEvmSignature
+      - ErrorCodeString_EvmSigVerificationFailed
+      - ErrorCodeString_InvalidSubkey
+      - ErrorCodeString_SubkeyNotActivatable
+      - ErrorCodeString_SubkeyRevoked
+      - ErrorCodeString_TokenLimitReached
+      - ErrorCodeString_InvalidTokenScope
+      - ErrorCodeString_IPNotAllowed
+      - ErrorCodeString_InsufficientTransferrableXP
+      - ErrorCodeString_TransferLimitReached
+      - ErrorCodeString_XPTransfersDisabled
+      - ErrorCodeString_BlockTradeNotFound
+      - ErrorCodeString_BlockTradeNotEnabled
+      - ErrorCodeString_BlockTradeExpired
+      - ErrorCodeString_BlockTradeAlreadyCancelled
+      - ErrorCodeString_BlockTradeInvalidStatus
+      - ErrorCodeString_BlockTradeUnauthorized
+      - ErrorCodeString_BlockTradeMissingTrades
+      - ErrorCodeString_BlockTradeMissingSigners
+      - ErrorCodeString_BlockTradeMissingSignature
+      - ErrorCodeString_BlockTradeAccountMismatch
+      - ErrorCodeString_BlockTradeInvalidSignature
+      - ErrorCodeString_BlockTradeSignerKeyUnauthorized
+      - ErrorCodeString_BlockTradeReplayedSignature
+      - ErrorCodeString_BlockTradeSelfTrade
+      - ErrorCodeString_OfferAlreadyCancelled
+      - ErrorCodeString_OfferInvalidStatus
+      - ErrorCodeString_OfferUnauthorized
+      - ErrorCodeString_OfferParentMismatch
+      - ErrorCodeString_OfferParentNotAccepting
+      - ErrorCodeString_PortfolioMarginConfigNotFound
+      - ErrorCodeString_MarginConfigNotFound
+      - ErrorCodeString_MmpConfigInvalid
+      - ErrorCodeString_MmpNotEnabled
+      - ErrorCodeString_MmpMinFreezeNotElapsed
+      - ErrorCodeString_MmpNotConfigured
+      - ErrorCodeString_RfqVenueUnavailable
+    responses.UpdateAccountMarginConfigResp:
+      type: object
+      properties:
+        account:
+          description: Account ID
+          type: string
+        leverage:
+          description: Leverage value
+          type: integer
+        margin_type:
+          description: Margin type (CROSS/ISOLATED)
+          type: string
+        market:
+          description: Market symbol
+          type: string
+    requests.UpdateNotificationPreferencesRequest:
+      type: object
+      properties:
+        announcements:
+          type: boolean
+          example: false
+        fill_sound:
+          type: boolean
+          example: true
+        fills:
+          type: boolean
+          example: true
+        orders:
+          type: boolean
+          example: true
+        transfers:
+          type: boolean
+          example: true
+    responses.TransactionResponse:
+      type: object
+      properties:
+        completed_at:
+          description: Timestamp from when the transaction was completed
+          type: integer
+        created_at:
+          description: Timestamp from when the transaction was sent to blockchain gateway
+          type: integer
+        hash:
+          description: Tx Hash of the settled trade                                                // Hash of the transaction
+          type: string
+          example: '0x445c05d6bfb899e39338440d199971c4d7f4cde7878ed3888df3f716efb8df2'
+        id:
+          description: Unique string ID of the event that triggered the transaction. For example, fill ID or liquidation ID
+          type: string
+          example: '12342423'
+        state:
+          description: Status of the transaction on Starknet
+          type: string
+          enum:
+          - ACCEPTED_ON_L1
+          - ACCEPTED_ON_L2
+          - NOT_RECEIVED
+          - RECEIVED
+          - REJECTED
+          - REVERTED
+        type:
+          description: Event that triggered the transaction
+          type: string
+          enum:
+          - TRANSACTION_FILL
+          - TRANSACTION_LIQUIDATE
+          - TRANSACTION_SETTLE_MARKET
+    responses.AccountInfoResponse:
+      type: object
+      properties:
+        account:
+          description: Starknet address of the account
+          type: string
+          example: '0x495d2eb5236a12b8b4ad7d3849ce6a203ce21c43f473c248dfd5ce70d9454fa'
+        created_at:
+          description: Account creation time
+          type: integer
+          example: 1681471234972
+        derivation_path:
+          description: Account derivation path used to derive the account, if a sub-account
+          type: string
+          example: m/44'/9004'/0'/0/1
+        fees:
+          $ref: '#/components/schemas/responses.Fees'
+        has_ecosystem_nft:
+          description: True if account owns an ecosystem NFT (Money Badgers / ShizoPunk) — qualifies for the lower retail tier thresholds
+          type: boolean
+          example: false
+        isolated_market:
+          description: Isolated market for the account
+          type: string
+          example: ETHUSD-PERP
+        kind:
+          description: Account kind
+          allOf:
+          - $ref: '#/components/schemas/responses.AccountKind'
+          example: main
+        parent_account:
+          description: Starknet address of the parent account
+          type: string
+          example: '0x495d2eb5236a12b8b4ad7d3849ce6a203ce21c43f473c248dfd5ce70d'
+        public_key:
+          description: Starknet public key
+          type: string
+          example: '0x495d2eb5236a12b8b4ad7d3849ce6a203ce21c43f473c248dfd5ce70d'
+        username:
+          description: Username of the account
+          type: string
+          example: username
+        volume_tiers:
+          description: Volume tier info by kind
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/responses.VolumeTierKindInfo'
+    responses.ApiError:
+      type: object
+      properties:
+        data:
+          description: any additional data related to the error
+          type: object
+        error:
+          description: unique immutable string identifier for specific error
+          allOf:
+          - $ref: '#/components/schemas/responses.ErrorCode'
+          example: NOT_ONBOARDED
+        message:
+          description: detailed description of error and how to address it
+          type: string
+          example: User has never called /onboarding endpoint
+    responses.GetAccountMarginConfigsResp:
+      type: object
+      properties:
+        account:
+          description: Account ID
+          type: string
+        configs:
+          description: List of margin configurations per market
+          type: array
+          items:
+            $ref: '#/components/schemas/responses.AccountMarginEntry'
+        margin_methodology:
+          description: Margin methodology (cross_margin/portfolio_margin)
+          type: string
+    responses.FundingPayment:
+      type: object
+      properties:
+        account:
+          description: Account that made the payment
+          type: string
+        created_at:
+          description: Funding payment time
+          type: integer
+          example: 1681375481000
+        fill_id:
+          description: Fill id that triggered the payment (if any)
+          type: string
+          example: '8615262148007718462'
+        id:
+          description: Unique string ID to identify the payment
+          type: string
+          example: '1681375578221101699352320000'
+        index:
+          description: Value of the funding index at the time of payment
+          type: string
+          example: '-2819.53434361'
+        market:
+          description: Market against which payment is made
+          type: string
+          example: BTC-USD-PERP
+        payment:
+          description: Payment amount in settlement asset
+          type: string
+          example: '34.4490622'
+    requests.UpdateTradingValueDisplayRequest:
+      type: object
+      required:
+      - trading_value_display
+      properties:
+        trading_value_display:
+          type: string
+    responses.TwitterProfile:
+      type: object
+      properties:
+        id:
+          type: string
+        image_url:
+          type: string
+        username:
+          type: string
+    responses.AccountMarginEntry:
+      type: object
+      properties:
+        isolated_margin_leverage:
+          description: Isolated margin leverage
+          type: integer
+        leverage:
+          description: Leverage value
+          type: integer
+        margin_type:
+          description: Margin type (CROSS/ISOLATED)
+          type: string
+        market:
+          description: Market symbol
+          type: string
+    responses.AccountSummaryResponse:
+      type: object
+      properties:
+        account:
+          description: User's starknet account
+          type: string
+          example: '0x495d2eb5236a12b8b4ad7d3849ce6a203ce21c43f473c248dfd5ce70d9454fa'
+        account_value:
+          description: Current account value [with unrealized P&Ls]
+          type: string
+          example: '136285.06918911'
+        free_collateral:
+          description: Free collateral available (Account value in excess of Initial Margin required)
+          type: string
+          example: '73276.47229774'
+        initial_margin_requirement:
+          description: Amount required to open trade for the existing positions
+          type: string
+          example: '63008.59689218'
+        last_seen_notification:
+          description: Latest notification event timestamp (ms) the user has seen — used for cross-device dedup
+          type: integer
+          example: 1713400000000
+        maintenance_margin_requirement:
+          description: Amount required to maintain exisiting positions
+          type: string
+          example: '31597.25239676'
+        margin_cushion:
+          description: Acc value in excess of maintenance margin required
+          type: string
+          example: '104687.8167956'
+        seq_no:
+          description: Unique increasing number (non-sequential) that is assigned to this account update. Can be used to deduplicate multiple feeds
+          type: integer
+          example: 1681471234972000000
+        settlement_asset:
+          description: Settlement asset for the account
+          type: string
+          example: USDC
+        status:
+          description: Status of the acc - like ACTIVE, LIQUIDATION
+          type: string
+          example: ACTIVE
+        total_collateral:
+          description: User's total collateral
+          type: string
+          example: '123003.62047353'
+        updated_at:
+          description: Account last updated time
+          type: integer
+          example: 1681471234972
+    requests.RecordComplianceActionRequest:
+      type: object
+      required:
+      - action_type
+      - action_version
+      properties:
+        action_type:
+          type: string
+        action_version:
+          type: string
+    responses.GetAccountsInfoResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/responses.AccountInfoResponse'
+    responses.AccountHistoricalDataResp:
+      type: object
+      properties:
+        data:
+          description: Ordered list of datapoints
+          type: array
+          items:
+            type: number
+        timestamps:
+          description: Ordered list of timestamps
+          type: array
+          items:
+            type: integer
+    responses.ComplianceActionResp:
+      type: object
+      properties:
+        action_type:
+          type: string
+          example: ACCEPT_TOS
+        action_version:
+          type: string
+          example: '2026-02-15'
+        created_at:
+          type: integer
+          example: 1771156475000
+    responses.TradebustResult:
+      type: object
+      properties:
+        account:
+          description: Paradex Account
+          type: string
+          example: '0x495d2eb5236a12b8b4ad7d3849ce6a203ce21c43f473c248dfd5ce70d9454fa'
+        busted_fill_id:
+          description: Unique ID of the busted fill
+          type: string
+          example: '12342345'
+        created_at:
+          description: Unix timestamp in milliseconds when bust was created
+          type: integer
+          example: 1681497002041
+    responses.ReferralConfigResp:
+      type: object
+      properties:
+        commission_rate:
+          description: Commission rate for the referer
+          type: string
+          example: '0.1'
+        commission_volume_cap:
+          description: Volume cap for commission
+          type: string
+          example: '1000000000'
+        discount_rate:
+          description: Discount rate for the referee
+          type: string
+          example: '0.1'
+        discount_volume_cap:
+          description: Volume cap for discount
+          type: string
+          example: '30000000'
+        minimum_volume:
+          description: Minimum volume required to be eligible for Program
+          type: string
+          example: '0.123'
+        name:
+          description: Referral name
+          type: string
+          example: Referral
+        points_bonus_rate:
+          description: Points bonus rate for the referee
+          type: string
+          example: '0.1'
+        points_bonus_volume_cap:
+          description: Volume cap for points bonus
+          type: string
+          example: '1000000000'
+        referral_type:
+          description: Referral type
+          type: string
+          example: Referral
+    responses.FillResult:
+      type: object
+      properties:
+        account:
+          description: Account that made the fill
+          type: string
+          example: '0x978532f46745d7fFBa1CDfa1D8C8202D09D89C9E'
+        client_id:
+          description: Unique client assigned ID for the order
+          type: string
+          example: x1234
+        created_at:
+          description: Fill time
+          type: integer
+          example: 1681375176910
+        fee:
+          description: Fee paid by the user
+          type: string
+          example: '7.56'
+        fee_currency:
+          description: Asset that fee is charged in
+          type: string
+          example: USDC
+        fill_type:
+          description: Fill type, can be FILL, LIQUIDATION or UNWIND_TRANSFER
+          allOf:
+          - $ref: '#/components/schemas/responses.FillType'
+          example: FILL
+        flags:
+          description: Fill flags indicating special properties
+          type: array
+          items:
+            $ref: '#/components/schemas/responses.FillFlag'
+          example:
+          - '["interactive"'
+          - ' "rpi"]'
+        id:
+          description: Unique string ID of fill per FillType
+          type: string
+          example: '8615262148007718462'
+        liquidity:
+          description: Maker or Taker
+          allOf:
+          - $ref: '#/components/schemas/responses.TraderRole'
+        market:
+          description: Market name
+          type: string
+          example: BTC-USD-PERP
+        order_id:
+          description: Order ID
+          type: string
+          example: '1681462103821101699438490000'
+        orderbook_seq_no:
+          description: Orderbook sequence number after trade execution (post-execution state). Use seqno-1 for pre-execution. 0 for position transfers (liquidations, settlements)
+          type: integer
+          example: 12345
+        price:
+          description: Price at which order was filled
+          type: string
+          example: '30000.12'
+        realized_funding:
+          description: Realized funding of the fill
+          type: string
+          example: '7.56'
+        realized_pnl:
+          description: Realized PnL of the fill
+          type: string
+          example: '7.56'
+        remaining_size:
+          description: Remaining size of the order
+          type: string
+          example: '0.5'
+        side:
+          description: Taker side
+          allOf:
+          - $ref: '#/components/schemas/responses.OrderSide'
+        size:
+          description: Size of the fill
+          type: string
+          example: '0.5'
+        underlying_price:
+          description: Underlying asset price of the fill (spot price)
+          type: string
+          example: '7.56'
+    requests.UpdateSizeCurrencyDisplayRequest:
+      type: object
+      required:
+      - size_currency_display
+      properties:
+        size_currency_display:
+          type: string
+    requests.UpdateAccountMaxSlippageRequest:
+      type: object
+      required:
+      - max_slippage
+      properties:
+        max_slippage:
+          type: string
+    responses.AccountKind:
+      type: string
+      enum:
+      - ''
+      - main
+      - subaccount
+      - vault_operator
+      - vault_sub_operator
+      x-enum-varnames:
+      - AccountKindUnspecified
+      - AccountKindMain
+      - AccountKindSubaccount
+      - AccountKindVaultOperator
+      - AccountKindVaultSubOperator
+    messagesv1.NftPrice:
+      type: object
+      properties:
+        currency:
+          type: string
+        decimals:
+          type: integer
+        value:
+          type: string
+    responses.APIResults:
+      type: object
+      properties:
+        results:
+          description: Array of results
+          type: array
+          items:
+            type: object
+    responses.GetSubAccountsResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/responses.AccountInfoResponse'
+    responses.DiscordProfile:
+      type: object
+      properties:
+        id:
+          type: string
+        image_url:
+          type: string
+        username:
+          type: string
+    responses.OrderSide:
+      type: string
+      enum:
+      - BUY
+      - SELL
+      x-enum-varnames:
+      - OrderSideBuy
+      - OrderSideSell
+    responses.RefreshInventoryResp:
+      type: object
+      properties:
+        nfts:
+          type: array
+          items:
+            $ref: '#/components/schemas/responses.Nft'
+    responses.VolumeTierKindInfo:
+      type: object
+      properties:
+        tier:
+          description: Effective tier name, e.g. "VIP 1"
+          type: string
+        volume:
+          description: Traded volume for the tier's duration window
+          type: string
+  securitySchemes:
+    BearerToken:
+      type: apiKey
+      name: Authorization
+      in: header
+x-refined-from:
+- paradex-openapi-prod.json
+- paradex-openapi.yml
+x-hideTryItPanel: true

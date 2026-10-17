@@ -1,0 +1,1467 @@
+openapi: 3.2.0
+info:
+  title: Paradex Markets API
+  version: 1.142.2
+  contact: {}
+  description: 'Operations tagged Markets across 2 of this provider''s published API definitions: paradex-openapi-prod.json, paradex-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.prod.paradex.trade/v1
+tags:
+- name: Markets
+paths:
+  /bbo/{market}:
+    get:
+      description: Get the best bid/ask for the given market
+      tags:
+      - Markets
+      summary: Get market bbo
+      operationId: get-bbo
+      parameters:
+      - description: 'Market symbol - ex: BTC-USD-PERP'
+        name: market
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.BBOResp'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /bbo/{market}/interactive:
+    get:
+      description: Returns best bid/offer including all orders including RPI (as seen by the UI)
+      tags:
+      - Markets
+      summary: Get market bbo including all orders including RPI (as seen by the UI)
+      operationId: get-bbo-interactive
+      parameters:
+      - description: 'Market symbol - ex: BTC-USD-PERP'
+        name: market
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.BBOResp'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /funding/data:
+    get:
+      description: List historical funding data by market
+      tags:
+      - Markets
+      summary: Funding data history
+      operationId: get-funding-data
+      parameters:
+      - description: Returns the ‘next’ paginated page.
+        name: cursor
+        in: query
+        schema:
+          type: string
+      - description: End Time (unix time millisecond)
+        name: end_at
+        in: query
+        schema:
+          type: integer
+      - example: BTC-USD-PERP
+        description: Market for which funding payments are queried
+        name: market
+        in: query
+        required: true
+        schema:
+          type: string
+      - description: Limit the number of responses in the page
+        name: page_size
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 5000
+          default: 100
+      - description: Start Time (unix time millisecond)
+        name: start_at
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/responses.PaginatedAPIResults'
+                - type: object
+                  properties:
+                    results:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/responses.FundingDataResult'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /markets:
+    get:
+      description: Get markets static data component
+      tags:
+      - Markets
+      summary: List available markets
+      operationId: get-markets
+      parameters:
+      - description: 'Market Name - example: BTC-USD-PERP'
+        name: market
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/responses.APIResults'
+                - type: object
+                  properties:
+                    results:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/responses.MarketResp'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /markets/history:
+    get:
+      description: 'Returns audit-driven events for market spec changes (listing, settlement, parameter updates) over the last 7 days. Source: market audit table; includes Ops manual changes.'
+      tags:
+      - Markets
+      summary: History of changes to market specifications
+      operationId: get-markets-history
+      parameters:
+      - example: BTC-USD-PERP
+        description: Market symbol to filter history. Omit or pass "ALL" for all markets.
+        name: market
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.MarketHistoryResponse'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /markets/klines:
+    get:
+      description: Klines for a symbol
+      tags:
+      - Markets
+      summary: OHLCV for a symbol
+      operationId: markets-klines
+      parameters:
+      - description: end time for klines in milliseconds
+        name: end_at
+        in: query
+        required: true
+        schema:
+          type: integer
+      - x-enum-varnames:
+        - PriceKindLast
+        - PriceKindMark
+        - PriceKindUnderlying
+        description: Which price to use for the klines
+        name: price_kind
+        in: query
+        schema:
+          type: string
+          enum:
+          - last
+          - mark
+          - underlying
+      - description: 'resolution in minutes: 1, 3, 5, 15, 30, 60'
+        name: resolution
+        in: query
+        required: true
+        schema:
+          type: string
+      - description: start time for klines in milliseconds
+        name: start_at
+        in: query
+        required: true
+        schema:
+          type: integer
+      - description: Symbol of the market pair
+        name: symbol
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /markets/settlement-price:
+    get:
+      description: Returns the settlement price and the underlying spot TWAP used to compute it. The market must have already settled; otherwise returns 404.
+      tags:
+      - Markets
+      summary: Settlement price for a single market
+      operationId: get-market-settlement-price
+      parameters:
+      - description: Market symbol, e.g. BTC-USD-15SEP25-55000-C
+        name: market
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.MarketSettlementResp'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /markets/summary:
+    get:
+      description: Get markets dynamic data component
+      tags:
+      - Markets
+      summary: List available markets summary
+      operationId: get-markets-summary
+      parameters:
+      - description: End Time (unix time millisecond)
+        name: end
+        in: query
+        schema:
+          type: integer
+      - example: BTC-USD-PERP
+        description: Name of the market for which summary is requested (for all available markets use ALL)
+        name: market
+        in: query
+        required: true
+        schema:
+          type: string
+      - description: Start Time (unix time millisecond)
+        name: start
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/responses.APIResults'
+                - type: object
+                  properties:
+                    results:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/responses.MarketSummaryResp'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /orderbook/{market}:
+    get:
+      description: Get snapshot of the orderbook for the given market
+      tags:
+      - Markets
+      summary: Get market orderbook
+      operationId: get-orderbook
+      parameters:
+      - description: 'Market symbol - ex: BTC-USD-PERP'
+        name: market
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Depth
+        name: depth
+        in: query
+        schema:
+          type: integer
+          default: 20
+      - description: Price tick for aggregation
+        name: price_tick
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.AskBidArray'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /orderbook/{market}/impact-price:
+    get:
+      tags:
+      - Markets
+      summary: Get market impact price
+      operationId: get-impact-price
+      parameters:
+      - description: 'Market symbol - ex: BTC-USD-PERP'
+        name: market
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Size
+        name: size
+        in: query
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ImpactPriceResp'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /orderbook/{market}/interactive:
+    get:
+      description: Returns orderbook including RPI
+      tags:
+      - Markets
+      summary: Get market interactive orderbook
+      operationId: get-orderbook-interactive
+      parameters:
+      - description: 'Market symbol - ex: BTC-USD-PERP'
+        name: market
+        in: path
+        required: true
+        schema:
+          type: string
+      - description: Depth
+        name: depth
+        in: query
+        schema:
+          type: integer
+          default: 20
+      - description: Price tick for aggregation
+        name: price_tick
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.AskBidArray'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+components:
+  schemas:
+    responses.AssetKind:
+      type: string
+      enum:
+      - PERP
+      - PERP_OPTION
+      - SPOT
+      - OPTION
+      - FUTURE
+      x-enum-varnames:
+      - AssetKindPerp
+      - AssetKindPerpOption
+      - AssetKindSpot
+      - AssetKindOption
+      - AssetKindFuture
+    responses.MarketKind:
+      type: string
+      enum:
+      - ''
+      - cross
+      - isolated
+      - isolated_margin
+      x-enum-varnames:
+      - MarketKindUnknown
+      - MarketKindCross
+      - MarketKindIsolated
+      - MarketKindIsolatedMargin
+    responses.OptionMarginParams:
+      type: object
+      properties:
+        long_itm:
+          description: Margin fraction for long ITM options
+          type: string
+          example: '0.2'
+        premium_multiplier:
+          description: Multiplier for margin fraction for premium
+          type: string
+          example: '1.2'
+        short_itm:
+          description: Margin fraction for short ITM options
+          type: string
+          example: '0.4'
+        short_otm:
+          description: Margin fraction for short OTM options
+          type: string
+          example: '0.25'
+        short_put_cap:
+          description: Cap for margin fraction for short put options
+          type: string
+          example: '0.5'
+    responses.MarketSummaryResp:
+      type: object
+      properties:
+        ask:
+          description: Best ask price
+          type: string
+          example: '30130.15'
+        ask_iv:
+          description: Ask implied volatility, for options
+          type: string
+          example: '0.2'
+        ask_size:
+          description: Size at best ask price
+          type: string
+          example: '0.05'
+        bid:
+          description: Best bid price
+          type: string
+          example: '30112.22'
+        bid_iv:
+          description: Bid implied volatility, for options
+          type: string
+          example: '0.2'
+        bid_size:
+          description: Size at best bid price
+          type: string
+          example: '0.04'
+        created_at:
+          description: Market summary creation time
+          type: integer
+        delta:
+          description: 'Deprecated: Use greeks.delta instead'
+          type: string
+          example: '1'
+        external_fair_price:
+          description: 'External fair price, calculated from spot price and an external basis: spot_price * (1 + external_basis). where external basis is the median basis rate on different external exchanges'
+          type: string
+          example: '29876.3'
+        forward_rate:
+          description: EWMA-smoothed annualized forward rate for dated options
+          type: string
+          example: '0.05'
+        funding_rate:
+          description: This raw funding rate corresponds to the actual funding period of the instrument itself. It is not a normalized 8h funding rate.
+          type: string
+          example: '0.3'
+        future_funding_rate:
+          description: For options it's a smoothed version of future's funding rate
+          type: string
+          example: '0.3'
+        greeks:
+          description: Greeks (delta, gamma, vega). Partial for perpetual futures.
+          allOf:
+          - $ref: '#/components/schemas/responses.Greeks'
+        last_iv:
+          description: Last traded price implied volatility, for options
+          type: string
+          example: '0.2'
+        last_traded_price:
+          description: Last traded price
+          type: string
+          example: '30109.53'
+        mark_iv:
+          description: Mark implied volatility, for options
+          type: string
+          example: '0.2'
+        mark_price:
+          description: '[Mark price](https://docs.paradex.trade/risk-system/mark-price-calculation)'
+          type: string
+          example: '29799.70877478'
+        open_interest:
+          description: Open interest in base currency
+          type: string
+          example: '6100048.3'
+        price_change_rate_24h:
+          description: Price change rate in the last 24 hours
+          type: string
+          example: '0.05'
+        risk_free_rate:
+          description: Risk-free discounting rate used for option pricing
+          type: string
+          example: '0.05'
+        rolling_details:
+          description: Rolling futures details — only populated for rolling futures markets
+          allOf:
+          - $ref: '#/components/schemas/responses.RollingDetailsResp'
+        settlement_twap_estimate:
+          description: Running average of the underlying over the settlement window, on the live summary only while inside that window
+          type: string
+          example: '76423.56'
+        symbol:
+          description: Market symbol
+          type: string
+          example: BTC-USD-PERP
+        total_volume:
+          description: Lifetime total traded volume in USD
+          type: string
+          example: '141341.0424'
+        underlying_price:
+          description: Underlying asset price (spot price)
+          type: string
+          example: '29876.3'
+        volume_24h:
+          description: 24 hour volume in USD
+          type: string
+          example: '47041.0424'
+    responses.Delta1CrossMarginParams:
+      type: object
+      properties:
+        imf_base:
+          description: Initial Margin Base
+          type: string
+          example: '0.11'
+        imf_factor:
+          description: Initial Margin Factor, always 0.
+          type: string
+          example: '0'
+        imf_shift:
+          description: Initial Margin Shift, unused, always 0.
+          type: string
+          example: '0'
+        mmf_factor:
+          description: Maintenance Margin Factor
+          type: string
+          example: '0.51'
+    responses.FeeWithCap:
+      type: object
+      properties:
+        fee:
+          description: fee rate
+          type: string
+          example: '0.0003'
+        fee_cap:
+          description: fee cap (used for option)
+          type: string
+          example: '0.5'
+        fee_floor:
+          description: fee floor (used for option)
+          type: string
+          example: '-0.5'
+    responses.MarketEvent:
+      type: object
+      properties:
+        changed_fields:
+          $ref: '#/components/schemas/responses.MarketHistoryFields'
+        event_type:
+          description: Type of change
+          enum:
+          - CREATED
+          - DELETED
+          - SETTLED
+          - UPDATED
+          allOf:
+          - $ref: '#/components/schemas/responses.MarketEventType'
+          example: UPDATED
+        symbol:
+          description: Market symbol
+          type: string
+          example: BTC-USD-PERP
+        updated_at:
+          description: Time of change (unix time millisecond)
+          type: integer
+          example: 1762809600000
+    responses.MakerTakerFee:
+      type: object
+      properties:
+        maker_fee:
+          description: fee for maker
+          allOf:
+          - $ref: '#/components/schemas/responses.FeeWithCap'
+        taker_fee:
+          description: fee for taker
+          allOf:
+          - $ref: '#/components/schemas/responses.FeeWithCap'
+    responses.PaginatedAPIResults:
+      type: object
+      properties:
+        next:
+          description: The pointer to fetch next set of records (null if there are no records left)
+          type: string
+          example: eyJmaWx0ZXIiMsIm1hcmtlciI6eyJtYXJrZXIiOiIxNjc1NjUwMDE3NDMxMTAxNjk5N=
+        prev:
+          description: The pointer to fetch previous set of records (null if there are no records left)
+          type: string
+          example: eyJmaWx0ZXIiOnsiTGltaXQiOjkwfSwidGltZSI6MTY4MTY3OTgzNzk3MTMwOTk1MywibWFya2VyIjp7Im1zMjExMD==
+        results:
+          description: Array of paginated results
+          type: array
+          items:
+            type: object
+    responses.ErrorCode:
+      type: string
+      enum:
+      - VALIDATION_ERROR
+      - BINDING_ERROR
+      - INTERNAL_ERROR
+      - NOT_FOUND
+      - SERVICE_UNAVAILABLE
+      - INVALID_REQUEST_PARAMETER
+      - ORDER_ID_NOT_FOUND
+      - ORDER_IS_CLOSED
+      - ORDER_IS_NOT_OPEN
+      - INVALID_ORDER_SIZE
+      - CLIENT_ORDER_ID_NOT_FOUND
+      - DUPLICATED_CLIENT_ID
+      - INVALID_SYMBOL
+      - INVALID_TOKEN
+      - INVALID_ETHEREUM_ADDRESS
+      - INVALID_ETHEREUM_SIGNATURE
+      - INVALID_STARKNET_ADDRESS
+      - INVALID_STARKNET_SIGNATURE
+      - STARKNET_SIGNATURE_VERIFICATION_FAILED
+      - ETHEREUM_SIGNER_MISMATCH
+      - ETHEREUM_HASH_MISMATCH
+      - NOT_ONBOARDED
+      - INVALID_TIMESTAMP
+      - INVALID_BLOCK_EXPIRATION
+      - ACCOUNT_NOT_FOUND
+      - MEDIA_NOT_FOUND
+      - INVALID_ORDER_SIGNATURE
+      - PUBLIC_KEY_INVALID
+      - UNAUTHORIZED_ETHEREUM_ADDRESS
+      - UNAUTHORIZED_ERROR
+      - ETHEREUM_ADDRESS_ALREADY_ONBOARDED
+      - EVM_ADDRESS_ALREADY_ONBOARDED
+      - MARKET_NOT_FOUND
+      - ALLOWLIST_ENTRY_NOT_FOUND
+      - USERNAME_IN_USE
+      - GEO_IP_BLOCK
+      - ETHEREUM_ADDRESS_BLOCKED
+      - PROGRAM_NOT_FOUND
+      - PROGRAM_NOT_SUPPORTED
+      - INVALID_DASHBOARD
+      - MARKET_NOT_OPEN
+      - MARKET_NOT_SETTLED
+      - INVALID_REFERRAL_CODE
+      - REQUEST_NOT_ALLOWED
+      - PARENT_ADDRESS_ALREADY_ONBOARDED
+      - INVALID_PARENT_ACCOUNT
+      - INVALID_VAULT_OPERATOR_CHAIN
+      - VAULT_OPERATOR_ALREADY_ONBOARDED
+      - VAULT_NAME_IN_USE
+      - VAULT_NOT_FOUND
+      - VAULT_STRATEGY_NOT_FOUND
+      - VAULT_LIMIT_REACHED
+      - VAULT_DATA_PRIVATE
+      - BATCH_SIZE_OUT_OF_RANGE
+      - ISOLATED_MARKET_ACCOUNT_MISMATCH
+      - NO_ACCESS_TO_MARKET
+      - POINTS_SUMMARY_NOT_FOUND
+      - ALGO_ID_NOT_FOUND
+      - INVALID_DERIVATION_PATH
+      - PROFILE_STATS_NOT_FOUND
+      - INVALID_CHAIN
+      - INVALID_LAYERSWAP_SWAP
+      - INVALID_DEPOSIT_ADDRESS
+      - SOCIAL_USERNAME_IN_USE
+      - INVALID_OAUTH_REQUEST
+      - RPI_ACCOUNT_NOT_WHITELISTED
+      - SYSTEM_STATUS_POST_ONLY
+      - SYSTEM_STATUS_CANCEL_ONLY
+      - INVALID_MARKETING_CODE
+      - OFFER_NOT_FOUND
+      - MARKET_MARGIN_RESTRICTED
+      - NOT_UNIQUE
+      - ACCOUNT_ALREADY_REFERRED
+      - ONBOARDING_PERIOD_EXPIRED
+      - ONBOARDING_RATE_LIMITED
+      - RFQ_CREATE_BUDGET_EXCEEDED
+      - SUBACCOUNTS_LIMIT_EXCEEDED
+      - INSUFFICIENT_MIN_CHAIN_BALANCE
+      - INSUFFICIENT_EVM_BALANCE
+      - PORTFOLIO_MARGIN_ONBOARDING_DISABLED
+      - PORTFOLIO_MARGIN_INVALID_ACCOUNT_KIND
+      - EVM_VAULT_OPERATORS_DISABLED
+      - VAULT_OPERATOR_OWNER_PROOF_REQUIRED
+      - INVALID_EVM_SIGNATURE
+      - EVM_SIGNATURE_VERIFICATION_FAILED
+      - INVALID_SUBKEY
+      - SUBKEY_NOT_ACTIVATABLE
+      - SUBKEY_REVOKED
+      - TOKEN_LIMIT_REACHED
+      - INVALID_TOKEN_SCOPE
+      - IP_NOT_ALLOWED
+      - INSUFFICIENT_TRANSFERRABLE_XP
+      - TRANSFER_LIMIT_REACHED
+      - XP_TRANSFERS_DISABLED
+      - BLOCK_TRADE_NOT_FOUND
+      - BLOCK_TRADE_NOT_ENABLED
+      - BLOCK_TRADE_EXPIRED
+      - BLOCK_TRADE_ALREADY_CANCELLED
+      - BLOCK_TRADE_INVALID_STATUS
+      - BLOCK_TRADE_UNAUTHORIZED
+      - BLOCK_TRADE_MISSING_TRADES
+      - BLOCK_TRADE_MISSING_SIGNERS
+      - BLOCK_TRADE_MISSING_SIGNATURE
+      - BLOCK_TRADE_ACCOUNT_MISMATCH
+      - BLOCK_TRADE_INVALID_SIGNATURE
+      - BLOCK_TRADE_SIGNER_KEY_UNAUTHORIZED
+      - BLOCK_TRADE_REPLAYED_SIGNATURE
+      - BLOCK_TRADE_SELF_TRADE
+      - OFFER_ALREADY_CANCELLED
+      - OFFER_INVALID_STATUS
+      - OFFER_UNAUTHORIZED
+      - OFFER_PARENT_MISMATCH
+      - OFFER_PARENT_NOT_ACCEPTING
+      - PORTFOLIO_MARGIN_CONFIG_NOT_FOUND
+      - MARGIN_CONFIG_NOT_FOUND
+      - MMP_CONFIG_INVALID
+      - MMP_NOT_ENABLED
+      - MMP_MIN_FREEZE_NOT_ELAPSED
+      - MMP_NOT_CONFIGURED
+      - RFQ_VENUE_UNAVAILABLE
+      x-enum-comments:
+        ErrorCodeString_SignerMismatch: '#nosec G101'
+      x-enum-varnames:
+      - ErrorCode_Validation
+      - ErrorCode_Binding
+      - ErrorCode_InternalError
+      - ErrorCode_NotFound
+      - ErrorCode_ServiceUnavailable
+      - ErrorCodeString_InvalidParameter
+      - ErrorCodeString_OrderIdNotFound
+      - ErrorCodeString_OrderIsClosed
+      - ErrorCodeString_OrderIsNotOpen
+      - ErrorCodeString_InvalidSizeForModifyOrder
+      - ErrorCodeString_ClientOrderIdNotFound
+      - ErrorCodeString_DuplicatedClientOrderId
+      - ErrorCodeString_InvalidSymbol
+      - ErrorCodeString_InvalidToken
+      - ErrorCodeString_BadEthAddress
+      - ErrorCodeString_BadEthSignature
+      - ErrorCodeString_BadStarkNetAddress
+      - ErrorCodeString_BadStarkNetSignature
+      - ErrorCodeString_StarknetSigVerificationFailed
+      - ErrorCodeString_SignerMismatch
+      - ErrorCodeString_HashMismatch
+      - ErrorCodeString_NotOnboarded
+      - ErrorCodeString_BadTimestamp
+      - ErrorCodeString_BadExpiration
+      - ErrorCodeString_AccountIdNotFound
+      - ErrorCodeString_MediaNotFound
+      - ErrorCodeString_InvalidOrderSignature
+      - ErrorCodeString_BadPublicKey
+      - ErrorCodeString_UnauthorizedEthAddress
+      - ErrorCodeString_UnauthorizedError
+      - ErrorCodeString_EthAddressAlreadyOnboarded
+      - ErrorCodeString_EvmAddressAlreadyOnboarded
+      - ErrorCodeString_MarketNotFound
+      - ErrorCodeString_AllowlistNotFound
+      - ErrorCodeString_UsernameInUse
+      - ErrorCodeString_GeoIPBlock
+      - ErrorCodeString_EthAddressBlocked
+      - ErrorCodeString_ProgramNotFound
+      - ErrorCodeString_ProgramNotSupported
+      - ErrorCodeString_InvalidDashboard
+      - ErrorCodeString_MarketNotOpen
+      - ErrorCodeString_MarketNotSettled
+      - ErrorCodeString_InvalidReferralCode
+      - ErrorCodeString_RequestNotAllowed
+      - ErrorCodeString_ParentAddressAlreadyOnboarded
+      - ErrorCodeString_InvalidParentAccount
+      - ErrorCodeString_InvalidVaultOperatorChain
+      - ErrorCodeString_VaultOperatorAlreadyOnboarded
+      - ErrorCodeString_VaultNameInUse
+      - ErrorCodeString_VaultNotFound
+      - ErrorCodeString_VaultStrategyNotFound
+      - ErrorCodeString_VaultLimitReached
+      - ErrorCodeString_VaultDataPrivate
+      - ErrorCodeString_BatchSizeOutOfRange
+      - ErrorCodeString_IsolatedMarketAccountMismatch
+      - ErrorCodeString_NoAccessToMarket
+      - ErrorCodeString_PointsSummaryNotFound
+      - ErrorCodeString_AlgoIdNotFound
+      - ErrorCodeString_InvalidDerivationPath
+      - ErrorCodeString_ProfileStatsNotFound
+      - ErrorCodeString_InvalidChain
+      - ErrorCodeString_InvalidLayerswapSwap
+      - ErrorCodeString_InvalidDepositAddress
+      - ErrorCodeString_SocialUsernameInUse
+      - ErrorCodeString_InvalidOAuthRequest
+      - ErrorCodeString_RPIAccountNotWhitelisted
+      - ErrorCodeString_SystemStatusPostOnly
+      - ErrorCodeString_SystemStatusCancelOnly
+      - ErrorCodeString_InvalidMarketingCode
+      - ErrorCodeString_OfferNotFound
+      - ErrorCodeString_MarketMarginRestricted
+      - ErrorCodeString_NotUnique
+      - ErrorCodeString_AccountAlreadyReferred
+      - ErrorCodeString_OnboardingPeriodExpired
+      - ErrorCodeString_OnboardingRateLimited
+      - ErrorCodeString_RfqCreateBudgetExceeded
+      - ErrorCodeString_SubaccountsLimitExceeded
+      - ErrorCodeString_InsufficientMinChainBalance
+      - ErrorCodeString_InsufficientEvmBalance
+      - ErrorCodeString_PortfolioMarginOnboardingDisabled
+      - ErrorCodeString_PortfolioMarginInvalidAccountKind
+      - ErrorCodeString_EvmVaultOperatorsDisabled
+      - ErrorCodeString_VaultOperatorOwnerProofRequired
+      - ErrorCodeString_BadEvmSignature
+      - ErrorCodeString_EvmSigVerificationFailed
+      - ErrorCodeString_InvalidSubkey
+      - ErrorCodeString_SubkeyNotActivatable
+      - ErrorCodeString_SubkeyRevoked
+      - ErrorCodeString_TokenLimitReached
+      - ErrorCodeString_InvalidTokenScope
+      - ErrorCodeString_IPNotAllowed
+      - ErrorCodeString_InsufficientTransferrableXP
+      - ErrorCodeString_TransferLimitReached
+      - ErrorCodeString_XPTransfersDisabled
+      - ErrorCodeString_BlockTradeNotFound
+      - ErrorCodeString_BlockTradeNotEnabled
+      - ErrorCodeString_BlockTradeExpired
+      - ErrorCodeString_BlockTradeAlreadyCancelled
+      - ErrorCodeString_BlockTradeInvalidStatus
+      - ErrorCodeString_BlockTradeUnauthorized
+      - ErrorCodeString_BlockTradeMissingTrades
+      - ErrorCodeString_BlockTradeMissingSigners
+      - ErrorCodeString_BlockTradeMissingSignature
+      - ErrorCodeString_BlockTradeAccountMismatch
+      - ErrorCodeString_BlockTradeInvalidSignature
+      - ErrorCodeString_BlockTradeSignerKeyUnauthorized
+      - ErrorCodeString_BlockTradeReplayedSignature
+      - ErrorCodeString_BlockTradeSelfTrade
+      - ErrorCodeString_OfferAlreadyCancelled
+      - ErrorCodeString_OfferInvalidStatus
+      - ErrorCodeString_OfferUnauthorized
+      - ErrorCodeString_OfferParentMismatch
+      - ErrorCodeString_OfferParentNotAccepting
+      - ErrorCodeString_PortfolioMarginConfigNotFound
+      - ErrorCodeString_MarginConfigNotFound
+      - ErrorCodeString_MmpConfigInvalid
+      - ErrorCodeString_MmpNotEnabled
+      - ErrorCodeString_MmpMinFreezeNotElapsed
+      - ErrorCodeString_MmpNotConfigured
+      - ErrorCodeString_RfqVenueUnavailable
+    responses.ImpactPriceResp:
+      type: object
+      properties:
+        impact_price:
+          description: The calculated impact price
+          type: string
+          example: '30130.15'
+        market:
+          description: Symbol of the market
+          type: string
+          example: BTC-USD-PERP
+        side:
+          description: Trade side (BUY or SELL)
+          type: string
+          example: BUY
+        size:
+          description: Size of the order
+          type: string
+          example: '0.05'
+    responses.FundingDataResult:
+      type: object
+      properties:
+        created_at:
+          description: Timestamp in milliseconds when the funding data was created
+          type: integer
+        funding_index:
+          description: Current funding index value as a decimal string
+          type: string
+        funding_period_hours:
+          description: Actual funding period in hours for this market
+          type: number
+        funding_premium:
+          description: Current funding premium as a decimal string
+          type: string
+        funding_rate:
+          description: Raw funding rate for the actual funding period as a decimal string
+          type: string
+        funding_rate_8h:
+          description: Normalized 8-hour funding rate as a decimal string
+          type: string
+        impact_premium_rate:
+          description: 'Raw cross-venue impact premium rate (weighted-median impact premium / spot,
+
+            pre-clamp) as a decimal string. Omitted when impact aggregation did not
+
+            produce the rate.'
+          type: string
+        market:
+          description: Market represents the market identifier
+          type: string
+    responses.ApiError:
+      type: object
+      properties:
+        data:
+          description: any additional data related to the error
+          type: object
+        error:
+          description: unique immutable string identifier for specific error
+          allOf:
+          - $ref: '#/components/schemas/responses.ErrorCode'
+          example: NOT_ONBOARDED
+        message:
+          description: detailed description of error and how to address it
+          type: string
+          example: User has never called /onboarding endpoint
+    responses.MarketSettlementResp:
+      type: object
+      properties:
+        expiry_at:
+          description: Scheduled expiry (unix ms); settlement is computed at or shortly after this time
+          type: integer
+          example: 1758326400000
+        settlement_price:
+          description: Option payoff for option markets; spot TWAP for perp/future
+          type: string
+          example: '5000'
+        symbol:
+          type: string
+          example: BTC-USD-15SEP25-55000-C
+        underlying_twap_price:
+          description: 30-min spot TWAP at expiry
+          type: string
+          example: '60000'
+    responses.AskBidArray:
+      type: object
+      properties:
+        asks:
+          description: List of Ask sizes and prices
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+        best_ask_api:
+          description: Size on the best ask from API (excluding RPI)
+          type: array
+          items:
+            type: string
+          example:
+          - '10.5'
+        best_ask_interactive:
+          description: Size on the best ask from UI
+          type: array
+          items:
+            type: string
+          example:
+          - '10.5'
+        best_bid_api:
+          description: Size on the best bid from API (excluding RPI)
+          type: array
+          items:
+            type: string
+          example:
+          - '10.5'
+        best_bid_interactive:
+          description: Size on the best bid from UI
+          type: array
+          items:
+            type: string
+          example:
+          - '10.5'
+        bids:
+          description: List of Bid sizes and prices
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+        last_updated_at:
+          description: Last update to the orderbook in milliseconds
+          type: integer
+          example: 1681462770114
+        market:
+          description: Market name
+          type: string
+          example: ETH-USD-PERP
+        seq_no:
+          description: Sequence number of the orderbook
+          type: integer
+          example: 20784
+    responses.OptionSpreadMarginParams:
+      type: object
+      properties:
+        unpaired_scale_im:
+          description: Initial-margin scale on the unpaired short call reserve
+          type: string
+          example: '1.0'
+        unpaired_scale_mm:
+          description: Maintenance-margin scale on the unpaired short call reserve
+          type: string
+          example: '1.0'
+    responses.Greeks:
+      type: object
+      properties:
+        delta:
+          description: Market Delta
+          type: string
+          example: '1'
+        gamma:
+          description: Market Gamma
+          type: string
+          example: '0.2'
+        rho:
+          description: Market Rho
+          type: string
+          example: '0.2'
+        theta:
+          description: Market Theta
+          type: string
+          example: '-0.2'
+        vanna:
+          description: Market Vanna
+          type: string
+          example: '0.2'
+        vega:
+          description: Market Vega
+          type: string
+          example: '0.2'
+        volga:
+          description: Market Volga
+          type: string
+          example: '0.2'
+    responses.OptionCrossMarginParams:
+      type: object
+      properties:
+        imf:
+          $ref: '#/components/schemas/responses.OptionMarginParams'
+        mmf:
+          $ref: '#/components/schemas/responses.OptionMarginParams'
+    responses.MarketResp:
+      type: object
+      properties:
+        asset_kind:
+          description: Type of asset
+          enum:
+          - PERP
+          - PERP_OPTION
+          - SPOT
+          allOf:
+          - $ref: '#/components/schemas/responses.AssetKind'
+          example: PERP
+        base_currency:
+          description: Base currency of the market
+          type: string
+          example: ETH
+        clamp_rate:
+          description: Clamp rate
+          type: string
+          example: '0.05'
+        delta1_cross_margin_params:
+          description: Delta1 Cross margin parameters
+          allOf:
+          - $ref: '#/components/schemas/responses.Delta1CrossMarginParams'
+        expiry_at:
+          description: Market expiry time
+          type: integer
+          example: 0
+        fee_config:
+          description: Fee config indicates override fee for the market. If not set, it will use the global exchange fee config
+          allOf:
+          - $ref: '#/components/schemas/responses.MarketFeeConfig'
+        funding_multiplier:
+          description: Funding multiplier
+          type: number
+          example: 1
+        funding_period_hours:
+          description: Funding period in hours
+          type: number
+          example: 8
+        interest_rate:
+          description: Interest rate
+          type: string
+          example: '0.01'
+        iv_bands_width:
+          description: IV Bands Width
+          type: string
+          example: '0.05'
+        market_kind:
+          description: Market's margin mode
+          enum:
+          - cross
+          - isolated
+          - isolated_margin
+          allOf:
+          - $ref: '#/components/schemas/responses.MarketKind'
+          example: cross
+        max_funding_rate:
+          description: Max funding rate
+          type: string
+          example: '0.05'
+        max_funding_rate_change:
+          description: Max funding rate change
+          type: string
+          example: '0.0005'
+        max_open_orders:
+          description: Max open orders
+          type: integer
+          example: 100
+        max_order_size:
+          description: Maximum order size in base currency
+          type: string
+          example: '100'
+        max_slippage:
+          description: Default max slippage allowed for the market
+          type: string
+          example: '0.05'
+        max_tob_spread:
+          description: The maximum TOB spread allowed to apply funding rate changes
+          type: string
+          example: '0.2'
+        min_notional:
+          description: 'Minimum order notional in USD. For futures: size*mark_price, for options: size*spot_price'
+          type: string
+          example: '3'
+        open_at:
+          description: Market open time in milliseconds
+          type: integer
+          example: 0
+        option_cross_margin_params:
+          description: Option Cross margin parameters
+          allOf:
+          - $ref: '#/components/schemas/responses.OptionCrossMarginParams'
+        option_spread_margin_params:
+          description: Same-expiry option spread offset scales
+          allOf:
+          - $ref: '#/components/schemas/responses.OptionSpreadMarginParams'
+        option_type:
+          description: Type of option
+          type: string
+          enum:
+          - PUT
+          - CALL
+          example: PUT
+        oracle_ewma_factor:
+          description: Oracle EWMA factor
+          type: string
+          example: '0.2'
+        order_size_increment:
+          description: Minimum size increment for base currency
+          type: string
+          example: '0.001'
+        position_limit:
+          description: Position limit in base currency
+          type: string
+          example: '500'
+        price_bands_width:
+          description: Price Bands Width, 0.05 means 5% price deviation allowed from mark price
+          type: string
+          example: '0.05'
+        price_feed_id:
+          description: Price feed id. Pyth price account used to price underlying asset
+          type: string
+          example: GVXRSBjFk6e6J3NbVPXohDJetcTjaeeuykUpbQF8UoMU
+        price_tick_size:
+          description: Minimum price increment of the market in USD
+          type: string
+          example: '0.01'
+        quote_currency:
+          description: Quote currency of the market
+          type: string
+          example: USD
+        settlement_currency:
+          description: Settlement currency of the market
+          type: string
+          example: USDC
+        strike_price:
+          description: Strike price for option market
+          type: string
+          example: '66500'
+        symbol:
+          description: Market symbol
+          type: string
+          example: ETH-USD-PERP
+        tags:
+          description: Market tags
+          type: array
+          items:
+            type: string
+          example:
+          - MEME
+          - DEFI
+        trading_mode:
+          description: Order-entry mode. STANDARD accepts on-book orders; RFQ_ONLY rejects them and accepts only block-trade legs from RFQ settlement.
+          enum:
+          - STANDARD
+          - RFQ_ONLY
+          allOf:
+          - $ref: '#/components/schemas/responses.TradingMode'
+          example: STANDARD
+    responses.RollingDetailsResp:
+      type: object
+      properties:
+        current_active_contract_symbol:
+          description: Current active contract symbol
+          type: string
+          example: Commodities.WTIJ6/USD
+        current_active_contract_weight:
+          description: Front contract weight ("0" to "1")
+          type: string
+          example: '0.75'
+        next_active_contract_symbol:
+          description: Next active contract symbol
+          type: string
+          example: Commodities.WTIK6/USD
+        period_end:
+          description: UTC millis, end of current rolling period
+          type: integer
+          example: 1718150400000
+        period_start:
+          description: UTC millis, start of current rolling period
+          type: integer
+          example: 1717545600000
+    responses.MarketHistoryResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/responses.MarketEvent'
+    responses.TradingMode:
+      type: string
+      enum:
+      - STANDARD
+      - RFQ_ONLY
+      x-enum-varnames:
+      - TradingModeStandard
+      - TradingModeRfqOnly
+    responses.MarketEventType:
+      type: string
+      enum:
+      - CREATED
+      - DELETED
+      - SETTLED
+      - UPDATED
+      x-enum-varnames:
+      - MarketEventCreated
+      - MarketEventDeleted
+      - MarketEventSettled
+      - MarketEventUpdated
+    responses.MarketHistoryFields:
+      type: object
+      properties:
+        asset_kind:
+          type: string
+          example: PERP
+        base_currency:
+          type: string
+          example: BTC
+        clamp_rate:
+          type: number
+          example: 0.05
+        delta1_cross_margin_params: {}
+        expiry_at:
+          type: integer
+          example: 0
+        fee_config: {}
+        funding_multiplier:
+          type: number
+          example: 1
+        funding_period_hours:
+          type: number
+          example: 8
+        interest_rate:
+          type: number
+          example: 0.01
+        market_kind:
+          type: string
+          example: cross
+        max_funding_rate:
+          type: number
+          example: 0.05
+        max_funding_rate_change:
+          type: number
+          example: 0.0005
+        max_open_orders:
+          type: integer
+          example: 100
+        max_order_size:
+          type: string
+          example: '100'
+        max_slippage:
+          type: number
+          example: 0.05
+        max_tob_spread:
+          type: number
+          example: 0.2
+        min_notional:
+          type: string
+          example: '3'
+        open_at:
+          type: integer
+          example: 1762809600000
+        option_cross_margin_params: {}
+        option_type:
+          type: string
+          example: CALL
+        oracle_ewma_factor:
+          type: number
+          example: 0.2
+        order_size_increment:
+          type: string
+          example: '0.001'
+        position_limit:
+          type: string
+          example: '500'
+        price_bands_width:
+          type: number
+          example: 0.05
+        price_tick_size:
+          type: string
+          example: '0.01'
+        quote_currency:
+          type: string
+          example: USD
+        settlement_currency:
+          type: string
+          example: USDC
+        settlement_price:
+          type: number
+          example: 50000
+        strike_price:
+          type: string
+          example: '66500'
+        underlying_twap_price:
+          type: number
+          example: 50000
+    responses.BBOResp:
+      type: object
+      properties:
+        ask:
+          description: Best ask price
+          type: string
+          example: '30130.15'
+        ask_size:
+          description: Best ask size
+          type: string
+          example: '0.05'
+        bid:
+          description: Best bid price
+          type: string
+          example: '30112.22'
+        bid_size:
+          description: Best bid size
+          type: string
+          example: '0.04'
+        last_updated_at:
+          description: Last update to the orderbook in milliseconds
+          type: integer
+          example: 1681493939981
+        market:
+          description: Symbol of the market
+          type: string
+          example: BTC-USD-PERP
+        seq_no:
+          description: Sequence number of the orderbook
+          type: integer
+          example: 20784
+    responses.MarketFeeConfig:
+      type: object
+      properties:
+        api_fee:
+          description: fee for order coming from API
+          allOf:
+          - $ref: '#/components/schemas/responses.MakerTakerFee'
+        interactive_fee:
+          description: fee for order coming from UI
+          allOf:
+          - $ref: '#/components/schemas/responses.MakerTakerFee'
+        rpi_fee:
+          description: fee for order coming from API with RPI instruction
+          allOf:
+          - $ref: '#/components/schemas/responses.MakerTakerFee'
+    responses.APIResults:
+      type: object
+      properties:
+        results:
+          description: Array of results
+          type: array
+          items:
+            type: object
+  securitySchemes:
+    BearerToken:
+      type: apiKey
+      name: Authorization
+      in: header
+x-refined-from:
+- paradex-openapi-prod.json
+- paradex-openapi.yml
+x-hideTryItPanel: true

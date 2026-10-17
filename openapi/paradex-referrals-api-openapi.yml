@@ -1,0 +1,380 @@
+openapi: 3.2.0
+info:
+  title: Paradex Referrals API
+  version: 1.142.2
+  contact: {}
+  description: 'Operations tagged Referrals across 2 of this provider''s published API definitions: paradex-openapi-prod.json, paradex-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.prod.paradex.trade/v1
+tags:
+- name: Referrals
+paths:
+  /referrals/qr-code:
+    get:
+      security:
+      - BearerToken: []
+      description: Returns a QR code image containing the user's referral link
+      tags:
+      - Referrals
+      summary: Get Referral QR Code
+      operationId: get-referral-qr-code
+      responses:
+        '200':
+          description: QR code image
+          content:
+            image/png:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+          content:
+            image/png:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            image/png:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /referrals/summary:
+    get:
+      security:
+      - BearerToken: []
+      description: Get latest referee data for requester's account
+      tags:
+      - Referrals
+      summary: Get account referral details
+      operationId: get-referrals-summary
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/responses.APIResults'
+                - type: object
+                  properties:
+                    results:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/responses.ReferralsResp'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+components:
+  schemas:
+    responses.ApiError:
+      type: object
+      properties:
+        data:
+          description: any additional data related to the error
+          type: object
+        error:
+          description: unique immutable string identifier for specific error
+          allOf:
+          - $ref: '#/components/schemas/responses.ErrorCode'
+          example: NOT_ONBOARDED
+        message:
+          description: detailed description of error and how to address it
+          type: string
+          example: User has never called /onboarding endpoint
+    responses.APIResults:
+      type: object
+      properties:
+        results:
+          description: Array of results
+          type: array
+          items:
+            type: object
+    responses.ReferralsResp:
+      type: object
+      properties:
+        address:
+          description: referee address
+          type: string
+        created_at:
+          description: Joined at timestamp in milliseconds
+          type: integer
+          example: 1715592690488
+        referral_code:
+          description: Referral code used to onboard the referee
+          type: string
+          example: maxdegen01
+        referral_rewards:
+          description: Total referral commission earned from the fee of referee
+          type: string
+          example: '0.123'
+        volume_traded:
+          description: Total volume traded by referee
+          type: string
+          example: '0.123'
+    responses.ErrorCode:
+      type: string
+      enum:
+      - VALIDATION_ERROR
+      - BINDING_ERROR
+      - INTERNAL_ERROR
+      - NOT_FOUND
+      - SERVICE_UNAVAILABLE
+      - INVALID_REQUEST_PARAMETER
+      - ORDER_ID_NOT_FOUND
+      - ORDER_IS_CLOSED
+      - ORDER_IS_NOT_OPEN
+      - INVALID_ORDER_SIZE
+      - CLIENT_ORDER_ID_NOT_FOUND
+      - DUPLICATED_CLIENT_ID
+      - INVALID_SYMBOL
+      - INVALID_TOKEN
+      - INVALID_ETHEREUM_ADDRESS
+      - INVALID_ETHEREUM_SIGNATURE
+      - INVALID_STARKNET_ADDRESS
+      - INVALID_STARKNET_SIGNATURE
+      - STARKNET_SIGNATURE_VERIFICATION_FAILED
+      - ETHEREUM_SIGNER_MISMATCH
+      - ETHEREUM_HASH_MISMATCH
+      - NOT_ONBOARDED
+      - INVALID_TIMESTAMP
+      - INVALID_BLOCK_EXPIRATION
+      - ACCOUNT_NOT_FOUND
+      - MEDIA_NOT_FOUND
+      - INVALID_ORDER_SIGNATURE
+      - PUBLIC_KEY_INVALID
+      - UNAUTHORIZED_ETHEREUM_ADDRESS
+      - UNAUTHORIZED_ERROR
+      - ETHEREUM_ADDRESS_ALREADY_ONBOARDED
+      - EVM_ADDRESS_ALREADY_ONBOARDED
+      - MARKET_NOT_FOUND
+      - ALLOWLIST_ENTRY_NOT_FOUND
+      - USERNAME_IN_USE
+      - GEO_IP_BLOCK
+      - ETHEREUM_ADDRESS_BLOCKED
+      - PROGRAM_NOT_FOUND
+      - PROGRAM_NOT_SUPPORTED
+      - INVALID_DASHBOARD
+      - MARKET_NOT_OPEN
+      - MARKET_NOT_SETTLED
+      - INVALID_REFERRAL_CODE
+      - REQUEST_NOT_ALLOWED
+      - PARENT_ADDRESS_ALREADY_ONBOARDED
+      - INVALID_PARENT_ACCOUNT
+      - INVALID_VAULT_OPERATOR_CHAIN
+      - VAULT_OPERATOR_ALREADY_ONBOARDED
+      - VAULT_NAME_IN_USE
+      - VAULT_NOT_FOUND
+      - VAULT_STRATEGY_NOT_FOUND
+      - VAULT_LIMIT_REACHED
+      - VAULT_DATA_PRIVATE
+      - BATCH_SIZE_OUT_OF_RANGE
+      - ISOLATED_MARKET_ACCOUNT_MISMATCH
+      - NO_ACCESS_TO_MARKET
+      - POINTS_SUMMARY_NOT_FOUND
+      - ALGO_ID_NOT_FOUND
+      - INVALID_DERIVATION_PATH
+      - PROFILE_STATS_NOT_FOUND
+      - INVALID_CHAIN
+      - INVALID_LAYERSWAP_SWAP
+      - INVALID_DEPOSIT_ADDRESS
+      - SOCIAL_USERNAME_IN_USE
+      - INVALID_OAUTH_REQUEST
+      - RPI_ACCOUNT_NOT_WHITELISTED
+      - SYSTEM_STATUS_POST_ONLY
+      - SYSTEM_STATUS_CANCEL_ONLY
+      - INVALID_MARKETING_CODE
+      - OFFER_NOT_FOUND
+      - MARKET_MARGIN_RESTRICTED
+      - NOT_UNIQUE
+      - ACCOUNT_ALREADY_REFERRED
+      - ONBOARDING_PERIOD_EXPIRED
+      - ONBOARDING_RATE_LIMITED
+      - RFQ_CREATE_BUDGET_EXCEEDED
+      - SUBACCOUNTS_LIMIT_EXCEEDED
+      - INSUFFICIENT_MIN_CHAIN_BALANCE
+      - INSUFFICIENT_EVM_BALANCE
+      - PORTFOLIO_MARGIN_ONBOARDING_DISABLED
+      - PORTFOLIO_MARGIN_INVALID_ACCOUNT_KIND
+      - EVM_VAULT_OPERATORS_DISABLED
+      - VAULT_OPERATOR_OWNER_PROOF_REQUIRED
+      - INVALID_EVM_SIGNATURE
+      - EVM_SIGNATURE_VERIFICATION_FAILED
+      - INVALID_SUBKEY
+      - SUBKEY_NOT_ACTIVATABLE
+      - SUBKEY_REVOKED
+      - TOKEN_LIMIT_REACHED
+      - INVALID_TOKEN_SCOPE
+      - IP_NOT_ALLOWED
+      - INSUFFICIENT_TRANSFERRABLE_XP
+      - TRANSFER_LIMIT_REACHED
+      - XP_TRANSFERS_DISABLED
+      - BLOCK_TRADE_NOT_FOUND
+      - BLOCK_TRADE_NOT_ENABLED
+      - BLOCK_TRADE_EXPIRED
+      - BLOCK_TRADE_ALREADY_CANCELLED
+      - BLOCK_TRADE_INVALID_STATUS
+      - BLOCK_TRADE_UNAUTHORIZED
+      - BLOCK_TRADE_MISSING_TRADES
+      - BLOCK_TRADE_MISSING_SIGNERS
+      - BLOCK_TRADE_MISSING_SIGNATURE
+      - BLOCK_TRADE_ACCOUNT_MISMATCH
+      - BLOCK_TRADE_INVALID_SIGNATURE
+      - BLOCK_TRADE_SIGNER_KEY_UNAUTHORIZED
+      - BLOCK_TRADE_REPLAYED_SIGNATURE
+      - BLOCK_TRADE_SELF_TRADE
+      - OFFER_ALREADY_CANCELLED
+      - OFFER_INVALID_STATUS
+      - OFFER_UNAUTHORIZED
+      - OFFER_PARENT_MISMATCH
+      - OFFER_PARENT_NOT_ACCEPTING
+      - PORTFOLIO_MARGIN_CONFIG_NOT_FOUND
+      - MARGIN_CONFIG_NOT_FOUND
+      - MMP_CONFIG_INVALID
+      - MMP_NOT_ENABLED
+      - MMP_MIN_FREEZE_NOT_ELAPSED
+      - MMP_NOT_CONFIGURED
+      - RFQ_VENUE_UNAVAILABLE
+      x-enum-comments:
+        ErrorCodeString_SignerMismatch: '#nosec G101'
+      x-enum-varnames:
+      - ErrorCode_Validation
+      - ErrorCode_Binding
+      - ErrorCode_InternalError
+      - ErrorCode_NotFound
+      - ErrorCode_ServiceUnavailable
+      - ErrorCodeString_InvalidParameter
+      - ErrorCodeString_OrderIdNotFound
+      - ErrorCodeString_OrderIsClosed
+      - ErrorCodeString_OrderIsNotOpen
+      - ErrorCodeString_InvalidSizeForModifyOrder
+      - ErrorCodeString_ClientOrderIdNotFound
+      - ErrorCodeString_DuplicatedClientOrderId
+      - ErrorCodeString_InvalidSymbol
+      - ErrorCodeString_InvalidToken
+      - ErrorCodeString_BadEthAddress
+      - ErrorCodeString_BadEthSignature
+      - ErrorCodeString_BadStarkNetAddress
+      - ErrorCodeString_BadStarkNetSignature
+      - ErrorCodeString_StarknetSigVerificationFailed
+      - ErrorCodeString_SignerMismatch
+      - ErrorCodeString_HashMismatch
+      - ErrorCodeString_NotOnboarded
+      - ErrorCodeString_BadTimestamp
+      - ErrorCodeString_BadExpiration
+      - ErrorCodeString_AccountIdNotFound
+      - ErrorCodeString_MediaNotFound
+      - ErrorCodeString_InvalidOrderSignature
+      - ErrorCodeString_BadPublicKey
+      - ErrorCodeString_UnauthorizedEthAddress
+      - ErrorCodeString_UnauthorizedError
+      - ErrorCodeString_EthAddressAlreadyOnboarded
+      - ErrorCodeString_EvmAddressAlreadyOnboarded
+      - ErrorCodeString_MarketNotFound
+      - ErrorCodeString_AllowlistNotFound
+      - ErrorCodeString_UsernameInUse
+      - ErrorCodeString_GeoIPBlock
+      - ErrorCodeString_EthAddressBlocked
+      - ErrorCodeString_ProgramNotFound
+      - ErrorCodeString_ProgramNotSupported
+      - ErrorCodeString_InvalidDashboard
+      - ErrorCodeString_MarketNotOpen
+      - ErrorCodeString_MarketNotSettled
+      - ErrorCodeString_InvalidReferralCode
+      - ErrorCodeString_RequestNotAllowed
+      - ErrorCodeString_ParentAddressAlreadyOnboarded
+      - ErrorCodeString_InvalidParentAccount
+      - ErrorCodeString_InvalidVaultOperatorChain
+      - ErrorCodeString_VaultOperatorAlreadyOnboarded
+      - ErrorCodeString_VaultNameInUse
+      - ErrorCodeString_VaultNotFound
+      - ErrorCodeString_VaultStrategyNotFound
+      - ErrorCodeString_VaultLimitReached
+      - ErrorCodeString_VaultDataPrivate
+      - ErrorCodeString_BatchSizeOutOfRange
+      - ErrorCodeString_IsolatedMarketAccountMismatch
+      - ErrorCodeString_NoAccessToMarket
+      - ErrorCodeString_PointsSummaryNotFound
+      - ErrorCodeString_AlgoIdNotFound
+      - ErrorCodeString_InvalidDerivationPath
+      - ErrorCodeString_ProfileStatsNotFound
+      - ErrorCodeString_InvalidChain
+      - ErrorCodeString_InvalidLayerswapSwap
+      - ErrorCodeString_InvalidDepositAddress
+      - ErrorCodeString_SocialUsernameInUse
+      - ErrorCodeString_InvalidOAuthRequest
+      - ErrorCodeString_RPIAccountNotWhitelisted
+      - ErrorCodeString_SystemStatusPostOnly
+      - ErrorCodeString_SystemStatusCancelOnly
+      - ErrorCodeString_InvalidMarketingCode
+      - ErrorCodeString_OfferNotFound
+      - ErrorCodeString_MarketMarginRestricted
+      - ErrorCodeString_NotUnique
+      - ErrorCodeString_AccountAlreadyReferred
+      - ErrorCodeString_OnboardingPeriodExpired
+      - ErrorCodeString_OnboardingRateLimited
+      - ErrorCodeString_RfqCreateBudgetExceeded
+      - ErrorCodeString_SubaccountsLimitExceeded
+      - ErrorCodeString_InsufficientMinChainBalance
+      - ErrorCodeString_InsufficientEvmBalance
+      - ErrorCodeString_PortfolioMarginOnboardingDisabled
+      - ErrorCodeString_PortfolioMarginInvalidAccountKind
+      - ErrorCodeString_EvmVaultOperatorsDisabled
+      - ErrorCodeString_VaultOperatorOwnerProofRequired
+      - ErrorCodeString_BadEvmSignature
+      - ErrorCodeString_EvmSigVerificationFailed
+      - ErrorCodeString_InvalidSubkey
+      - ErrorCodeString_SubkeyNotActivatable
+      - ErrorCodeString_SubkeyRevoked
+      - ErrorCodeString_TokenLimitReached
+      - ErrorCodeString_InvalidTokenScope
+      - ErrorCodeString_IPNotAllowed
+      - ErrorCodeString_InsufficientTransferrableXP
+      - ErrorCodeString_TransferLimitReached
+      - ErrorCodeString_XPTransfersDisabled
+      - ErrorCodeString_BlockTradeNotFound
+      - ErrorCodeString_BlockTradeNotEnabled
+      - ErrorCodeString_BlockTradeExpired
+      - ErrorCodeString_BlockTradeAlreadyCancelled
+      - ErrorCodeString_BlockTradeInvalidStatus
+      - ErrorCodeString_BlockTradeUnauthorized
+      - ErrorCodeString_BlockTradeMissingTrades
+      - ErrorCodeString_BlockTradeMissingSigners
+      - ErrorCodeString_BlockTradeMissingSignature
+      - ErrorCodeString_BlockTradeAccountMismatch
+      - ErrorCodeString_BlockTradeInvalidSignature
+      - ErrorCodeString_BlockTradeSignerKeyUnauthorized
+      - ErrorCodeString_BlockTradeReplayedSignature
+      - ErrorCodeString_BlockTradeSelfTrade
+      - ErrorCodeString_OfferAlreadyCancelled
+      - ErrorCodeString_OfferInvalidStatus
+      - ErrorCodeString_OfferUnauthorized
+      - ErrorCodeString_OfferParentMismatch
+      - ErrorCodeString_OfferParentNotAccepting
+      - ErrorCodeString_PortfolioMarginConfigNotFound
+      - ErrorCodeString_MarginConfigNotFound
+      - ErrorCodeString_MmpConfigInvalid
+      - ErrorCodeString_MmpNotEnabled
+      - ErrorCodeString_MmpMinFreezeNotElapsed
+      - ErrorCodeString_MmpNotConfigured
+      - ErrorCodeString_RfqVenueUnavailable
+  securitySchemes:
+    BearerToken:
+      type: apiKey
+      name: Authorization
+      in: header
+x-refined-from:
+- paradex-openapi-prod.json
+- paradex-openapi.yml
+x-hideTryItPanel: true

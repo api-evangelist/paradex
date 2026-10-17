@@ -1,0 +1,1553 @@
+openapi: 3.2.0
+info:
+  title: Paradex Rfqs API
+  version: 1.142.2
+  contact: {}
+  description: 'Operations tagged Rfqs across 2 of this provider''s published API definitions: paradex-openapi-prod.json, paradex-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.prod.paradex.trade/v1
+tags:
+- name: Rfqs
+paths:
+  /account/paradigm/enable:
+    post:
+      security:
+      - BearerToken: []
+      description: 'Enables RFQ access for the authenticated account.
+
+
+        Call this operation once before using the RFQ API. It has no request body and
+
+        only initializes the account associated with the Bearer token. The operation
+
+        is idempotent, so calling it again safely returns the current enabled state.
+
+
+        Enabling an account for the first time requires a Bearer token issued to the
+
+        account''s main key; a token obtained with a subkey is rejected with `403`.
+
+        Once RFQ access is enabled, any token for the account, including a subkey
+
+        token, receives the current enabled state.
+
+
+        A successful response has status `ENABLED` and identifies the account and
+
+        delegated RFQ trading public key. If that delegated key was revoked on the
+
+        account, RFQ access is disabled until the operation is called again with a
+
+        main-key token: that call issues a new delegated key, leaves the revoked one
+
+        revoked, and returns the new public key. A subkey token is rejected with `403`
+
+        until then. If the new key it would enable is itself already revoked, the
+
+        operation returns `409` with error `SUBKEY_REVOKED` and RFQ access stays
+
+        disabled.
+
+
+        The delegated key counts toward the account''s subkey limit. If the account
+
+        already holds the maximum number of subkeys when a new delegated key is
+
+        needed, the operation returns `400` with error `TOKEN_LIMIT_REACHED`, the
+
+        same error as subkey registration, and RFQ access stays disabled. Revoke a
+
+        subkey, then call the operation again with a main-key token.
+
+
+        If the RFQ venue refuses to enable the account, the operation returns `400`
+
+        with error `REQUEST_NOT_ALLOWED` and the venue''s reason as the message, and
+
+        RFQ access stays disabled. Calling the operation again does not change that
+
+        outcome.'
+      tags:
+      - Rfqs
+      summary: Enable RFQ access
+      operationId: rfq-enable
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ParadigmEnableResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /rfqs:
+    get:
+      security:
+      - BearerToken: []
+      description: 'Lists the authenticated account''s RFQs, most recent first.
+
+
+        This is a synchronous read from the RFQ venue. It returns one page of RFQs
+
+        (up to 100 by default, sized via `page_size`), optionally filtered by `state`.
+
+        The page is built from the RFQs the venue holds for the account and every
+
+        account sharing its RFQ registration, of which only the authenticated
+
+        account''s are returned — a busy set of related accounts can therefore leave a
+
+        page short. The response''s `next` field carries the venue''s cursor to the
+
+        following page; pass it back as `cursor` to continue, and stop only when it
+
+        is null — an empty `results` with a non-null `next` is normal, since the
+
+        cursor tracks the venue''s page, not this account''s records. Each
+
+        result includes the venue-issued RFQ identifier, lifecycle state, quantity,
+
+        legs, counterparties, timestamps, and optional close reason. Venue state and
+
+        close-reason strings are passed through. `mark_price`, when present, is the
+
+        venue''s structure mark at the moment the RFQ was created — the reference the
+
+        taker was quoted against — recorded by Paradex at create. It is omitted when
+
+        unknown: an RFQ created before that recording began, a structure the venue
+
+        had not priced at create, or a mark past its retention.'
+      tags:
+      - Rfqs
+      summary: List RFQs
+      operationId: rfq-list
+      parameters:
+      - description: RFQ state to filter by; omit for all states
+        name: state
+        in: query
+        schema:
+          type: string
+          enum:
+          - OPEN
+          - CLOSED
+      - description: Cursor from a prior response's next field; omit for the first (most recent) page
+        name: cursor
+        in: query
+        schema:
+          type: string
+      - description: Records per page, between 1 and 1000; omit for the default of 100
+        name: page_size
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.RfqResults'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    post:
+      security:
+      - BearerToken: []
+      description: Creates an RFQ for the authenticated account.
+      tags:
+      - Rfqs
+      summary: Create RFQ
+      operationId: rfq-create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/requests.RfqCreateRequest'
+        description: RFQ create request
+        required: true
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.RfqAcceptedResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /rfqs/drafts:
+    get:
+      security:
+      - BearerToken: []
+      description: 'Lists the authenticated account''s stored RFQ drafts, most recent first.
+
+
+        The response is unpaginated because each account may store at most 20 drafts.
+
+        Drafts are private to the account and have no effect on venue RFQs until their
+
+        contents are submitted through `POST /v1/rfqs`.'
+      tags:
+      - Rfqs
+      summary: List RFQ drafts
+      operationId: rfq-draft-list
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/responses.APIResults'
+                - type: object
+                  properties:
+                    results:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/responses.RfqDraftResult'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    post:
+      security:
+      - BearerToken: []
+      description: 'Stores an RFQ-builder draft for the authenticated account.
+
+
+        A draft is inert: it is not sent to the RFQ venue and does not reserve margin.
+
+        Each account may store at most 20 drafts. The request shares the RFQ-create
+
+        schema, but only `quantity`, `strategy`, and `legs` are persisted;
+
+        `is_anonymous`, `counterparties`, and `label` are ignored.
+
+
+        Draft validation permits work in progress. A draft accepts up to 25 legs.
+
+        Quantity and ratios must be positive decimal strings, every market must exist
+
+        on Paradex, `side` must be `BUY` or `SELL`, and a supplied hedge-leg price must
+
+        be positive. `strategy` is limited to 64 bytes and defaults to `custom` when
+
+        omitted. The cross-leg strategy rules enforced by RFQ creation do not apply
+
+        until the draft is submitted through `POST /v1/rfqs`.'
+      tags:
+      - Rfqs
+      summary: Create RFQ draft
+      operationId: rfq-draft-create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/requests.RfqCreateRequest'
+        description: RFQ draft create request (single common input with POST /rfqs; is_anonymous, counterparties and label are ignored for drafts)
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.RfqDraftResult'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /rfqs/drafts/{draft_id}:
+    delete:
+      security:
+      - BearerToken: []
+      description: 'Deletes one stored RFQ draft owned by the authenticated account.
+
+
+        Deleting a draft has no effect on any RFQ previously created from its
+
+        contents. An unknown draft identifier, including an identifier owned by a
+
+        different account, returns `404 Not Found`.'
+      tags:
+      - Rfqs
+      summary: Delete RFQ draft
+      operationId: rfq-draft-delete
+      parameters:
+      - description: Draft id
+        name: draft_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /rfqs/markets:
+    get:
+      security:
+      - BearerToken: []
+      description: 'Returns the market symbols currently available for RFQ.
+
+
+        Not every listed Paradex market can be quoted as an RFQ: the venue quotes only
+
+        the instruments it lists for the Paradex venue, and a create naming any other
+
+        market is rejected with a validation error. This endpoint is that set, so a
+
+        client can stop offering markets a create would reject on their name instead of
+
+        discovering the difference after the user has already sized a structure.
+
+
+        Membership is necessary but not sufficient. A create additionally checks that a
+
+        hedge leg''s price sits on the instrument''s tick and that the strategy quantity
+
+        meets its minimum block size, so a market listed here can still be rejected on
+
+        those grounds.
+
+
+        `markets_info` carries one record per market: its `symbol` and the venue''s
+
+        own `venue_size_increment`, the step the RFQ quantity must be a multiple of,
+
+        so a client can size on the right grid as the user types. On an RFQ whose legs
+
+        span products, each leg''s size (the quantity times its ratio) is held to its
+
+        own `venue_size_increment`, not to the coarsest step across the RFQ. These
+
+        are the venue instrument''s grids, not the Paradex market''s own increments:
+
+        the two differ, and quantities are validated against the venue''s.
+
+        A quantity has to satisfy both grids, so combine them with their least
+
+        common multiple rather than by taking the larger: the two coincide only when
+
+        one divides the other, which holds for the powers of ten Paradex lists today
+
+        but is not guaranteed of venue data. Neither grid is reliably the coarser
+
+        one. Where they are coprime the combined step can exceed both (0.001 and
+
+        0.0025 give 0.005), which is correct: a quantity off either grid is
+
+        rejected by one side or the other.
+
+
+        The combined step and the minimum block size constrain different things and
+
+        both always apply, so neither overrides the other. The step says which
+
+        quantities are legal, the block size sets a floor, and the smallest quotable
+
+        size is simply the first step at or above that floor. There is always one, so
+
+        the two can never be mutually unsatisfiable.
+
+
+        `venue_size_increment` is empty when the venue reports no usable grid for
+
+        that market, or while an older service is still deployed. Read an empty one
+
+        as "unknown" and do not fall back to the market''s own increment alone, since
+
+        a size legal on the order book can still be rejected by the venue.
+
+        `POST /rfqs` validates the quantity against the venue grid and rejects an
+
+        off-grid size before the RFQ is created, so that check remains the authority
+
+        whatever a client sizes on.
+
+
+        `markets` repeats the same symbols in the same order and is **deprecated**:
+
+        it stays only until every client reads `markets_info`, and new integrations
+
+        should ignore it.
+
+
+        The set is served from a periodically refreshed snapshot, so a market listed by
+
+        the venue moments ago may take up to one refresh interval to appear here.
+
+
+        `markets` is never an empty list: a caller cannot tell "the venue quotes
+
+        nothing" from "this read is unavailable", so a degraded or empty snapshot is
+
+        reported as `503` instead. (`venue_size_increments` may legitimately be
+
+        `{}` — an older service reports no grids at all.) Treat any failure as
+
+        "unknown" and fall back to offering every market — the create remains
+
+        authoritative.'
+      tags:
+      - Rfqs
+      summary: List markets available for RFQ
+      operationId: rfq-markets
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.RfqMarketsResult'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '503':
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /rfqs/platform-state:
+    get:
+      security:
+      - BearerToken: []
+      description: 'Returns whether the RFQ venue currently accepts RFQs from Paradex.
+
+
+        `state` is the one to act on. It is the more restrictive of two venue states,
+
+        both also returned:
+
+
+        - `platform_state`, the venue''s global state, with the scheduled next state
+
+        in `next_platform_state` taking effect at `next_platform_state_at` (unix
+
+        milliseconds, `0` when the state is unknown);
+
+        - `venue_state`, the venue''s maintenance state for Paradex markets.
+
+
+        | `state` | Create | Execute | Cancel |
+
+        | ------- | ------ | ------- | ------ |
+
+        | `AVAILABLE` | yes | yes | yes |
+
+        | `AVAILABLE_CANCEL_ONLY` | no | no | yes |
+
+        | `UNAVAILABLE` | no | no | only when `platform_state` is not `UNAVAILABLE` |
+
+        | `UNKNOWN` | sent to the venue | sent to the venue | sent to the venue |
+
+
+        A create or an execute refused on the state is answered `400` with error
+
+        `RFQ_VENUE_UNAVAILABLE`. A cancel is always sent to the venue; while
+
+        `platform_state` is `UNAVAILABLE` the venue refuses it, and the WebSocket
+
+        `RESULT` event reports the refusal. `UNKNOWN` means the state could not be
+
+        read recently; requests are then sent to the venue, which answers them through
+
+        the WebSocket `RESULT` event.
+
+
+        The state is served from a snapshot refreshed every few seconds, so a change
+
+        on the venue appears here after up to one refresh.'
+      tags:
+      - Rfqs
+      summary: Get RFQ venue state
+      operationId: rfq-platform-state
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.RfqPlatformStateResult'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /rfqs/{rfq_id}:
+    delete:
+      security:
+      - BearerToken: []
+      description: 'Queues cancellation of an RFQ.
+
+
+        Cancellation is asynchronous. Subscribe to the private WebSocket channel
+
+        `rfq` before sending the request. A `202 Accepted` response contains a Paradex
+
+        `request_id` and confirms only that the command was queued. The later
+
+        WebSocket `RESULT` event with the same `request_id` reports whether the venue
+
+        accepted the cancellation. RFQ lifecycle events report the eventual closed
+
+        state.
+
+
+        The `rfq_id` is the venue-issued identifier returned by a successful create
+
+        result or by the RFQ list endpoint.
+
+
+        An account holds only one two-way RFQ open at a time, and a bounded number of
+
+        RFQs in total, so this is also the request that frees it to create the next
+
+        one. The `RESULT` event reporting the cancellation accepted is the point at
+
+        which it is normally free; a create sent immediately after may still be
+
+        rejected for the RFQ being open, and can be retried.'
+      tags:
+      - Rfqs
+      summary: Delete RFQ
+      operationId: rfq-delete
+      parameters:
+      - description: Paradigm-issued RFQ id
+        name: rfq_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.RfqAcceptedResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /rfqs/{rfq_id}/bbo:
+    get:
+      security:
+      - BearerToken: []
+      description: 'Returns live strategy-level and per-leg market data for one RFQ.
+
+
+        The response contains the best bid and ask, available quantities, mark price,
+
+        acceptable price band, and per-leg market data. Decimal values are encoded as
+
+        strings. Implied-volatility fields are populated for option legs when supplied
+
+        by the venue.
+
+
+        The RFQ must be visible to the authenticated account and currently available
+
+        from the venue. Unknown, closed, or inaccessible RFQs return `404 Not Found`.'
+      tags:
+      - Rfqs
+      summary: Get RFQ market data
+      operationId: rfq-bbo
+      parameters:
+      - description: Paradigm-issued RFQ id
+        name: rfq_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.RfqBboResult'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+  /rfqs/{rfq_id}/execute:
+    post:
+      security:
+      - BearerToken: []
+      description: 'Queues a taker limit Fill-or-Kill order against an RFQ.
+
+
+        Execution is asynchronous. Subscribe to the private WebSocket channel `rfq`
+
+        before sending the request. A `202 Accepted` response contains a Paradex
+
+        `request_id` and confirms only that the command was queued. The later
+
+        WebSocket `RESULT` event with the same `request_id` reports success or failure;
+
+        on success, `result.order_id` is the venue-issued order identifier.
+
+
+        `quantity` must be a positive decimal string. `side` is `BUY` or `SELL`.
+
+        `price` is the signed net strategy price, so zero and negative values are valid
+
+        for multi-leg credit strategies.
+
+
+        `side` must be a direction the RFQ was accepted for, which its create result
+
+        reports as `result.allowed_side`: the direction an RFQ created with a `side` was
+
+        committed to, or either direction for a `TWO_WAY` one. An execute on any other
+
+        side is rejected by the `RESULT` event, because the collateral held against the
+
+        RFQ never covered it. An empty `result.allowed_side` is an RFQ Paradex did not
+
+        risk-check, which holds no such collateral and accepts either direction.
+
+
+        Validation or risk-check failures that occur after queueing are reported by
+
+        the WebSocket `RESULT` event.
+
+
+        While the RFQ venue is `AVAILABLE_CANCEL_ONLY` or `UNAVAILABLE` for Paradex,
+
+        the request is rejected with `400` and error `RFQ_VENUE_UNAVAILABLE`. The
+
+        current state is readable at `GET /rfqs/platform-state`.'
+      tags:
+      - Rfqs
+      summary: Execute RFQ
+      operationId: rfq-execute
+      parameters:
+      - description: Paradigm-issued RFQ id
+        name: rfq_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/requests.RfqExecuteRequest'
+        description: Order details
+        required: true
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.RfqAcceptedResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.ApiError'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+components:
+  schemas:
+    responses.RfqResults:
+      type: object
+      properties:
+        next:
+          description: 'Venue cursor to fetch the next page; null on the venue''s last page.
+
+            An empty `results` with a non-null `next` is normal — the venue
+
+            paginates over the whole RFQ registration, of which only this
+
+            account''s records are returned — so continue until `next` is null
+
+            rather than stopping on an empty page.'
+          type: string
+          example: cD0yMDIyLTAxLTAxKzAwJTNBMDA=
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/responses.RfqResult'
+    responses.RfqResult:
+      type: object
+      properties:
+        closed_reason:
+          description: Empty while open
+          type: string
+          example: EXPIRED
+        counterparties:
+          description: Maker desk tickers the RFQ was sent to
+          type: array
+          items:
+            type: string
+        created_at:
+          description: Unix milliseconds
+          type: integer
+          example: 1640995200000
+        expires_at:
+          type: integer
+          example: 1640995500000
+        id:
+          description: Venue-issued RFQ id
+          type: string
+          example: r_2abCdEfGhIjKlMnOpQrStUvWxYz
+        label:
+          description: User label
+          type: string
+        legs:
+          type: array
+          items:
+            $ref: '#/components/schemas/responses.RfqLegResult'
+        mark_price:
+          description: 'The venue''s structure mark when the RFQ was created — per unit, signed
+
+            as listed — the reference the taker was quoted against. Omitted when
+
+            unknown: an RFQ created before marks were recorded, a structure the
+
+            venue had not priced at create, or a mark past its retention.'
+          type: string
+          example: '49.98'
+        quantity:
+          description: Total strategy size
+          type: string
+          example: '10'
+        state:
+          type: string
+          enum:
+          - OPEN
+          - CLOSED
+    responses.ParadigmEnableResponse:
+      type: object
+      properties:
+        account:
+          description: Paradex account enabled for RFQ access
+          type: string
+        status:
+          description: Current RFQ enablement status
+          type: string
+          enum:
+          - ENABLED
+        subkey_public_key:
+          description: Public key used for delegated RFQ trading, when available
+          type: string
+    responses.RfqBboLegResult:
+      type: object
+      properties:
+        best_ask_iv:
+          description: Options legs only
+          type: string
+          example: '0.56'
+        best_ask_price:
+          type: string
+          example: '50001'
+        best_ask_quantity:
+          type: string
+          example: '5'
+        best_bid_iv:
+          description: Options legs only
+          type: string
+          example: '0.55'
+        best_bid_price:
+          type: string
+          example: '49999'
+        best_bid_quantity:
+          type: string
+          example: '10'
+        mark_price:
+          type: string
+          example: '50000'
+        mark_price_iv:
+          description: Options legs only
+          type: string
+          example: '0.55'
+        market:
+          description: Paradex market symbol
+          type: string
+          example: BTC-USD-PERP
+    responses.RfqPlatformStateResult:
+      type: object
+      properties:
+        next_platform_state:
+          description: The venue's scheduled next global state
+          enum:
+          - AVAILABLE
+          - AVAILABLE_CANCEL_ONLY
+          - UNAVAILABLE
+          - UNKNOWN
+          allOf:
+          - $ref: '#/components/schemas/responses.RfqVenueState'
+          example: UNAVAILABLE
+        next_platform_state_at:
+          description: 'When next_platform_state takes effect, unix milliseconds; 0 when the
+
+            state is unknown'
+          type: integer
+          example: 1640995200000
+        platform_state:
+          description: The venue's global state
+          enum:
+          - AVAILABLE
+          - AVAILABLE_CANCEL_ONLY
+          - UNAVAILABLE
+          - UNKNOWN
+          allOf:
+          - $ref: '#/components/schemas/responses.RfqVenueState'
+          example: AVAILABLE
+        state:
+          description: 'The state that applies to an RFQ create, execute or cancel: the more
+
+            restrictive of platform_state and venue_state'
+          enum:
+          - AVAILABLE
+          - AVAILABLE_CANCEL_ONLY
+          - UNAVAILABLE
+          - UNKNOWN
+          allOf:
+          - $ref: '#/components/schemas/responses.RfqVenueState'
+          example: AVAILABLE
+        venue_state:
+          description: The venue's maintenance state for Paradex markets
+          enum:
+          - AVAILABLE
+          - AVAILABLE_CANCEL_ONLY
+          - UNAVAILABLE
+          - UNKNOWN
+          allOf:
+          - $ref: '#/components/schemas/responses.RfqVenueState'
+          example: AVAILABLE
+    responses.ErrorCode:
+      type: string
+      enum:
+      - VALIDATION_ERROR
+      - BINDING_ERROR
+      - INTERNAL_ERROR
+      - NOT_FOUND
+      - SERVICE_UNAVAILABLE
+      - INVALID_REQUEST_PARAMETER
+      - ORDER_ID_NOT_FOUND
+      - ORDER_IS_CLOSED
+      - ORDER_IS_NOT_OPEN
+      - INVALID_ORDER_SIZE
+      - CLIENT_ORDER_ID_NOT_FOUND
+      - DUPLICATED_CLIENT_ID
+      - INVALID_SYMBOL
+      - INVALID_TOKEN
+      - INVALID_ETHEREUM_ADDRESS
+      - INVALID_ETHEREUM_SIGNATURE
+      - INVALID_STARKNET_ADDRESS
+      - INVALID_STARKNET_SIGNATURE
+      - STARKNET_SIGNATURE_VERIFICATION_FAILED
+      - ETHEREUM_SIGNER_MISMATCH
+      - ETHEREUM_HASH_MISMATCH
+      - NOT_ONBOARDED
+      - INVALID_TIMESTAMP
+      - INVALID_BLOCK_EXPIRATION
+      - ACCOUNT_NOT_FOUND
+      - MEDIA_NOT_FOUND
+      - INVALID_ORDER_SIGNATURE
+      - PUBLIC_KEY_INVALID
+      - UNAUTHORIZED_ETHEREUM_ADDRESS
+      - UNAUTHORIZED_ERROR
+      - ETHEREUM_ADDRESS_ALREADY_ONBOARDED
+      - EVM_ADDRESS_ALREADY_ONBOARDED
+      - MARKET_NOT_FOUND
+      - ALLOWLIST_ENTRY_NOT_FOUND
+      - USERNAME_IN_USE
+      - GEO_IP_BLOCK
+      - ETHEREUM_ADDRESS_BLOCKED
+      - PROGRAM_NOT_FOUND
+      - PROGRAM_NOT_SUPPORTED
+      - INVALID_DASHBOARD
+      - MARKET_NOT_OPEN
+      - MARKET_NOT_SETTLED
+      - INVALID_REFERRAL_CODE
+      - REQUEST_NOT_ALLOWED
+      - PARENT_ADDRESS_ALREADY_ONBOARDED
+      - INVALID_PARENT_ACCOUNT
+      - INVALID_VAULT_OPERATOR_CHAIN
+      - VAULT_OPERATOR_ALREADY_ONBOARDED
+      - VAULT_NAME_IN_USE
+      - VAULT_NOT_FOUND
+      - VAULT_STRATEGY_NOT_FOUND
+      - VAULT_LIMIT_REACHED
+      - VAULT_DATA_PRIVATE
+      - BATCH_SIZE_OUT_OF_RANGE
+      - ISOLATED_MARKET_ACCOUNT_MISMATCH
+      - NO_ACCESS_TO_MARKET
+      - POINTS_SUMMARY_NOT_FOUND
+      - ALGO_ID_NOT_FOUND
+      - INVALID_DERIVATION_PATH
+      - PROFILE_STATS_NOT_FOUND
+      - INVALID_CHAIN
+      - INVALID_LAYERSWAP_SWAP
+      - INVALID_DEPOSIT_ADDRESS
+      - SOCIAL_USERNAME_IN_USE
+      - INVALID_OAUTH_REQUEST
+      - RPI_ACCOUNT_NOT_WHITELISTED
+      - SYSTEM_STATUS_POST_ONLY
+      - SYSTEM_STATUS_CANCEL_ONLY
+      - INVALID_MARKETING_CODE
+      - OFFER_NOT_FOUND
+      - MARKET_MARGIN_RESTRICTED
+      - NOT_UNIQUE
+      - ACCOUNT_ALREADY_REFERRED
+      - ONBOARDING_PERIOD_EXPIRED
+      - ONBOARDING_RATE_LIMITED
+      - RFQ_CREATE_BUDGET_EXCEEDED
+      - SUBACCOUNTS_LIMIT_EXCEEDED
+      - INSUFFICIENT_MIN_CHAIN_BALANCE
+      - INSUFFICIENT_EVM_BALANCE
+      - PORTFOLIO_MARGIN_ONBOARDING_DISABLED
+      - PORTFOLIO_MARGIN_INVALID_ACCOUNT_KIND
+      - EVM_VAULT_OPERATORS_DISABLED
+      - VAULT_OPERATOR_OWNER_PROOF_REQUIRED
+      - INVALID_EVM_SIGNATURE
+      - EVM_SIGNATURE_VERIFICATION_FAILED
+      - INVALID_SUBKEY
+      - SUBKEY_NOT_ACTIVATABLE
+      - SUBKEY_REVOKED
+      - TOKEN_LIMIT_REACHED
+      - INVALID_TOKEN_SCOPE
+      - IP_NOT_ALLOWED
+      - INSUFFICIENT_TRANSFERRABLE_XP
+      - TRANSFER_LIMIT_REACHED
+      - XP_TRANSFERS_DISABLED
+      - BLOCK_TRADE_NOT_FOUND
+      - BLOCK_TRADE_NOT_ENABLED
+      - BLOCK_TRADE_EXPIRED
+      - BLOCK_TRADE_ALREADY_CANCELLED
+      - BLOCK_TRADE_INVALID_STATUS
+      - BLOCK_TRADE_UNAUTHORIZED
+      - BLOCK_TRADE_MISSING_TRADES
+      - BLOCK_TRADE_MISSING_SIGNERS
+      - BLOCK_TRADE_MISSING_SIGNATURE
+      - BLOCK_TRADE_ACCOUNT_MISMATCH
+      - BLOCK_TRADE_INVALID_SIGNATURE
+      - BLOCK_TRADE_SIGNER_KEY_UNAUTHORIZED
+      - BLOCK_TRADE_REPLAYED_SIGNATURE
+      - BLOCK_TRADE_SELF_TRADE
+      - OFFER_ALREADY_CANCELLED
+      - OFFER_INVALID_STATUS
+      - OFFER_UNAUTHORIZED
+      - OFFER_PARENT_MISMATCH
+      - OFFER_PARENT_NOT_ACCEPTING
+      - PORTFOLIO_MARGIN_CONFIG_NOT_FOUND
+      - MARGIN_CONFIG_NOT_FOUND
+      - MMP_CONFIG_INVALID
+      - MMP_NOT_ENABLED
+      - MMP_MIN_FREEZE_NOT_ELAPSED
+      - MMP_NOT_CONFIGURED
+      - RFQ_VENUE_UNAVAILABLE
+      x-enum-comments:
+        ErrorCodeString_SignerMismatch: '#nosec G101'
+      x-enum-varnames:
+      - ErrorCode_Validation
+      - ErrorCode_Binding
+      - ErrorCode_InternalError
+      - ErrorCode_NotFound
+      - ErrorCode_ServiceUnavailable
+      - ErrorCodeString_InvalidParameter
+      - ErrorCodeString_OrderIdNotFound
+      - ErrorCodeString_OrderIsClosed
+      - ErrorCodeString_OrderIsNotOpen
+      - ErrorCodeString_InvalidSizeForModifyOrder
+      - ErrorCodeString_ClientOrderIdNotFound
+      - ErrorCodeString_DuplicatedClientOrderId
+      - ErrorCodeString_InvalidSymbol
+      - ErrorCodeString_InvalidToken
+      - ErrorCodeString_BadEthAddress
+      - ErrorCodeString_BadEthSignature
+      - ErrorCodeString_BadStarkNetAddress
+      - ErrorCodeString_BadStarkNetSignature
+      - ErrorCodeString_StarknetSigVerificationFailed
+      - ErrorCodeString_SignerMismatch
+      - ErrorCodeString_HashMismatch
+      - ErrorCodeString_NotOnboarded
+      - ErrorCodeString_BadTimestamp
+      - ErrorCodeString_BadExpiration
+      - ErrorCodeString_AccountIdNotFound
+      - ErrorCodeString_MediaNotFound
+      - ErrorCodeString_InvalidOrderSignature
+      - ErrorCodeString_BadPublicKey
+      - ErrorCodeString_UnauthorizedEthAddress
+      - ErrorCodeString_UnauthorizedError
+      - ErrorCodeString_EthAddressAlreadyOnboarded
+      - ErrorCodeString_EvmAddressAlreadyOnboarded
+      - ErrorCodeString_MarketNotFound
+      - ErrorCodeString_AllowlistNotFound
+      - ErrorCodeString_UsernameInUse
+      - ErrorCodeString_GeoIPBlock
+      - ErrorCodeString_EthAddressBlocked
+      - ErrorCodeString_ProgramNotFound
+      - ErrorCodeString_ProgramNotSupported
+      - ErrorCodeString_InvalidDashboard
+      - ErrorCodeString_MarketNotOpen
+      - ErrorCodeString_MarketNotSettled
+      - ErrorCodeString_InvalidReferralCode
+      - ErrorCodeString_RequestNotAllowed
+      - ErrorCodeString_ParentAddressAlreadyOnboarded
+      - ErrorCodeString_InvalidParentAccount
+      - ErrorCodeString_InvalidVaultOperatorChain
+      - ErrorCodeString_VaultOperatorAlreadyOnboarded
+      - ErrorCodeString_VaultNameInUse
+      - ErrorCodeString_VaultNotFound
+      - ErrorCodeString_VaultStrategyNotFound
+      - ErrorCodeString_VaultLimitReached
+      - ErrorCodeString_VaultDataPrivate
+      - ErrorCodeString_BatchSizeOutOfRange
+      - ErrorCodeString_IsolatedMarketAccountMismatch
+      - ErrorCodeString_NoAccessToMarket
+      - ErrorCodeString_PointsSummaryNotFound
+      - ErrorCodeString_AlgoIdNotFound
+      - ErrorCodeString_InvalidDerivationPath
+      - ErrorCodeString_ProfileStatsNotFound
+      - ErrorCodeString_InvalidChain
+      - ErrorCodeString_InvalidLayerswapSwap
+      - ErrorCodeString_InvalidDepositAddress
+      - ErrorCodeString_SocialUsernameInUse
+      - ErrorCodeString_InvalidOAuthRequest
+      - ErrorCodeString_RPIAccountNotWhitelisted
+      - ErrorCodeString_SystemStatusPostOnly
+      - ErrorCodeString_SystemStatusCancelOnly
+      - ErrorCodeString_InvalidMarketingCode
+      - ErrorCodeString_OfferNotFound
+      - ErrorCodeString_MarketMarginRestricted
+      - ErrorCodeString_NotUnique
+      - ErrorCodeString_AccountAlreadyReferred
+      - ErrorCodeString_OnboardingPeriodExpired
+      - ErrorCodeString_OnboardingRateLimited
+      - ErrorCodeString_RfqCreateBudgetExceeded
+      - ErrorCodeString_SubaccountsLimitExceeded
+      - ErrorCodeString_InsufficientMinChainBalance
+      - ErrorCodeString_InsufficientEvmBalance
+      - ErrorCodeString_PortfolioMarginOnboardingDisabled
+      - ErrorCodeString_PortfolioMarginInvalidAccountKind
+      - ErrorCodeString_EvmVaultOperatorsDisabled
+      - ErrorCodeString_VaultOperatorOwnerProofRequired
+      - ErrorCodeString_BadEvmSignature
+      - ErrorCodeString_EvmSigVerificationFailed
+      - ErrorCodeString_InvalidSubkey
+      - ErrorCodeString_SubkeyNotActivatable
+      - ErrorCodeString_SubkeyRevoked
+      - ErrorCodeString_TokenLimitReached
+      - ErrorCodeString_InvalidTokenScope
+      - ErrorCodeString_IPNotAllowed
+      - ErrorCodeString_InsufficientTransferrableXP
+      - ErrorCodeString_TransferLimitReached
+      - ErrorCodeString_XPTransfersDisabled
+      - ErrorCodeString_BlockTradeNotFound
+      - ErrorCodeString_BlockTradeNotEnabled
+      - ErrorCodeString_BlockTradeExpired
+      - ErrorCodeString_BlockTradeAlreadyCancelled
+      - ErrorCodeString_BlockTradeInvalidStatus
+      - ErrorCodeString_BlockTradeUnauthorized
+      - ErrorCodeString_BlockTradeMissingTrades
+      - ErrorCodeString_BlockTradeMissingSigners
+      - ErrorCodeString_BlockTradeMissingSignature
+      - ErrorCodeString_BlockTradeAccountMismatch
+      - ErrorCodeString_BlockTradeInvalidSignature
+      - ErrorCodeString_BlockTradeSignerKeyUnauthorized
+      - ErrorCodeString_BlockTradeReplayedSignature
+      - ErrorCodeString_BlockTradeSelfTrade
+      - ErrorCodeString_OfferAlreadyCancelled
+      - ErrorCodeString_OfferInvalidStatus
+      - ErrorCodeString_OfferUnauthorized
+      - ErrorCodeString_OfferParentMismatch
+      - ErrorCodeString_OfferParentNotAccepting
+      - ErrorCodeString_PortfolioMarginConfigNotFound
+      - ErrorCodeString_MarginConfigNotFound
+      - ErrorCodeString_MmpConfigInvalid
+      - ErrorCodeString_MmpNotEnabled
+      - ErrorCodeString_MmpMinFreezeNotElapsed
+      - ErrorCodeString_MmpNotConfigured
+      - ErrorCodeString_RfqVenueUnavailable
+    requests.RfqLeg:
+      type: object
+      required:
+      - market
+      - ratio
+      - side
+      properties:
+        market:
+          description: Paradex market symbol
+          type: string
+          example: BTC-USD-PERP
+        price:
+          description: Any positive value marks a hedge leg; the leg is then fixed at the market's mark price at creation
+          type: string
+          example: '30000.00'
+        ratio:
+          description: Positive decimal multiplier for the leg
+          type: string
+          example: '1'
+        side:
+          description: Leg direction
+          type: string
+          enum:
+          - BUY
+          - SELL
+          example: BUY
+    responses.RfqMarketsResult:
+      type: object
+      properties:
+        markets:
+          description: 'Deprecated: use MarketsInfo, which carries the same symbols plus the
+
+            venue parameters. Kept until every client reads the structured list.'
+          type: array
+          items:
+            type: string
+          example:
+          - BTC-USD-PERP
+          - ETH-USD-PERP
+        markets_info:
+          description: One record per market, same markets as Markets and in the same order.
+          type: array
+          items:
+            $ref: '#/components/schemas/responses.RfqMarketInfo'
+    requests.RfqCreateRequest:
+      type: object
+      required:
+      - legs
+      - quantity
+      properties:
+        counterparties:
+          description: Reserved for future use; currently ignored for RFQ creation and drafts
+          type: array
+          items:
+            type: string
+        is_anonymous:
+          description: Whether to hide the taker desk name from RFQ counterparties; ignored for drafts
+          type: boolean
+          example: true
+        label:
+          description: User-defined RFQ label; ignored for drafts
+          type: string
+          example: my-rfq
+        legs:
+          description: Strategy and optional fixed-price hedge legs; maximum 25
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/requests.RfqLeg'
+        max_slippage:
+          description: 'MaxSlippage sets the collateral held against this RFQ while it is open, as
+
+            a fraction of underlying spot, replacing the configured bound for this RFQ
+
+            only. It does not limit the price the RFQ may execute at. Empty leaves the
+
+            configured one in place. Ignored for drafts.'
+          type: string
+          example: '0.002'
+        quantity:
+          description: Positive total strategy size
+          type: string
+          example: '100'
+        side:
+          description: 'Side commits the RFQ to one direction of the strategy, which is then the
+
+            only direction it may be executed in. Empty leaves it two-way. Ignored for
+
+            drafts.'
+          type: string
+          enum:
+          - BUY
+          - SELL
+          example: BUY
+        strategy:
+          description: Draft strategy label; maximum 64 bytes and defaults to custom for drafts; ignored on RFQ create
+          type: string
+          example: straddle
+    responses.APIResults:
+      type: object
+      properties:
+        results:
+          description: Array of results
+          type: array
+          items:
+            type: object
+    responses.RfqLegResult:
+      type: object
+      properties:
+        market:
+          description: Paradex market symbol
+          type: string
+          example: BTC-USD-PERP
+        price:
+          description: Hedge legs only
+          type: string
+          example: '50000'
+        ratio:
+          type: string
+          example: '1'
+        side:
+          type: string
+          enum:
+          - BUY
+          - SELL
+    requests.RfqExecuteRequest:
+      type: object
+      required:
+      - price
+      - quantity
+      - side
+      properties:
+        label:
+          description: User-defined order label
+          type: string
+          example: my-order
+        price:
+          description: Signed decimal strategy price; zero and negative values are valid
+          type: string
+          example: '0.1'
+        quantity:
+          description: Positive decimal strategy quantity
+          type: string
+          example: '0.1'
+        side:
+          description: Taker order side
+          type: string
+          enum:
+          - BUY
+          - SELL
+          example: BUY
+    responses.RfqMarketInfo:
+      type: object
+      properties:
+        symbol:
+          type: string
+          example: BTC-USD-PERP
+        venue_size_increment:
+          description: 'The venue''s own size grid, as a decimal string. RFQ quantities are
+
+            validated against THIS, not the Paradex market''s own increment, so a
+
+            client sizing off the order-book grid alone can produce a quantity the
+
+            venue rejects. Empty when the venue reports no usable grid for the
+
+            market, which the client reads as "unknown" and falls back on; the
+
+            venue itself remains the authority on whether a quantity is on-grid.'
+          type: string
+          example: '0.0001'
+    responses.RfqBboResult:
+      type: object
+      properties:
+        best_ask_price:
+          type: string
+          example: '50001'
+        best_ask_quantity:
+          type: string
+          example: '5'
+        best_bid_price:
+          type: string
+          example: '49999'
+        best_bid_quantity:
+          type: string
+          example: '10'
+        created_at:
+          description: Unix milliseconds
+          type: integer
+          example: 1640995200000
+        legs:
+          type: array
+          items:
+            $ref: '#/components/schemas/responses.RfqBboLegResult'
+        mark_price:
+          type: string
+          example: '50000'
+        max_price:
+          description: Upper bound of the acceptable price band
+          type: string
+          example: '52000'
+        min_price:
+          description: Lower bound of the acceptable price band
+          type: string
+          example: '48000'
+        rfq_id:
+          type: string
+          example: r_2abCdEfGhIjKlMnOpQrStUvWxYz
+    responses.ApiError:
+      type: object
+      properties:
+        data:
+          description: any additional data related to the error
+          type: object
+        error:
+          description: unique immutable string identifier for specific error
+          allOf:
+          - $ref: '#/components/schemas/responses.ErrorCode'
+          example: NOT_ONBOARDED
+        message:
+          description: detailed description of error and how to address it
+          type: string
+          example: User has never called /onboarding endpoint
+    responses.RfqDraftResult:
+      type: object
+      properties:
+        created_at:
+          description: Unix milliseconds
+          type: integer
+          example: 1640995200000
+        id:
+          description: Opaque application-generated RFQ draft identifier
+          type: string
+          example: '1784275070090201698744820000'
+        legs:
+          type: array
+          items:
+            $ref: '#/components/schemas/responses.RfqLegResult'
+        quantity:
+          type: string
+          example: '10'
+        strategy:
+          description: User-facing strategy label
+          type: string
+          example: straddle
+        updated_at:
+          description: Unix milliseconds
+          type: integer
+          example: 1640995200000
+    responses.RfqVenueState:
+      type: string
+      enum:
+      - AVAILABLE
+      - AVAILABLE_CANCEL_ONLY
+      - UNAVAILABLE
+      - UNKNOWN
+      x-enum-varnames:
+      - RfqVenueStateAvailable
+      - RfqVenueStateCancelOnly
+      - RfqVenueStateUnavailable
+      - RfqVenueStateUnknown
+    responses.RfqAcceptedResponse:
+      type: object
+      properties:
+        accepted_at:
+          description: Unix milliseconds when the request was queued
+          type: integer
+          example: 1640995200000
+        request_id:
+          description: 'request_id identifies this request. It is echoed on the RESULT event
+
+            delivered later on the WebSocket rfq channel, so a client with several
+
+            requests in flight can match each outcome to the request that caused
+
+            it. On Create it is the only identifier available until the venue issues
+
+            the rfq_id.'
+          type: string
+          example: '1739923200000000000'
+  securitySchemes:
+    BearerToken:
+      type: apiKey
+      name: Authorization
+      in: header
+x-refined-from:
+- paradex-openapi-prod.json
+- paradex-openapi.yml
+x-hideTryItPanel: true

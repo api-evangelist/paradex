@@ -1,0 +1,57 @@
+openapi: 3.2.0
+info:
+  title: Paradex Insurance API
+  version: 1.142.2
+  contact: {}
+  description: 'Operations tagged Insurance across 2 of this provider''s published API definitions: paradex-openapi-prod.json, paradex-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.prod.paradex.trade/v1
+tags:
+- name: Insurance
+paths:
+  /insurance:
+    get:
+      description: Get insurance fund account's information
+      tags:
+      - Insurance
+      summary: Get insurance fund account information
+      operationId: get-insurance-fund
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/responses.InsuranceAccountResp'
+    servers:
+    - url: https://api.prod.paradex.trade/v1
+components:
+  schemas:
+    responses.InsuranceAccountResp:
+      type: object
+      properties:
+        account:
+          description: Starknet address of the Insurance fund
+          type: string
+          example: '0x495d2eb5236a12b8b4ad7d3849ce6a203ce21c43f473c248dfd5ce70d9454fa'
+        account_value:
+          description: Total account value of insurance fund
+          type: string
+          example: '136285.069'
+        settlement_asset:
+          description: Settlement Asset for the account
+          type: string
+          example: USDC
+        updated_at:
+          description: Account last updated time
+          type: integer
+          example: 1681471234972
+  securitySchemes:
+    BearerToken:
+      type: apiKey
+      name: Authorization
+      in: header
+x-refined-from:
+- paradex-openapi-prod.json
+- paradex-openapi.yml
+x-hideTryItPanel: true

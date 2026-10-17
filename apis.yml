@@ -91,20 +91,41 @@ common:
 - type: StatusPage
   url: https://status.paradex.trade
 apis:
-- name: Paradex REST API
-  description: Public and private REST endpoints for markets, order books, trades,
-    orders, accounts, positions, vaults, block trades, RFQs and transfers on Paradex.
+- name: Paradex WebSocket API
+  description: >-
+    JSON-RPC over WebSocket channels for real-time market data, order book, trades, fills, orders, positions
+    and account updates.
+  humanURL: https://docs.paradex.trade/ws/general-information/introduction
+  baseURL: wss://ws.api.prod.paradex.trade/v1
+  tags:
+  - WebSockets
+  properties:
+  - type: AsyncAPI
+    url: asyncapi/paradex-websocket-asyncapi.yml
+  - type: AsyncAPI
+    name: AsyncAPI (provider-hosted)
+    url: https://docs.paradex.trade/asyncapi.json
+  aid: paradex:paradex-websocket-api
+- name: Paradex MCP Server
+  description: >-
+    Paradex-hosted public remote MCP server exposing market and vault data tools to AI clients; also distributed
+    as the mcp-paradex Python package.
+  humanURL: https://docs.paradex.trade/agentic-ai-hub/paradex-hosted-mcp/quickstart
+  baseURL: https://mcp.paradex.trade/mcp
+  tags:
+  - MCP
+  properties: []
+  aid: paradex:paradex-mcp-server
+- aid: paradex:paradex-account-api
+  name: Paradex Account API
+  description: The Account API from Paradex — 25 operation(s) for account.
   humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
   baseURL: https://api.prod.paradex.trade/v1
   tags:
-  - Trading
-  - Derivatives
+  - Account
   properties:
   - type: OpenAPI
-    url: openapi/paradex-openapi.yml
-  - type: OpenAPI
-    name: OpenAPI (provider-hosted)
-    url: https://raw.githubusercontent.com/tradeparadex/paradex-docs/main/fern/apis/prod_rest/openapi/openapi.json
+    url: openapi/paradex-account-api-openapi.yml
   - type: Documentation
     url: https://docs.paradex.trade/api/general-information/api-quick-start
   - type: JSONSchema
@@ -119,30 +140,438 @@ apis:
     url: json-schema/paradex-responses-order-resp-schema.json
   - type: JSONSchema
     url: json-schema/paradex-responses-transfer-result-schema.json
-  aid: paradex:paradex-rest-api
-- name: Paradex WebSocket API
-  description: JSON-RPC over WebSocket channels for real-time market data, order book,
-    trades, fills, orders, positions and account updates.
-  humanURL: https://docs.paradex.trade/ws/general-information/introduction
-  baseURL: wss://ws.api.prod.paradex.trade/v1
+- aid: paradex:paradex-algos-api
+  name: Paradex Algos API
+  description: The Algos API from Paradex — 3 operation(s) for algos.
+  humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
+  baseURL: https://api.prod.paradex.trade/v1
   tags:
-  - WebSockets
+  - Algos
   properties:
-  - type: AsyncAPI
-    url: asyncapi/paradex-websocket-asyncapi.yml
-  - type: AsyncAPI
-    name: AsyncAPI (provider-hosted)
-    url: https://docs.paradex.trade/asyncapi.json
-  aid: paradex:paradex-websocket-api
-- name: Paradex MCP Server
-  description: Paradex-hosted public remote MCP server exposing market and vault data
-    tools to AI clients; also distributed as the mcp-paradex Python package.
-  humanURL: https://docs.paradex.trade/agentic-ai-hub/paradex-hosted-mcp/quickstart
-  baseURL: https://mcp.paradex.trade/mcp
+  - type: OpenAPI
+    url: openapi/paradex-algos-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paradex.trade/api/general-information/api-quick-start
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-vault-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-system-config-response-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-transfer-result-schema.json
+- aid: paradex:paradex-authentication-api
+  name: Paradex Authentication API
+  description: The Authentication API from Paradex — 5 operation(s) for authentication.
+  humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
+  baseURL: https://api.prod.paradex.trade/v1
   tags:
-  - MCP
-  properties: []
-  aid: paradex:paradex-mcp-server
+  - Authentication
+  properties:
+  - type: OpenAPI
+    url: openapi/paradex-authentication-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paradex.trade/api/general-information/api-quick-start
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-vault-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-system-config-response-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-transfer-result-schema.json
+- aid: paradex:paradex-blocktrades-api
+  name: Paradex Block Trades API
+  description: The BlockTrades API from Paradex — 6 operation(s) for blocktrades.
+  humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
+  baseURL: https://api.prod.paradex.trade/v1
+  tags:
+  - BlockTrades
+  properties:
+  - type: OpenAPI
+    url: openapi/paradex-blocktrades-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paradex.trade/api/general-information/api-quick-start
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-vault-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-system-config-response-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-transfer-result-schema.json
+- aid: paradex:paradex-insurance-api
+  name: Paradex Insurance API
+  description: The Insurance API from Paradex — 1 operation(s) for insurance.
+  humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
+  baseURL: https://api.prod.paradex.trade/v1
+  tags:
+  - Insurance
+  properties:
+  - type: OpenAPI
+    url: openapi/paradex-insurance-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paradex.trade/api/general-information/api-quick-start
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-vault-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-system-config-response-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-transfer-result-schema.json
+- aid: paradex:paradex-liquidations-api
+  name: Paradex Liquidations API
+  description: The Liquidations API from Paradex — 1 operation(s) for liquidations.
+  humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
+  baseURL: https://api.prod.paradex.trade/v1
+  tags:
+  - Liquidations
+  properties:
+  - type: OpenAPI
+    url: openapi/paradex-liquidations-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paradex.trade/api/general-information/api-quick-start
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-vault-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-system-config-response-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-transfer-result-schema.json
+- aid: paradex:paradex-marketmakerprotection-api
+  name: Paradex Market Maker Protection API
+  description: The MarketMakerProtection API from Paradex — 3 operation(s) for marketmakerprotection.
+  humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
+  baseURL: https://api.prod.paradex.trade/v1
+  tags:
+  - MarketMakerProtection
+  properties:
+  - type: OpenAPI
+    url: openapi/paradex-marketmakerprotection-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paradex.trade/api/general-information/api-quick-start
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-vault-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-system-config-response-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-transfer-result-schema.json
+- aid: paradex:paradex-markets-api
+  name: Paradex Markets API
+  description: The Markets API from Paradex — 11 operation(s) for markets.
+  humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
+  baseURL: https://api.prod.paradex.trade/v1
+  tags:
+  - Markets
+  properties:
+  - type: OpenAPI
+    url: openapi/paradex-markets-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paradex.trade/api/general-information/api-quick-start
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-vault-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-system-config-response-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-transfer-result-schema.json
+- aid: paradex:paradex-orders-api
+  name: Paradex Orders API
+  description: The Orders API from Paradex — 5 operation(s) for orders.
+  humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
+  baseURL: https://api.prod.paradex.trade/v1
+  tags:
+  - Orders
+  properties:
+  - type: OpenAPI
+    url: openapi/paradex-orders-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paradex.trade/api/general-information/api-quick-start
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-vault-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-system-config-response-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-transfer-result-schema.json
+- aid: paradex:paradex-referrals-api
+  name: Paradex Referrals API
+  description: The Referrals API from Paradex — 2 operation(s) for referrals.
+  humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
+  baseURL: https://api.prod.paradex.trade/v1
+  tags:
+  - Referrals
+  properties:
+  - type: OpenAPI
+    url: openapi/paradex-referrals-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paradex.trade/api/general-information/api-quick-start
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-vault-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-system-config-response-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-transfer-result-schema.json
+- aid: paradex:paradex-rfqs-api
+  name: Paradex Rfqs API
+  description: The Rfqs API from Paradex — 9 operation(s) for rfqs.
+  humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
+  baseURL: https://api.prod.paradex.trade/v1
+  tags:
+  - Rfqs
+  properties:
+  - type: OpenAPI
+    url: openapi/paradex-rfqs-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paradex.trade/api/general-information/api-quick-start
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-vault-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-system-config-response-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-transfer-result-schema.json
+- aid: paradex:paradex-staking-api
+  name: Paradex Staking API
+  description: The Staking API from Paradex — 5 operation(s) for staking.
+  humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
+  baseURL: https://api.prod.paradex.trade/v1
+  tags:
+  - Staking
+  properties:
+  - type: OpenAPI
+    url: openapi/paradex-staking-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paradex.trade/api/general-information/api-quick-start
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-vault-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-system-config-response-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-transfer-result-schema.json
+- aid: paradex:paradex-subkey-api
+  name: Paradex Subkey API
+  description: The Subkey API from Paradex — 5 operation(s) for subkey.
+  humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
+  baseURL: https://api.prod.paradex.trade/v1
+  tags:
+  - Subkey
+  properties:
+  - type: OpenAPI
+    url: openapi/paradex-subkey-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paradex.trade/api/general-information/api-quick-start
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-vault-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-system-config-response-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-transfer-result-schema.json
+- aid: paradex:paradex-system-api
+  name: Paradex System API
+  description: The System API from Paradex — 7 operation(s) for system.
+  humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
+  baseURL: https://api.prod.paradex.trade/v1
+  tags:
+  - System
+  properties:
+  - type: OpenAPI
+    url: openapi/paradex-system-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paradex.trade/api/general-information/api-quick-start
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-vault-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-system-config-response-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-transfer-result-schema.json
+- aid: paradex:paradex-token-api
+  name: Paradex Token API
+  description: The Token API from Paradex — 4 operation(s) for token.
+  humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
+  baseURL: https://api.prod.paradex.trade/v1
+  tags:
+  - Token
+  properties:
+  - type: OpenAPI
+    url: openapi/paradex-token-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paradex.trade/api/general-information/api-quick-start
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-vault-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-system-config-response-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-transfer-result-schema.json
+- aid: paradex:paradex-trades-api
+  name: Paradex Trades API
+  description: The Trades API from Paradex — 1 operation(s) for trades.
+  humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
+  baseURL: https://api.prod.paradex.trade/v1
+  tags:
+  - Trades
+  properties:
+  - type: OpenAPI
+    url: openapi/paradex-trades-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paradex.trade/api/general-information/api-quick-start
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-vault-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-system-config-response-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-transfer-result-schema.json
+- aid: paradex:paradex-transfers-api
+  name: Paradex Transfers API
+  description: The Transfers API from Paradex — 1 operation(s) for transfers.
+  humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
+  baseURL: https://api.prod.paradex.trade/v1
+  tags:
+  - Transfers
+  properties:
+  - type: OpenAPI
+    url: openapi/paradex-transfers-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paradex.trade/api/general-information/api-quick-start
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-vault-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-system-config-response-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-transfer-result-schema.json
+- aid: paradex:paradex-vaults-api
+  name: Paradex Vaults API
+  description: The Vaults API from Paradex — 10 operation(s) for vaults.
+  humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
+  baseURL: https://api.prod.paradex.trade/v1
+  tags:
+  - Vaults
+  properties:
+  - type: OpenAPI
+    url: openapi/paradex-vaults-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paradex.trade/api/general-information/api-quick-start
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-vault-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-system-config-response-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-transfer-result-schema.json
+- aid: paradex:paradex-xptransfersv2-api
+  name: Paradex XP Transfers V2 API
+  description: The XPTransfersV2 API from Paradex — 6 operation(s) for xptransfersv2.
+  humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
+  baseURL: https://api.prod.paradex.trade/v1
+  tags:
+  - XPTransfersV2
+  properties:
+  - type: OpenAPI
+    url: openapi/paradex-xptransfersv2-api-openapi.yml
+  - type: Documentation
+    url: https://docs.paradex.trade/api/general-information/api-quick-start
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-vault-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-system-config-response-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-market-summary-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-order-resp-schema.json
+  - type: JSONSchema
+    url: json-schema/paradex-responses-transfer-result-schema.json
 x-enrichment:
   date: '2026-10-13'
   status: enriched
