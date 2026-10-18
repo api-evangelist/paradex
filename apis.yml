@@ -17,6 +17,16 @@ modified: '2026-10-13'
 tags:
 - Company
 - Cryptocurrency
+- Exchange
+- Derivatives
+- Trading
+- Perpetual Futures
+- DeFi
+- WebSocket
+- MCP
+tags_raw:
+- Company
+- Cryptocurrency
 - Exchanges
 - Derivatives
 - Trading
@@ -98,6 +108,8 @@ apis:
   humanURL: https://docs.paradex.trade/ws/general-information/introduction
   baseURL: wss://ws.api.prod.paradex.trade/v1
   tags:
+  - WebSocket
+  tags_raw:
   - WebSockets
   properties:
   - type: AsyncAPI
@@ -314,6 +326,8 @@ apis:
   humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
   baseURL: https://api.prod.paradex.trade/v1
   tags:
+  - Order
+  tags_raw:
   - Orders
   properties:
   - type: OpenAPI
@@ -362,6 +376,8 @@ apis:
   humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
   baseURL: https://api.prod.paradex.trade/v1
   tags:
+  - RFQs
+  tags_raw:
   - Rfqs
   properties:
   - type: OpenAPI
@@ -458,6 +474,8 @@ apis:
   humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
   baseURL: https://api.prod.paradex.trade/v1
   tags:
+  - Tokens
+  tags_raw:
   - Token
   properties:
   - type: OpenAPI
@@ -482,6 +500,8 @@ apis:
   humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
   baseURL: https://api.prod.paradex.trade/v1
   tags:
+  - Trade
+  tags_raw:
   - Trades
   properties:
   - type: OpenAPI
@@ -530,6 +550,8 @@ apis:
   humanURL: https://docs.paradex.trade/api/general-information/api-quick-start
   baseURL: https://api.prod.paradex.trade/v1
   tags:
+  - Vault
+  tags_raw:
   - Vaults
   properties:
   - type: OpenAPI
