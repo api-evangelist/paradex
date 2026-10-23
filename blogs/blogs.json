@@ -1,0 +1,14 @@
+{
+  "repo": "paradex",
+  "feeds": [
+    {
+      "source": "https://www.paradex.trade/blog",
+      "feed_url": "https://www.paradex.trade/blog/rss.xml",
+      "title": "",
+      "saved": 0,
+      "method": "discovered"
+    }
+  ],
+  "post_count": 0,
+  "fetched": "2026-10-17T14:53:57Z"
+}
